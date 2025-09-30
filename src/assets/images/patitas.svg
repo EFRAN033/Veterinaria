@@ -1,0 +1,33 @@
+<svg width="231" height="246" viewBox="0 0 231 246" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="195.128" y="115.303" width="69.9345" height="66.0629" transform="rotate(60 195.128 115.303)" fill="url(#pattern0_511_923)"/>
+<rect x="19.3526" y="166" width="70" height="57" transform="rotate(22 19.3526 166)" fill="url(#pattern1_511_923)"/>
+<rect x="74.3312" width="52.4956" height="49.6128" transform="rotate(18 74.3312 0)" fill="url(#pattern2_511_923)"/>
+<rect x="98.6136" y="128" width="59.3905" height="62.4834" transform="rotate(43 98.6136 128)" fill="url(#pattern3_511_923)"/>
+<rect x="29.2531" y="3.0127" width="42.5902" height="58.4791" transform="rotate(7 29.2531 3.0127)" fill="url(#pattern4_511_923)"/>
+<rect x="130.287" y="47" width="69.4589" height="64.6918" transform="rotate(42 130.287 47)" fill="url(#pattern5_511_923)"/>
+<rect x="41.618" y="55" width="70.0569" height="70.3602" transform="rotate(24 41.618 55)" fill="url(#pattern6_511_923)"/>
+<defs>
+<pattern id="pattern0_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.010496 0 0 0.0111111 0.0276801 0)"/>
+</pattern>
+<pattern id="pattern1_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.00904762 0 0 0.0111111 0.0928571 0)"/>
+</pattern>
+<pattern id="pattern2_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.0105009 0 0 0.0111111 0.0274575 0)"/>
+</pattern>
+<pattern id="pattern3_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.0111111 0 0 0.0105611 0 0.0247504)"/>
+</pattern>
+<pattern id="pattern4_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.0111111 0 0 0.00809218 0 0.135852)"/>
+</pattern>
+<pattern id="pattern5_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.0103485 0 0 0.0111111 0.0343155 0)"/>
+</pattern>
+<pattern id="pattern6_511_923" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_511_923" transform="matrix(0.0111111 0 0 0.0110632 0 0.00215479)"/>
+</pattern>
+<image id="image0_511_923" width="90" height="90" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFEklEQVR4nO2cW4hVVRjHP62H8hoVYzpdqEjKirLoAnY36EKiSQ92oezB6CWiNBMMoodAHDSrh6IgulEMZFAEltjNjOhiZnkpNcwymWbMRJ0ZU/MXi7OEiHPWXmvt61l7/WBgHmb+51vf2Xvttf7ft7ZIJBKJRCKRSCQSiUQikUgkNcD5wOvAX/pnFTATGJqB9tHAPcBnwB6gV3/WuVIngKlAP835BDgphfY4YGUL7X3AFKkDwDnAXsysBzo8tDuAnxK01RU+XkIHeAc7PnSZRoCjDFfy/3lbQgYYDxzGngcdtGc76KoYzpJQAebgxi7geAvd4/TfuvCwhArwHu7Ms9B9zEP3XQkVkh9UzdgEDDFoDgG2eOhukFCh9ZIuiYsMmpd4au6VUAH2eyZltkFzrqdmv4QKMOCZlKUGzaWemvskVPCbSxVrDJrfeWpullABlnsmZZdBc7en5nIJFWBh1vMpMOip2SWhAtzkmZSBHB6wN0qoAMMtDKVm/GrQ3O6hp4ylYRIywIseifnYoKc8Z1eel9ABJjoaS8b5FFjkqPUPcIHUAeA1x+RcZ9C63lHrZakLQKcuL9mw0eRLax/a1kP5AxgrdQKYDBy0SM5tFlozLHQOmu6MoAGmJGzLn3PQesGgo8ysW6TOABOa7BjVEnC+yR5tojNU+9KqAPtfPlB1ynxH0UYAJwPT9ZQyIoXOCK2htDql3dEV50W6Yn1Iew6f6yuxs82/8Pl6LLv12NbrsXYUHcyFQJ9hTlTb4qeAkdImACOBJQlb+r7C1uD61tyBHVtN1ZGqAFwM/GI5pu2FbN89Khr9VTZwtNE1kFXFJ8vAPsWdQeBaqRj6oenj/n1URHCu/RNH2AmcLhVBxaJj8qG3iAD/xp8VUgF0i4JqOSNrfzzLIG09ilbcnnuQyWO4K+UYeooI8ouUQf6Qe5DJV7NaF6dhVRGBdpGeKx0/81LgWWCdro7s0b8/oxpoHLWuySD+BZI3wFVFBQqcCLyZoKWKCG8AJxR4oUxKnciq3HrAacCPDpobgFOLmPpczK5UAPemDHZHgv4wYK2HrmqmOTZBuydl7HdnntCEqsbXKYIdTNBfnEJ7YY7L06/U2DNPqIWxdMAz4J0G3bEpevSObPnH5LDhOlBaURe4L4deuodIT8sjGZ5TkmKWlInnU3yxQU9VRNKyzKD/dCWXczYATzgEfVitiw1a20jPVoP+5Y5aj0uVAO7QJ2CT6E7Q8W1adHnYvmWhocYyQ6qIWscCr+ryTzO+AUYnlMey4hTD54wGVrf4PxX7K6qkJVUHOFOdpgLeB75Xrh3wSFJlArg/w0R3WazV52oXT8W4DHgUOENChsay7s8ME6167G4oe1yVgsaBzC/JHtXjMbns8VUCGvOymrvzQm1+pkmdAc4GfiZ/DpW+4Si5xN9Lcaj1+wNSJ4DLtHlfNCrZd0odoLG68Dl3kuWcPVFChkbRQL3Kp2y+zeLdTZUFuJnqMFVCheT6X5EYPZe2hmycuazYJqGC/ynXPNgvoUK2XkZa+iRUgDVUh9USKsACqsOTEirAedq+LBvlfUyQkAFeKjvLdTl0P0pXNMpinamcFhQ0aotrHc2gbuBq/UWN0l2h3Y5vSlC+9zipEzRqdkssWrRUU+IVBp1JFo2LA/o1Q8dIXaFxdc/TZtPvuvWqR79ec5pN56Y2q27VBdYerfGbLgrPqd1VHIlEIpFIJBKJRCKRSCQi+fIvxvdrMBjXL2cAAAAASUVORK5CYII="/>
+</defs>
+</svg>

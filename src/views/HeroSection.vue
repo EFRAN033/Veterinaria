@@ -48,7 +48,7 @@
 
       <path
         d="M1440,80 C1200,40 960,40 720,80 C480,120 240,120 0,80 L0,120 L1440,120 Z"
-        fill="#FFFFFF" stroke="#ADD8E6" stroke-width="4" />
+        fill="#FFFFFF" />
     </svg>
 
     <img :src="patitasImage" alt="Patas de perro" class="absolute bottom-8 left-0 w-56 z-20 opacity-70" />

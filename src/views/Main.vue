@@ -2,11 +2,13 @@
   <div class="main-container min-h-screen">
     <HeroSection />
     <Welcome /> </div>
+    <Adoption />
 </template>
 
 <script setup>
 import HeroSection from './HeroSection.vue';
-import Welcome from './Welcome.vue'; // 1. Importar el nuevo componente
+import Welcome from './Welcome.vue'; // 
+import Adoption from './Adoption.vue';
 </script>
 
 <style scoped>

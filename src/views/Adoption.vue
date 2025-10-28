@@ -52,7 +52,7 @@
             <a href="#" class="relative rounded-lg shadow-lg overflow-hidden transition-all duration-300 group">
               <img :src="pecesImage" alt="Peces en adopción" class="w-full h-64 object-cover">
               <div class="absolute inset-x-0 bottom-0 z-30 px-4">
-                <img :src="senalpecesImage" alt="Señal de peces" class="w-full h-12 object-cover rounded-t-md">
+                <img :src="senalgatoImage" alt="Señal de peces" class="w-full h-12 object-cover rounded-t-md">
               </div>
               <div class="absolute inset-x-0 bottom-0 z-40 h-12 flex items-center justify-center">
                 <span class="text-gray-900 text-2xl font-serif font-semibold">
@@ -78,7 +78,7 @@
   import senalgatoImage from '@/assets/images/senalgato.png'; 
   import senalperroImage from '@/assets/images/senalperro.png';
   import senalhamsterImage from '@/assets/images/senalhamster.png';
-  import senalpezImage from '@/assets/images/senalpez.png';
+  // CAMBIO: Se eliminó la importación de senalpez.png
  </script>
   
   <style scoped>

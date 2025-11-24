@@ -1,0 +1,9 @@
+# Archivos y carpetas comunes de Node/NPM (ahora en la raíz)
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+# Ignorar la carpeta 'backend' si no quieres subirla (opcional, dependiendo de tu backend)
+# backend/
+.vscode
+.env

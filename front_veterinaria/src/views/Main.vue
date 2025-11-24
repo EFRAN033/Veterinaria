@@ -12,7 +12,6 @@
     <Services />
     <carousel />
     <Footer />
-
   </main>
 </template>
 

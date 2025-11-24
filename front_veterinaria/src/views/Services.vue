@@ -320,14 +320,12 @@
 
       </div>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import Header from './Header.vue';
-import Footer from './Footer.vue';
 import BackButton from '@/components/BackButton.vue';
 
 const selectedService = ref('consultation');

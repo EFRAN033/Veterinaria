@@ -8,7 +8,7 @@
     <img 
       src="@/assets/images/catpatas.png" 
       alt="Volver"
-      class="w-12 h-12 object-contain transform rotate-[-112deg] scale-[1.3] group-hover:-translate-x-1 transition-transform duration-300"
+      class="w-12 h-12 object-contain transform rotate-[-112deg] group-hover:-translate-x-1 transition-transform duration-300"
     />
   </button>
 </template>

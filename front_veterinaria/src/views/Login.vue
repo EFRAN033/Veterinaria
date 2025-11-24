@@ -39,49 +39,59 @@
               <p class="text-gray-500">Accede a tu cuenta de veterinaria</p>
             </div>
 
+            <!-- Error Message -->
+            <ErrorMessage 
+              v-if="authError" 
+              :message="authError" 
+              type="error"
+              class="mb-6"
+              @dismiss="clearAuthError"
+            />
+
             <!-- Login Form -->
             <form @submit.prevent="handleLogin" class="space-y-6">
               <!-- Email Field -->
-              <div class="group relative">
-                <input 
-                  type="email" 
-                  v-model="loginForm.email" 
-                  placeholder=" " 
-                  required
-                  class="floating-input peer"
-                />
-                <label class="floating-label">Correo Electrónico</label>
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <FloatingInput
+                v-model="loginForm.email"
+                type="email"
+                label="Correo Electrónico"
+                :error="errors.email"
+                required
+                @blur="validateField('email')"
+              >
+                <template #icon>
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                   </svg>
-                </div>
-              </div>
+                </template>
+              </FloatingInput>
 
               <!-- Password Field -->
-              <div class="group relative">
-                <input 
-                  :type="showPassword ? 'text' : 'password'" 
-                  v-model="loginForm.password" 
-                  placeholder=" " 
-                  required
-                  class="floating-input peer"
-                />
-                <label class="floating-label">Contraseña</label>
-                <button 
-                  type="button"
-                  @click="showPassword = !showPassword"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1BB0B9] transition-colors"
-                >
-                  <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                  </svg>
-                </button>
-              </div>
+              <FloatingInput
+                v-model="loginForm.password"
+                :type="showPassword ? 'text' : 'password'"
+                label="Contraseña"
+                :error="errors.password"
+                required
+                @blur="validateField('password')"
+              >
+                <template #icon>
+                  <button 
+                    type="button"
+                    @click="showPassword = !showPassword"
+                    class="text-gray-400 hover:text-[#1BB0B9] transition-colors focus:outline-none"
+                    :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  >
+                    <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  </button>
+                </template>
+              </FloatingInput>
 
               <!-- Remember & Forgot -->
               <div class="flex items-center justify-between text-sm">
@@ -93,15 +103,17 @@
               </div>
 
               <!-- Submit Button -->
-              <button 
+              <BaseButton
                 type="submit"
-                class="w-full py-4 bg-gradient-to-r from-[#1BB0B9] to-[#16a0a8] text-white font-bold rounded-xl hover:shadow-lg hover:shadow-[#1BB0B9]/40 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                variant="primary"
+                size="lg"
+                :loading="loading"
+                :disabled="hasErrors"
+                full-width
+                loading-text="Iniciando sesión..."
               >
-                <span>Iniciar Sesión</span>
-                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
+                Iniciar Sesión
+              </BaseButton>
             </form>
 
             <!-- Divider -->
@@ -150,9 +162,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Footer from './Footer.vue';
 import BackButton from '@/components/BackButton.vue';
+import FloatingInput from '@/components/FloatingInput.vue';
+import BaseButton from '@/components/BaseButton.vue';
+import ErrorMessage from '@/components/ErrorMessage.vue';
+import { useFormValidation } from '@/composables/useFormValidation';
+import { useAuth } from '@/composables/useAuth';
+
+const { validateEmail, validateRequired, errors, setError, clearError } = useFormValidation();
+const { login, loading, error: authError, clearError: clearAuthError } = useAuth();
 
 const loginForm = ref({
   email: '',
@@ -162,19 +182,34 @@ const loginForm = ref({
 
 const showPassword = ref(false);
 
-const handleLogin = () => {
-  console.log('Login:', loginForm.value);
-  alert('Iniciando sesión...');
-  // Aquí irá la lógica de autenticación
+const hasErrors = computed(() => {
+  return Object.keys(errors.value).length > 0;
+});
+
+const validateField = (field) => {
+  clearError(field);
+  
+  if (field === 'email') {
+    const error = validateEmail(loginForm.value.email);
+    if (error) setError(field, error);
+  } else if (field === 'password') {
+    const error = validateRequired(loginForm.value.password, 'La contraseña');
+    if (error) setError(field, error);
+  }
+};
+
+const handleLogin = async () => {
+  // Validate all fields
+  validateField('email');
+  validateField('password');
+  
+  if (hasErrors.value) return;
+  
+  // Attempt login
+  await login(loginForm.value);
 };
 </script>
 
 <style scoped>
-.floating-input {
-  @apply block px-4 pb-2.5 pt-5 w-full text-gray-900 bg-gray-50 border-2 border-gray-100 rounded-xl appearance-none focus:outline-none focus:ring-0 focus:border-[#1BB0B9] focus:bg-white transition-all;
-}
-
-.floating-label {
-  @apply absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-[#1BB0B9] pointer-events-none font-bold;
-}
+/* Estilos específicos si son necesarios */
 </style>

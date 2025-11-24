@@ -43,6 +43,18 @@ const routes = [
     component: () => import('../views/Services.vue'),
     meta: { title: 'Servicios Veterinarios' }
   },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/Login.vue'),
+    meta: { title: 'Iniciar Sesión' }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
+    meta: { title: 'Registrarse' }
+  },
 
   // Ruta para manejar errores 404
   {

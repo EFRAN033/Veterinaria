@@ -100,15 +100,16 @@ async def domain_exception_handler(request: Request, exc: DomainException):
 
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(users.router, prefix="/api/users", tags=["Users"])
-app.include_router(services.router, prefix="/api/services", tags=["Services"])
-app.include_router(appointments.router, prefix="/api/appointments", tags=["Appointments"])
-app.include_router(products.router, prefix="/api/products", tags=["Products"])
-app.include_router(orders.router, prefix="/api/orders", tags=["Orders"])
-app.include_router(adoptions.router, prefix="/api/adoptions", tags=["Adoptions"])
-app.include_router(ai_chat.router, prefix="/api/ai", tags=["AI Chat"])
-app.include_router(service_requests.router, prefix="/api/service-requests", tags=["Service Requests"])
+# Include routers
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
+app.include_router(services.router, prefix="/api/v1/services", tags=["Services"])
+app.include_router(appointments.router, prefix="/api/v1/appointments", tags=["Appointments"])
+app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
+app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
+app.include_router(adoptions.router, prefix="/api/v1/adoptions", tags=["Adoptions"])
+app.include_router(ai_chat.router, prefix="/api/v1/ai", tags=["AI Chat"])
+app.include_router(service_requests.router, prefix="/api/v1/service-requests", tags=["Service Requests"])
 
 # Mount static files for uploads
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

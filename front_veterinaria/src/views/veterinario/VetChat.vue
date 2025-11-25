@@ -1,19 +1,157 @@
+<template>
+  <div class="h-full flex flex-col font-sans text-slate-600 bg-slate-50/50">
+    
+    <div class="mb-4 shrink-0 px-1">
+      <div class="flex items-end justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <SparklesIcon class="h-6 w-6 text-indigo-600" />
+            Asistente IA
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">Consultas clínicas y apoyo diagnóstico.</p>
+        </div>
+        
+        <div>
+          <button 
+            @click="loadClinicalCase"
+            class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wide rounded-full shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <FolderPlusIcon class="h-4 w-4" />
+            <span>Cargar Caso</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 bg-white rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.02)] border border-slate-200 overflow-hidden flex flex-col min-h-0 relative">
+      
+      <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
+
+      <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar relative z-10">
+        
+        <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full text-center opacity-60 space-y-4">
+          <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center">
+            <CpuChipIcon class="h-8 w-8 text-indigo-500" />
+          </div>
+          <div>
+            <p class="text-slate-800 font-bold">¿En qué puedo ayudarte?</p>
+            <p class="text-sm text-slate-500">Pregunta sobre síntomas, dosis o procedimientos.</p>
+          </div>
+        </div>
+
+        <div 
+          v-for="(msg, index) in messages" 
+          :key="index" 
+          class="flex w-full"
+          :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+        >
+          <div class="flex max-w-[85%] sm:max-w-[75%] gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'">
+            
+            <div class="shrink-0 h-8 w-8 rounded-full flex items-center justify-center shadow-sm border" 
+              :class="msg.role === 'user' ? 'bg-indigo-100 border-indigo-200' : 'bg-emerald-50 border-emerald-100'">
+              <UserIcon v-if="msg.role === 'user'" class="h-4 w-4 text-indigo-700" />
+              <SparklesIcon v-else class="h-4 w-4 text-emerald-600" />
+            </div>
+
+            <div 
+              class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
+              :class="[
+                msg.role === 'user' 
+                  ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none' 
+                  : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-2xl rounded-tl-none'
+              ]"
+            >
+              <p>{{ msg.content }}</p>
+              <span class="text-[9px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 w-20"
+                :class="msg.role === 'user' ? 'right-0 text-right' : 'left-0 text-left'"
+              >
+                Hace un momento
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="loading" class="flex justify-start w-full">
+          <div class="flex gap-3 max-w-[75%]">
+            <div class="shrink-0 h-8 w-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
+              <SparklesIcon class="h-4 w-4 text-emerald-600" />
+            </div>
+            <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
+              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-200"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 bg-white border-t border-slate-100 z-20">
+        <form @submit.prevent="sendMessage" class="relative flex items-end gap-2 max-w-4xl mx-auto">
+          
+          <div class="relative flex-1">
+            <input 
+              v-model="userInput" 
+              type="text" 
+              placeholder="Escribe tu consulta veterinaria..." 
+              class="w-full pl-5 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner"
+              :disabled="loading"
+            >
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+              <CpuChipIcon class="h-5 w-5" />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
+            :disabled="loading || !userInput.trim()"
+          >
+            <PaperAirplaneIcon class="h-5 w-5 transform -rotate-45 translate-x-0.5 -translate-y-0.5" />
+          </button>
+        </form>
+        
+        <p class="text-center text-[10px] text-slate-400 mt-2">
+          La IA puede cometer errores. Verifica la información clínica importante.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick } from 'vue';
 import axios from 'axios';
-import { PaperAirplaneIcon, UserIcon, CpuChipIcon } from '@heroicons/vue/24/solid';
+import { 
+  PaperAirplaneIcon, 
+  UserIcon, 
+  CpuChipIcon, 
+  SparklesIcon,
+  FolderPlusIcon 
+} from '@heroicons/vue/24/solid';
 
 const messages = ref([
-  { role: 'assistant', content: '¡Hola! Soy tu asistente veterinario IA. ¿En qué puedo ayudarte hoy con la salud de los animales?' }
+  { role: 'assistant', content: '¡Hola Dr.! Soy tu asistente veterinario. Puedo ayudarte a analizar síntomas, revisar dosis o buscar información clínica. ¿Por dónde empezamos?' }
 ]);
 const userInput = ref('');
 const loading = ref(false);
 const chatContainer = ref(null);
 
+const loadClinicalCase = () => {
+  messages.value.push({ 
+    role: 'assistant', 
+    content: '📂 Panel de carga abierto. Por favor, indica el ID del paciente o sube los archivos PDF/Imágenes para comenzar el análisis.' 
+  });
+};
+
 const scrollToBottom = async () => {
   await nextTick();
   if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    chatContainer.value.scrollTo({
+      top: chatContainer.value.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 };
 
@@ -34,7 +172,7 @@ const sendMessage = async () => {
     messages.value.push({ role: 'assistant', content: response.data.response });
   } catch (err) {
     console.error('Error in chat:', err);
-    messages.value.push({ role: 'assistant', content: 'Lo siento, tuve un problema al procesar tu consulta. Por favor intenta de nuevo.' });
+    messages.value.push({ role: 'assistant', content: 'Lo siento, tuve un problema de conexión. Por favor intenta de nuevo.' });
   } finally {
     loading.value = false;
     await scrollToBottom();
@@ -42,61 +180,21 @@ const sendMessage = async () => {
 };
 </script>
 
-<template>
-  <div class="flex flex-col h-[calc(100vh-10rem)] bg-white rounded-lg shadow-md overflow-hidden">
-    <!-- Chat Header -->
-    <div class="bg-indigo-600 p-4 text-white flex items-center">
-      <CpuChipIcon class="h-6 w-6 mr-2" />
-      <h2 class="text-lg font-medium">Asistente Veterinario IA</h2>
-    </div>
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
-    <!-- Chat Messages -->
-    <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-      <div 
-        v-for="(msg, index) in messages" 
-        :key="index" 
-        class="flex"
-        :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
-      >
-        <div 
-          class="max-w-[80%] rounded-lg px-4 py-3 shadow-sm flex items-start"
-          :class="msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'"
-        >
-          <UserIcon v-if="msg.role === 'user'" class="h-5 w-5 mr-2 mt-1 opacity-75 flex-shrink-0" />
-          <CpuChipIcon v-else class="h-5 w-5 mr-2 mt-1 text-indigo-600 flex-shrink-0" />
-          <p class="text-sm leading-relaxed">{{ msg.content }}</p>
-        </div>
-      </div>
-      
-      <div v-if="loading" class="flex justify-start">
-        <div class="bg-white border border-gray-200 rounded-lg rounded-bl-none px-4 py-3 shadow-sm">
-          <div class="flex space-x-2">
-            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Input Area -->
-    <div class="p-4 bg-white border-t border-gray-200">
-      <form @submit.prevent="sendMessage" class="flex space-x-2">
-        <input 
-          v-model="userInput" 
-          type="text" 
-          placeholder="Escribe tu consulta sobre síntomas, enfermedades, etc..." 
-          class="flex-1 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          :disabled="loading"
-        >
-        <button 
-          type="submit" 
-          class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          :disabled="loading || !userInput.trim()"
-        >
-          <PaperAirplaneIcon class="h-5 w-5 transform rotate-90" />
-        </button>
-      </form>
-    </div>
-  </div>
-</template>
+.delay-100 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 300ms; }
+</style>

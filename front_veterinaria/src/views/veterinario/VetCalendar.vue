@@ -1,101 +1,205 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+  <div class="h-screen bg-slate-50 flex flex-col p-6 font-sans text-slate-600 overflow-hidden">
     
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Agenda Veterinaria</h2>
-      <p class="text-sm text-gray-500">Gestión de turnos y disponibilidad.</p>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-12 gap-6 mb-6 shrink-0">
       
-      <div class="lg:col-span-8 xl:col-span-9">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full">
-          <div class="p-4">
-            <FullCalendar :options="calendarOptions" class="custom-calendar" />
+      <div class="col-span-12 lg:col-span-3 flex flex-col justify-center">
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+          <CalendarDaysIcon class="h-6 w-6 text-indigo-800" /> Agenda Veterinaria
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">Panel de control de turnos</p>
+      </div>
+
+      <div class="col-span-12 lg:col-span-9 grid grid-cols-3 gap-4">
+        
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Citas Hoy</p>
+            <p class="text-lg font-bold text-slate-800">{{ metrics.today }}</p>
+          </div>
+          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+            <ClockIcon class="h-5 w-5" />
+          </div>
+        </div>
+
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pendientes</p>
+            <p class="text-lg font-bold text-amber-600">{{ metrics.pending }}</p>
+          </div>
+          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+            <ExclamationCircleIcon class="h-5 w-5" />
+          </div>
+        </div>
+
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Confirmadas</p>
+            <p class="text-lg font-bold text-emerald-600">{{ metrics.confirmed }}</p>
+          </div>
+          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+            <CheckBadgeIcon class="h-5 w-5" />
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0"> 
+      
+      <div class="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <div class="flex-1 p-2">
+          <FullCalendar :options="calendarOptions" class="micro-calendar h-full" />
+        </div>
+      </div>
+
+      <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-4 h-full min-h-0">
         
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex-1 flex flex-col overflow-hidden">
-          <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-            <h3 class="font-semibold text-gray-900">
-              {{ selectedDate ? formatDateHeader(selectedDate) : 'Próximas Citas' }}
-            </h3>
-            <span class="text-xs font-medium px-2 py-1 bg-white rounded border border-gray-200 text-gray-500">
-              {{ activeAppointments.length }} eventos
-            </span>
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 shrink-0 space-y-3">
+          <div class="relative">
+            <input 
+              v-model="searchQuery" 
+              type="text" 
+              placeholder="Buscar cliente o mascota..." 
+              class="w-full pl-9 pr-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 transition-all"
+            />
+            <MagnifyingGlassIcon class="h-4 w-4 text-slate-400 absolute left-3 top-2" />
           </div>
 
-          <div class="p-4 overflow-y-auto max-h-[600px] space-y-3 custom-scrollbar">
-            <div v-if="activeAppointments.length === 0" class="text-center py-10">
-              <CalendarIcon class="h-12 w-12 text-gray-300 mx-auto mb-2" />
-              <p class="text-sm text-gray-500">No hay citas para este periodo.</p>
-            </div>
+          <div class="flex justify-between gap-1">
+            <button 
+              v-for="filter in filters" :key="filter.id"
+              @click="activeFilter = filter.id"
+              class="flex-1 py-1.5 text-[10px] font-bold rounded-md border transition-all duration-200 flex justify-center items-center gap-1"
+              :class="activeFilter === filter.id 
+                ? 'bg-indigo-800 text-white border-indigo-800' 
+                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'"
+            >
+              <component :is="filter.icon" class="h-3 w-3" />
+              {{ filter.label }}
+            </button>
+          </div>
+        </div>
 
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 overflow-hidden flex flex-col">
+          <div class="bg-slate-50 px-4 py-2 border-b border-slate-200 shrink-0 flex justify-between items-center">
+            <h3 class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">
+              {{ selectedDate ? formatDateHeader(selectedDate) : 'Agenda Global' }}
+            </h3>
+            <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+              {{ filteredList.length }}
+            </span>
+          </div>
+          
+          <div class="overflow-y-auto p-3 space-y-2 custom-scrollbar flex-1">
+            <div v-if="filteredList.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-2 opacity-60">
+              <InboxIcon class="h-8 w-8" />
+              <p class="text-xs font-medium">No se encontraron citas</p>
+            </div>
+            
             <div 
-              v-for="app in activeAppointments" 
+              v-for="app in filteredList" 
               :key="app.id" 
-              class="group relative bg-white p-3 rounded-lg border border-gray-100 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer"
+              class="group relative bg-white p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200 cursor-pointer"
               @click="openDetails(app)"
             >
-              <div class="flex items-start justify-between">
-                <div class="flex flex-col">
-                  <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">
-                    {{ app.extendedProps.time }}
-                  </span>
-                  <h4 class="text-sm font-semibold text-gray-900">{{ app.title }}</h4>
-                  <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                    <UserIcon class="h-3 w-3" /> {{ app.extendedProps.client }}
-                  </p>
+              <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg transition-colors" :class="getStatusBorder(app.extendedProps.status)"></div>
+              
+              <div class="pl-2 flex justify-between items-start">
+                <div class="overflow-hidden w-full">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-[10px] font-mono font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                      {{ app.extendedProps.time }}
+                    </span>
+                    <span class="text-[9px] font-bold uppercase px-1.5 rounded text-slate-500 bg-slate-50">
+                      {{ app.extendedProps.statusLabel }}
+                    </span>
+                  </div>
+                  
+                  <h4 class="text-xs font-bold text-slate-800 truncate">{{ app.title }}</h4>
+                  
+                  <div class="flex items-center gap-3 mt-1.5">
+                    <div class="flex items-center gap-1 text-[10px] text-slate-500 truncate max-w-[50%]">
+                      <UserIcon class="h-3 w-3 text-slate-400 shrink-0" /> 
+                      <span class="truncate">{{ app.extendedProps.client }}</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-[10px] text-slate-500 truncate max-w-[50%]">
+                      <TagIcon class="h-3 w-3 text-slate-400 shrink-0" /> 
+                      <span class="truncate">{{ app.extendedProps.pet }}</span>
+                    </div>
+                  </div>
                 </div>
-                <span class="h-2.5 w-2.5 rounded-full flex-shrink-0 mt-1" :style="{ backgroundColor: app.backgroundColor }"></span>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Referencia</h4>
-          <div class="space-y-2">
-            <div class="flex items-center text-sm text-gray-600"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Confirmada</div>
-            <div class="flex items-center text-sm text-gray-600"><span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span> Pendiente</div>
-            <div class="flex items-center text-sm text-gray-600"><span class="w-2 h-2 rounded-full bg-rose-500 mr-2"></span> Cancelada</div>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="closeModal">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
-        <div class="bg-indigo-600 px-4 py-3 flex justify-between items-center">
-          <h3 class="text-white font-semibold">Detalles de Cita #{{ selectedEvent.id }}</h3>
-          <button @click="closeModal" class="text-white/80 hover:text-white"><XMarkIcon class="h-5 w-5"/></button>
+    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm" @click.self="closeModal">
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 transform transition-all">
+        
+        <div class="bg-indigo-800 px-5 py-4 flex justify-between items-center">
+          <div>
+            <p class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Detalle de Cita</p>
+            <h3 class="text-sm font-bold text-white mt-0.5">ID #{{ selectedEvent.id }}</h3>
+          </div>
+          <button @click="closeModal" class="text-indigo-200 hover:text-white transition-colors">
+            <XMarkIcon class="h-5 w-5"/>
+          </button>
         </div>
-        <div class="p-6 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600"><ClockIcon class="h-6 w-6"/></div>
-            <div>
-              <p class="text-sm text-gray-500">Horario</p>
-              <p class="font-medium text-gray-900">{{ formatFullDate(selectedEvent.start) }}</p>
+
+        <div class="p-5 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-slate-400 uppercase">Fecha</span>
+              <p class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                <CalendarDaysIcon class="h-3 w-3 text-indigo-600" />
+                {{ formatFullDate(selectedEvent.start) }}
+              </p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-slate-400 uppercase">Hora</span>
+              <p class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                <ClockIcon class="h-3 w-3 text-indigo-600" />
+                {{ selectedEvent.time }}
+              </p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-purple-50 rounded-lg text-purple-600"><UserIcon class="h-6 w-6"/></div>
-            <div>
-              <p class="text-sm text-gray-500">Cliente / Paciente</p>
-              <p class="font-medium text-gray-900">{{ selectedEvent.client }} / {{ selectedEvent.pet }}</p>
+
+          <div class="border-t border-slate-100 pt-3 space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 p-1.5 bg-indigo-50 rounded-md text-indigo-600">
+                <UserIcon class="h-4 w-4" />
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>
+                <p class="text-xs font-medium text-slate-700">{{ selectedEvent.client }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 p-1.5 bg-purple-50 rounded-md text-purple-600">
+                <TagIcon class="h-4 w-4" />
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Mascota</p>
+                <p class="text-xs font-medium text-slate-700">{{ selectedEvent.pet }}</p>
+              </div>
             </div>
           </div>
-          <div class="mt-4 pt-4 border-t border-gray-100">
-            <p class="text-sm text-gray-500 mb-1">Notas del servicio:</p>
-            <p class="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">{{ selectedEvent.notes || 'Sin notas' }}</p>
+
+          <div v-if="selectedEvent.notes" class="bg-yellow-50 border border-yellow-100 p-3 rounded-lg">
+            <p class="text-[10px] font-bold text-yellow-700 uppercase mb-1 flex items-center gap-1">
+              <DocumentTextIcon class="h-3 w-3" /> Notas
+            </p>
+            <p class="text-xs text-slate-600 italic">"{{ selectedEvent.notes }}"</p>
           </div>
         </div>
-        <div class="px-4 py-3 bg-gray-50 text-right">
-          <button @click="closeModal" class="text-sm font-medium text-gray-600 hover:text-gray-900">Cerrar</button>
+        
+        <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-right">
+          <button @click="closeModal" class="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2 bg-white border border-slate-300 rounded-lg shadow-sm transition-colors">
+            Cerrar
+          </button>
         </div>
       </div>
     </div>
@@ -108,16 +212,15 @@ import { ref, onMounted, computed } from 'vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import esLocale from '@fullcalendar/core/locales/es';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { 
-  CalendarIcon, 
-  UserIcon, 
-  ClockIcon, 
-  XMarkIcon 
+  CalendarDaysIcon, UserIcon, ClockIcon, TagIcon, 
+  MagnifyingGlassIcon, FunnelIcon, CheckBadgeIcon, 
+  ExclamationCircleIcon, XMarkIcon, DocumentTextIcon,
+  InboxIcon
 } from '@heroicons/vue/24/outline';
 
 const userStore = useUserStore();
@@ -125,189 +228,137 @@ const isModalOpen = ref(false);
 const selectedEvent = ref({});
 const selectedDate = ref(null); 
 const allEvents = ref([]); 
+const activeFilter = ref('all'); 
+const searchQuery = ref(''); 
 
+const filters = [
+  { id: 'all', label: 'Todo', icon: FunnelIcon },
+  { id: 'confirmed', label: 'Ok', icon: CheckBadgeIcon },
+  { id: 'pending', label: 'Pend.', icon: ExclamationCircleIcon },
+  { id: 'cancelled', label: 'Canc.', icon: XMarkIcon }
+];
+
+// Configuración del Calendario Compacto
 const calendarOptions = ref({
-  plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin, listPlugin],
+  plugins: [dayGridPlugin, interactionPlugin, listPlugin],
   initialView: 'dayGridMonth',
   locale: esLocale,
-  height: 'auto',
-  contentHeight: 600,
-  headerToolbar: {
-    left: 'prev,next title',
-    center: '',
-    right: 'dayGridMonth,timeGridWeek'
-  },
-  buttonText: {
-    today: 'Hoy',
-    month: 'Mes',
-    week: 'Semana',
-  },
+  height: '100%', 
+  headerToolbar: { left: 'title', center: '', right: 'prev,next' },
+  dayMaxEvents: 1, 
+  fixedWeekCount: false, 
   events: [],
   dateClick: handleDateClick,
   eventClick: handleEventClick,
   editable: false,
-  dayMaxEvents: 2, 
-  fixedWeekCount: false,
 });
 
-const activeAppointments = computed(() => {
+// COMPUTED: Métricas
+const metrics = computed(() => {
+  const todayStr = new Date().toISOString().split('T')[0];
+  return {
+    today: allEvents.value.filter(e => e.start.startsWith(todayStr)).length,
+    pending: allEvents.value.filter(e => e.extendedProps.status === 'pending').length,
+    confirmed: allEvents.value.filter(e => e.extendedProps.status === 'confirmed').length
+  };
+});
+
+// COMPUTED: Filtrado
+const filteredList = computed(() => {
+  let list = allEvents.value;
+
   if (selectedDate.value) {
-    return allEvents.value.filter(event => {
-      return event.start.startsWith(selectedDate.value); 
-    });
+    list = list.filter(e => e.start.startsWith(selectedDate.value));
+  } else {
+    const today = new Date().toISOString().split('T')[0];
+    list = list.filter(e => e.start >= today).sort((a, b) => new Date(a.start) - new Date(b.start));
   }
-  const today = new Date().toISOString().split('T')[0];
-  return allEvents.value
-    .filter(e => e.start >= today)
-    .sort((a, b) => new Date(a.start) - new Date(b.start))
-    .slice(0, 6);
+
+  if (activeFilter.value !== 'all') {
+    list = list.filter(e => e.extendedProps.status === activeFilter.value);
+  }
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    list = list.filter(e => 
+      e.title.toLowerCase().includes(query) || 
+      e.extendedProps.client.toLowerCase().includes(query) ||
+      (e.extendedProps.pet && e.extendedProps.pet.toLowerCase().includes(query))
+    );
+  }
+
+  return list.slice(0, 20); 
 });
 
 const fetchAppointments = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/appointments/all', {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    
-    const mappedEvents = response.data.map(app => {
-      const styles = getStatusStyles(app.status);
-      return {
-        id: app.id,
-        title: app.service_id || `Cita #${app.id}`,
-        start: `${app.appointment_date}T${app.appointment_time}`,
-        backgroundColor: styles.bg,
-        borderColor: 'transparent',
-        textColor: styles.text,
-        extendedProps: {
-          status: app.status,
-          notes: app.notes,
-          client: app.user_id,
-          pet: app.pet_id,
-          time: app.appointment_time.substring(0, 5) 
-        }
-      };
-    });
-
+    const response = await axios.get('http://localhost:8000/api/appointments/all', { headers: { Authorization: `Bearer ${userStore.token}` } });
+    const mappedEvents = response.data.map(app => ({
+      id: app.id,
+      title: app.service_id || `Consulta General`,
+      start: `${app.appointment_date}T${app.appointment_time}`,
+      backgroundColor: getStatusColor(app.status),
+      borderColor: 'transparent',
+      textColor: '#475569', 
+      classNames: ['compact-event'], 
+      extendedProps: { 
+        status: app.status, 
+        statusLabel: app.status === 'confirmed' ? 'OK' : (app.status === 'pending' ? 'Pend.' : 'Canc.'),
+        notes: app.notes, 
+        client: app.user_id, 
+        pet: app.pet_id || 'Sin nombre', 
+        time: app.appointment_time.substring(0, 5) 
+      }
+    }));
     allEvents.value = mappedEvents;
     calendarOptions.value.events = mappedEvents;
-
-  } catch (err) {
-    console.error('Error fetching calendar events:', err);
-  }
+  } catch (err) { console.error(err); }
 };
 
-function getStatusStyles(status) {
-  switch(status) {
-    case 'confirmed': return { bg: '#10B981', text: '#FFFFFF' };
-    case 'pending': return { bg: '#F59E0B', text: '#FFFFFF' };
-    case 'cancelled': return { bg: '#EF4444', text: '#FFFFFF' };
-    default: return { bg: '#6B7280', text: '#FFFFFF' };
-  }
+function getStatusColor(s) { 
+  return s === 'confirmed' ? '#d1fae5' : s === 'pending' ? '#fef3c7' : '#fee2e2'; 
 }
 
-function handleDateClick(info) {
-  selectedDate.value = info.dateStr; 
+function getStatusBorder(s) {
+  return s === 'confirmed' ? 'bg-emerald-500' : s === 'pending' ? 'bg-amber-500' : 'bg-rose-500';
 }
 
+function handleDateClick(info) { selectedDate.value = info.dateStr; }
 function handleEventClick(info) {
-  openDetails({
-    id: info.event.id,
-    title: info.event.title,
-    start: info.event.startStr || info.event.start.toISOString(),
-    backgroundColor: info.event.backgroundColor,
-    extendedProps: info.event.extendedProps
-  });
-}
-
-function openDetails(eventData) {
-  selectedEvent.value = {
-    id: eventData.id,
-    title: eventData.title,
-    start: eventData.start,
-    client: eventData.extendedProps.client,
-    pet: eventData.extendedProps.pet || 'N/A',
-    notes: eventData.extendedProps.notes,
-    color: eventData.backgroundColor
+  const props = info.event.extendedProps;
+  selectedEvent.value = { 
+    id: info.event.id, 
+    title: info.event.title, 
+    start: info.event.startStr, 
+    client: props.client, 
+    pet: props.pet, 
+    notes: props.notes,
+    time: props.time,
+    statusLabel: props.statusLabel,
   };
   isModalOpen.value = true;
 }
+function closeModal() { isModalOpen.value = false; }
+function formatDateHeader(d) { return new Date(d + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }); }
+const formatFullDate = (d) => new Date(d).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-function closeModal() {
-  isModalOpen.value = false;
-}
-
-function formatDateHeader(dateStr) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-}
-
-const formatFullDate = (date) => {
-  if (!date) return '';
-  return new Date(date).toLocaleDateString('es-ES', {
-    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-  });
-};
-
-onMounted(() => {
-  fetchAppointments();
-});
+onMounted(() => { fetchAppointments(); });
 </script>
 
 <style>
-.custom-calendar {
-  font-size: 0.85rem; 
-}
-
-.fc .fc-toolbar-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.fc .fc-button {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.6rem;
-  font-weight: 500;
-}
-
-.fc-col-header-cell-cushion {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: #6b7280;
-  font-weight: 600;
-  padding-bottom: 8px !important;
-}
-
-.fc-daygrid-day-frame {
-  min-height: 80px !important;
-}
-
-.fc-daygrid-day-number {
-  font-size: 0.8rem;
-  color: #374151;
-  padding: 4px !important;
-}
-
-.fc-event {
-  border-radius: 4px;
-  padding: 1px 3px;
-  font-size: 0.7rem;
-  border: none;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1; 
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db; 
-  border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af; 
-}
+/* ESTILOS FINOS */
+.micro-calendar { font-size: 11px; --fc-border-color: #f1f5f9; --fc-today-bg-color: #f8fafc; }
+.fc .fc-toolbar-title { font-size: 0.9rem; font-weight: 800; color: #334155; text-transform: capitalize; }
+.fc .fc-button { padding: 0.15rem 0.5rem; font-size: 0.7rem; background: white; border: 1px solid #e2e8f0; color: #64748b; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-weight: 600; text-transform: capitalize; }
+.fc .fc-button:hover { background: #f1f5f9; color: #0f172a; border-color: #cbd5e1; }
+.fc .fc-button-active { background: #f8fafc !important; border-color: #94a3b8 !important; color: #0f172a !important; }
+.fc-theme-standard th { border: none !important; padding-bottom: 8px !important; }
+.fc-col-header-cell-cushion { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.fc-daygrid-day-frame { min-height: 40px !important; }
+.fc-daygrid-day-number { font-size: 0.7rem; color: #64748b; font-weight: 500; padding: 4px !important; }
+.compact-event { margin-top: 2px; border-radius: 3px; font-size: 9px; font-weight: 600; padding: 1px 2px; border: none !important; box-shadow: none; }
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 </style>

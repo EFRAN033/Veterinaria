@@ -31,7 +31,11 @@ def create_test_users():
             db.add(user)
             print("Regular user created successfully.")
         else:
-            print(f"User {user_email} already exists.")
+            print(f"User {user_email} already exists. Updating password...")
+            existing_user.password_hash = get_password_hash("usuario123")
+            existing_user.role = "user" # Ensure role is correct
+            existing_user.is_active = True # Ensure active
+            print("Regular user password updated.")
 
         # 2. Create Veterinarian User
         vet_email = "veterinario@test.com"
@@ -50,7 +54,11 @@ def create_test_users():
             db.add(vet)
             print("Veterinarian user created successfully.")
         else:
-            print(f"User {vet_email} already exists.")
+            print(f"User {vet_email} already exists. Updating password...")
+            existing_vet.password_hash = get_password_hash("veterinario123")
+            existing_vet.role = "veterinario" # Ensure role is correct
+            existing_vet.is_active = True # Ensure active
+            print("Veterinarian user password updated.")
 
         db.commit()
         print("\n✅ Test users setup complete!")

@@ -51,3 +51,12 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     Obtener información del usuario autenticado
     """
     return UserDTO.model_validate(current_user)
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout():
+    """
+    Logout de usuario (en JWT stateless no se hace nada en backend, 
+    pero el frontend espera este endpoint para limpiar estado)
+    """
+    return {"message": "Logout exitoso"}

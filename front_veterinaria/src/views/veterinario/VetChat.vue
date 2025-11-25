@@ -294,7 +294,6 @@ const selectCase = (item) => {
   prompt += `Por favor, estructura tu respuesta de la siguiente manera:\n`;
   prompt += `1. **Resumen del Caso**: Breve interpretación de los datos.\n`;
   prompt += `2. **Pre-diagnóstico Diferencial**: Lista de posibles causas ordenadas por probabilidad.\n`;
-  prompt += `3. **Análisis de Imágenes** (si aplica): Observaciones sobre las imágenes adjuntas.\n`;
   prompt += `4. **Plan Sugerido**: Pruebas diagnósticas recomendadas y tratamiento inicial.\n`;
 
   userInput.value = prompt;

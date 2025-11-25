@@ -1,8 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
+from openai import OpenAI
+from app.core.config import settings
+from app.core.vet_knowledge import SYSTEM_PROMPT, CLINICAL_EXAMPLES
 
 router = APIRouter()
+
+# Initialize OpenAI client
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 class ChatMessage(BaseModel):
     role: str  # "user" or "assistant"
@@ -14,17 +20,41 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     response: str
 
+import re
+import base64
+import os
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_vet_ai(request: ChatRequest):
-    """Mock AI Veterinary Assistant Chat"""
-    user_message = request.messages[-1].content.lower()
-    # Simple keyword-based mock responses
-    if "vomit" in user_message or "vómito" in user_message:
-        response = "El vómito en las mascotas puede deberse a muchas causas, desde una indigestión simple hasta algo más serio. Si es un episodio único y el animal está animado, puedes esperar. Si es persistente o hay sangre, acude al veterinario inmediatamente."
-    elif "comer" in user_message or "appetite" in user_message:
-        response = "La falta de apetito es un signo de alerta. Si tu mascota no ha comido en 24 horas, deberías traerla a consulta para descartar infecciones u otros problemas."
-    elif "vacuna" in user_message or "vaccine" in user_message:
-        response = "Las vacunas son esenciales. Para perros, las principales son Parvovirus, Moquillo, y Rabia. ¿Te gustaría agendar una cita para vacunación?"
-    else:
-        response = "Entiendo tu preocupación. Como asistente virtual, te recomiendo observar los síntomas. Si notas decaimiento, fiebre o dolor, lo mejor es agendar una cita con nuestros especialistas."
-    return {"response": response}
+    """AI Veterinary Assistant Chat using OpenAI with Few-Shot Learning"""
+    try:
+        # 1. Start with the System Prompt
+        messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
+        
+        # 2. Add Few-Shot Examples
+        messages_payload.extend(CLINICAL_EXAMPLES)
+        
+        # 3. Process User Messages (Text Only)
+        for msg in request.messages:
+            # We just pass the text content directly, ignoring any image markdown
+            # or stripping it if we want to be cleaner, but passing it as text is fine too
+            # as the system prompt no longer expects images.
+            # To be clean, let's strip the image markdown so the AI doesn't see weird links.
+            clean_text = re.sub(r'!\[.*?\]\((.*?)\)', '', msg.content).strip()
+            if not clean_text:
+                clean_text = msg.content # Fallback if everything was an image link
+            
+            messages_payload.append({"role": msg.role, "content": clean_text})
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini", 
+            messages=messages_payload,
+            temperature=0.3
+        )
+        
+        ai_response = response.choices[0].message.content
+        return {"response": ai_response}
+
+    except Exception as e:
+        print(f"Error in OpenAI API call: {e}")
+        raise HTTPException(status_code=500, detail="Error communicating with AI service")

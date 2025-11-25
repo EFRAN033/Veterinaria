@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # Environment
     ENVIRONMENT: str = "development"
     
+    # OpenAI
+    OPENAI_API_KEY: str = ""
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

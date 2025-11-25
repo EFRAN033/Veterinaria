@@ -102,20 +102,15 @@ Render es una excelente opción para desplegar este proyecto. Necesitarás dos s
 2.  Conecta tu repositorio de GitHub.
 3.  **Root Directory**: `back_veterinaria`
 4.  **Build Command**: `pip install -r requirements.txt`
-5.  **Start Command**: `uvicorn main:app --host 0.0.0.0 --port 10000`
+5.  **Start Command**: `alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 10000`
 6.  **Environment Variables**:
     - `PYTHON_VERSION`: `3.10.0` (o superior)
     - `DATABASE_URL`: (Pega la Internal Database URL del Paso 1)
     - `SECRET_KEY`: (Genera una segura)
     - `OPENAI_API_KEY`: (Tu llave de OpenAI)
     - `BACKEND_CORS_ORIGINS`: `["https://tu-frontend-en-render.onrender.com"]` (Añade la URL de tu frontend cuando la tengas)
-7.  **Despliegue**: Al desplegar, Render instalará dependencias y arrancará uvicorn.
-8.  **Migraciones en Producción**:
-    En la pestaña "Shell" del servicio en Render, ejecuta:
-    ```bash
-    alembic upgrade head
-    ```
-    Esto creará las tablas en la base de datos de Render.
+7.  **Despliegue**: Al desplegar, Render instalará dependencias, ejecutará las migraciones automáticamente y luego arrancará el servidor.
+    *Nota: Al usar el comando de inicio combinado, no necesitas acceso a la Shell.*
 
 ### Paso 3: Frontend (Static Site)
 1.  Crea un **New Static Site**.

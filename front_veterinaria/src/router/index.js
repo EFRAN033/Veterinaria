@@ -56,6 +56,39 @@ const routes = [
     meta: { title: 'Registrarse' }
   },
 
+  // --- RUTAS DE VETERINARIO ---
+  {
+    path: '/veterinario',
+    component: () => import('../layouts/VetLayout.vue'),
+    meta: { requiresAuth: true, title: 'Panel Veterinario' },
+    children: [
+      {
+        path: '',
+        name: 'VetDashboard',
+        component: () => import('../views/veterinario/VetDashboard.vue'),
+        meta: { title: 'Veterinario - Dashboard' }
+      },
+      {
+        path: 'calendar',
+        name: 'VetCalendar',
+        component: () => import('../views/veterinario/VetCalendar.vue'),
+        meta: { title: 'Veterinario - Calendario' }
+      },
+      {
+        path: 'history',
+        name: 'VetHistory',
+        component: () => import('../views/veterinario/VetHistory.vue'),
+        meta: { title: 'Veterinario - Historial' }
+      },
+      {
+        path: 'chat',
+        name: 'VetChat',
+        component: () => import('../views/veterinario/VetChat.vue'),
+        meta: { title: 'Veterinario - Asistente IA' }
+      }
+    ]
+  },
+
   // Ruta para manejar errores 404
   {
     path: '/:pathMatch(.*)*',
@@ -73,11 +106,27 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
+
+  // Check if route requires authentication
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    next({ path: '/' });
-  } else {
-    next();
+    next({ path: '/login' });
+    return;
   }
+
+  // Check if route requires veterinarian role
+  if (to.path.startsWith('/veterinario')) {
+    if (!userStore.isLoggedIn) {
+      next({ path: '/login' });
+      return;
+    }
+    if (userStore.userRole !== 'veterinario') {
+      // Regular users trying to access vet routes -> redirect to home
+      next({ path: '/home' });
+      return;
+    }
+  }
+
+  next();
 });
 
 router.afterEach((to) => {

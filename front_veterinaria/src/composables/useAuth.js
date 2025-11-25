@@ -68,8 +68,13 @@ export const useAuth = () => {
             // setToken en el store se encarga de decodificar el token y establecer el usuario
             userStore.setToken(response.data.access_token);
 
-            // Redirigir al home
-            await router.push('/');
+            // Redirigir según el rol del usuario
+            const userRole = userStore.userRole;
+            if (userRole === 'veterinario') {
+                await router.push('/veterinario');
+            } else {
+                await router.push('/home');
+            }
 
             return true;
         } catch (err) {

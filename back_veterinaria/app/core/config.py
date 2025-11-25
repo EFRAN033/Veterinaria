@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings
 from functools import lru_cache
 
 
+from typing import List
+
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
@@ -28,6 +30,7 @@ class Settings(BaseSettings):
     
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
+    BACKEND_CORS_ORIGINS: List[str] = []
     
     # Environment
     ENVIRONMENT: str = "development"

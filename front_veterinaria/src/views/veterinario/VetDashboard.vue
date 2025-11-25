@@ -193,6 +193,7 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+import { useToast } from '@/composables/useToast';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ServiceRequestsList from '@/components/ServiceRequestsList.vue';
@@ -309,7 +310,7 @@ const updateStatus = async (id, status) => {
   } catch (err) {
     console.error('Error updating status:', err);
     appointments.value = originalList;
-    alert('Error de conexión.');
+    addToast('Error de conexión.', 'error');
   }
 };
 

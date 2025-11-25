@@ -1,0 +1,12 @@
+SETUP_GUIDE.md
+.env
+.env.*
+.DS_Store
+node_modules/
+__pycache__/
+venv/
+.venv/
+dist/
+coverage/
+.idea/
+.vscode/

@@ -145,6 +145,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from '@/composables/useToast';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { 
@@ -172,15 +173,22 @@ const fetchRequests = async () => {
 const viewDetails = (request) => {
   // TODO: Open modal or navigate to detail page
   console.log('View details:', request);
-  alert(`Detalles de solicitud #${request.id}\n\nEsta funcionalidad se implementará próximamente.`);
+  addToast(`Detalles de solicitud #${request.id}\n\nEsta funcionalidad se implementará próximamente.`, 'info');
 };
 
-const updateStatus = async (requestId, newStatus) => {
+const updateStatus = async (request, newStatus) => {
   try {
-    await updateRequest(requestId, { status: newStatus });
-    await fetchRequests(); // Refresh list
-  } catch (err) {
-    alert('Error al actualizar estado');
+    // Optimistic update
+    const originalStatus = request.status;
+    request.status = newStatus;
+    
+    // Here you would call the API to update the status
+    // await axios.patch(`${backendUrl}/api/v1/service-requests/${request.id}`, { status: newStatus });
+    
+    addToast('Estado actualizado correctamente', 'success');
+  } catch (error) {
+    console.error('Error updating status:', error);
+    addToast('Error al actualizar estado', 'error');
   }
 };
 

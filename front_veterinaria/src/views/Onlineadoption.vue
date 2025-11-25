@@ -154,6 +154,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useToast } from '@/composables/useToast';
+
+const { addToast } = useToast();
 import Header from './Header.vue';
 import BackButton from '@/components/BackButton.vue';
 import Footer from './Footer.vue';
@@ -171,7 +174,7 @@ const handleImageUpload = (event) => {
 
 const handleSubmit = () => {
   // Simulación de envío
-  alert("¡Gracias por registrar la mascota! Nos pondremos en contacto contigo pronto para verificar los datos.");
+  addToast("¡Gracias por registrar la mascota! Nos pondremos en contacto contigo pronto para verificar los datos.", "success");
   // Aquí iría la lógica real de envío al backend
   console.log("Formulario enviado");
 };

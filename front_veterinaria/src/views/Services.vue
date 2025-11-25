@@ -390,9 +390,11 @@ import BackButton from '@/components/BackButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import ServiceSummary from '@/components/ServiceSummary.vue';
 import { useServiceRequests } from '@/composables/useServiceRequests';
+import { useToast } from '@/composables/useToast';
 
 const router = useRouter();
 const { createServiceRequest, loading, error } = useServiceRequests();
+const { addToast } = useToast();
 
 const currentStep = ref(1);
 const selectedService = ref('consultation');
@@ -489,7 +491,7 @@ const nextStep = () => {
   } else if (currentStep.value === 2) {
     // Validate step 2
     if (!dateTime.value.isUrgent && (!dateTime.value.date || !dateTime.value.timeSlot)) {
-      alert('Por favor selecciona una fecha y hora, o marca la opción de urgencia.');
+      addToast('Por favor selecciona una fecha y hora, o marca la opción de urgencia.', 'warning');
       return;
     }
     currentStep.value = 3;
@@ -534,13 +536,13 @@ const submitRequest = async () => {
     }
 
     await createServiceRequest(requestData);
-    alert('✅ Solicitud enviada exitosamente. Te contactaremos pronto.');
+    addToast('✅ Solicitud enviada exitosamente. Te contactaremos pronto.', 'success');
     
     // Reset and redirect
-    router.push('/dashboard');
+    router.push('/home');
   } catch (err) {
     console.error(err);
-    alert('❌ Error al enviar solicitud. Por favor intenta nuevamente.');
+    addToast('❌ Error al enviar solicitud. Por favor intenta nuevamente.', 'error');
   }
 };
 

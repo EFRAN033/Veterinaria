@@ -27,17 +27,14 @@ class AppointmentService:
     
     def get_history_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener historial de citas (completadas, canceladas o pasadas)"""
-        # Por ahora filtramos en memoria, idealmente esto iría al repositorio
         appointments = self.appointment_repo.get_by_user(user_id, skip=0, limit=1000)
         
-        # Filtrar citas pasadas o con estado final
         history = [
             app for app in appointments 
             if app.status in ["completed", "cancelled"] or 
             (app.appointment_date < date.today() and app.status != "cancelled")
         ]
         
-        # Aplicar paginación en memoria
         return [AppointmentDTO.model_validate(app) for app in history[skip:skip+limit]]
 
     def get_pending_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
@@ -57,7 +54,6 @@ class AppointmentService:
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
         
-        # Verificar que la cita pertenece al usuario
         if appointment.user_id != user_id:
             raise BusinessRuleException("No tienes permiso para ver esta cita")
         
@@ -72,19 +68,16 @@ class AppointmentService:
         - El horario está disponible
         - La fecha es futura
         """
-        # Validar que el servicio existe
         service = self.service_repo.get_by_id(appointment_data.service_id)
         if not service:
             raise NotFoundException("Servicio", appointment_data.service_id)
         
-        # Validar que el horario está disponible
         if not self.appointment_repo.check_availability(
             appointment_data.appointment_date,
             appointment_data.appointment_time
         ):
             raise BusinessRuleException("El horario seleccionado no está disponible")
         
-        # Crear cita
         new_appointment = Appointment(
             user_id=user_id,
             pet_id=appointment_data.pet_id,
@@ -105,21 +98,17 @@ class AppointmentService:
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
         
-        # Verificar que la cita pertenece al usuario
         if appointment.user_id != user_id:
             raise BusinessRuleException("No tienes permiso para modificar esta cita")
         
-        # Si se cambia fecha/hora, verificar disponibilidad
         if (appointment_data.appointment_date or appointment_data.appointment_time):
             new_date = appointment_data.appointment_date or appointment.appointment_date
             new_time = appointment_data.appointment_time or appointment.appointment_time
             
-            # Solo verificar si cambió la fecha o la hora
             if (new_date != appointment.appointment_date or new_time != appointment.appointment_time):
                 if not self.appointment_repo.check_availability(new_date, new_time):
                     raise BusinessRuleException("El horario seleccionado no está disponible")
         
-        # Actualizar campos
         if appointment_data.appointment_date:
             appointment.appointment_date = appointment_data.appointment_date
         if appointment_data.appointment_time:
@@ -138,7 +127,6 @@ class AppointmentService:
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
         
-        # Verificar que la cita pertenece al usuario
         if appointment.user_id != user_id:
             raise BusinessRuleException("No tienes permiso para cancelar esta cita")
         

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-// Función para decodificar el token JWT
 function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];
@@ -19,26 +18,22 @@ function parseJwt(token) {
 
 
 export const useUserStore = defineStore('user', () => {
-  // --- STATE ---
   const token = ref(localStorage.getItem('access_token') || null)
   const user = ref(JSON.parse(localStorage.getItem('user_info')) || null)
   const isLoggedIn = ref(!!token.value)
 
-  // --- GETTERS ---
   const userRole = computed(() => user.value?.role || null)
   const userName = computed(() => user.value?.name || '')
   const userShortName = computed(() => {
     if (!user.value?.name) return '';
     const parts = user.value.name.split(' ');
     if (parts.length >= 2) {
-      // Return First Name + First Surname (assuming standard format)
       return `${parts[0]} ${parts[1]}`;
     }
     return user.value.name;
   })
   const userEmail = computed(() => user.value?.email || '')
 
-  // --- ACTIONS ---
   function setUser(userData) {
     user.value = userData
     localStorage.setItem('user_info', JSON.stringify(userData))

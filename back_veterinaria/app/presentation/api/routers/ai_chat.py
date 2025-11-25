@@ -10,7 +10,6 @@ import re
 
 router = APIRouter()
 
-# Initialize OpenAI client
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 class ChatMessage(BaseModel):
@@ -29,12 +28,10 @@ class ChatResponse(BaseModel):
 async def chat_with_vet_ai(request: ChatRequest):
     """AI Veterinary Assistant Chat using OpenAI with Few-Shot Learning & DSS"""
     try:
-        # 1. Start with the System Prompt
         messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
         
         dss_output = None
         
-        # 1.5 Run DSS Analysis if vitals are provided
         if request.vitals:
             triage_result = assess_vitals(request.vitals)
             ml_result = predict_severity(request.vitals)
@@ -61,15 +58,9 @@ async def chat_with_vet_ai(request: ChatRequest):
             """
             messages_payload.append({"role": "system", "content": dss_context})
         
-        # 2. Add Few-Shot Examples
         messages_payload.extend(CLINICAL_EXAMPLES)
         
-        # 3. Process User Messages (Text Only)
         for msg in request.messages:
-            # We just pass the text content directly, ignoring any image markdown
-            # or stripping it if we want to be cleaner, but passing it as text is fine too
-            # as the system prompt no longer expects images.
-            # To be clean, let's strip the image markdown so the AI doesn't see weird links.
             clean_text = re.sub(r'!\[.*?\]\((.*?)\)', '', msg.content).strip()
             if not clean_text:
                 clean_text = msg.content # Fallback if everything was an image link

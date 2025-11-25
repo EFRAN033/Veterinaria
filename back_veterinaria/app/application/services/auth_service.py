@@ -29,15 +29,12 @@ class AuthService:
         - Email único
         - Contraseña con mínimo 6 caracteres
         """
-        # Validar que el email no exista
         if self.user_repo.exists_by_email(user_data.email):
             raise ConflictException("Este email ya está registrado", field="email")
         
-        # Validar contraseña
         if len(user_data.password) < 6:
             raise ValidationException("La contraseña debe tener al menos 6 caracteres", field="password")
         
-        # Crear usuario
         hashed_password = get_password_hash(user_data.password)
         new_user = User(
             email=user_data.email,
@@ -62,7 +59,6 @@ class AuthService:
         """
         logger.info(f"Intento de login para email: {credentials.email}")
         
-        # Buscar usuario
         user = self.user_repo.get_by_email(credentials.email)
         
         if not user:
@@ -71,19 +67,16 @@ class AuthService:
         
         logger.info(f"Usuario encontrado: {user.name} (role: {user.role}, active: {user.is_active})")
         
-        # Verificar contraseña
         if not verify_password(credentials.password, user.password_hash):
             logger.warning(f"Login fallido: Contraseña incorrecta para {credentials.email}")
             raise UnauthorizedException("Email o contraseña incorrectos")
         
         logger.info(f"Contraseña verificada correctamente para {credentials.email}")
         
-        # Verificar si el usuario está activo
         if not user.is_active:
             logger.warning(f"Login fallido: Usuario inactivo - {credentials.email}")
             raise ForbiddenException("Usuario inactivo")
         
-        # Crear token
         access_token = create_access_token(data={
             "sub": user.email,
             "name": user.name,

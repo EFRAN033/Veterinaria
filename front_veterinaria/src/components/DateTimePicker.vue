@@ -144,20 +144,17 @@ const calendarDays = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Previous month days
   const firstDayOfWeek = firstDay.getDay();
   for (let i = firstDayOfWeek; i > 0; i--) {
     const date = new Date(year, month, 1 - i);
     days.push(createDayObject(date, false, today));
   }
 
-  // Current month days
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const date = new Date(year, month, i);
     days.push(createDayObject(date, true, today));
   }
 
-  // Next month days to fill grid (42 days total for 6 rows)
   const remainingDays = 42 - days.length;
   for (let i = 1; i <= remainingDays; i++) {
     const date = new Date(year, month + 1, i);
@@ -217,9 +214,7 @@ const toggleUrgency = () => {
 };
 
 onMounted(() => {
-  // Initialize with today if no date selected
   if (!props.modelValue.date) {
-    // Optional: preselect today
   }
 });
 </script>

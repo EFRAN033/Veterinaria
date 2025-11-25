@@ -21,7 +21,6 @@ import Welcome from './Welcome.vue';
 import divisionImage from '@/assets/images/Division.png';
 import { defineAsyncComponent } from 'vue';
 
-// Async Components for performance
 const Adoption = defineAsyncComponent(() => import('./Adoption.vue'));
 const Shop = defineAsyncComponent(() => import('./Shop.vue'));
 const Services = defineAsyncComponent(() => import('./Services.vue'));

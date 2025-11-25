@@ -43,15 +43,12 @@ class ServiceService:
         - Precio mayor a 0
         - Duración mayor a 0 si se proporciona
         """
-        # Validar precio
         if service_data.price <= 0:
             raise ValidationException("El precio debe ser mayor a 0", field="price")
         
-        # Validar duración
         if service_data.duration is not None and service_data.duration <= 0:
             raise ValidationException("La duración debe ser mayor a 0", field="duration")
         
-        # Crear servicio
         new_service = Service(
             name=service_data.name,
             description=service_data.description,
@@ -69,15 +66,12 @@ class ServiceService:
         if not service:
             raise NotFoundException("Servicio", service_id)
         
-        # Validar precio si se proporciona
         if service_data.price is not None and service_data.price <= 0:
             raise ValidationException("El precio debe ser mayor a 0", field="price")
         
-        # Validar duración si se proporciona
         if service_data.duration is not None and service_data.duration <= 0:
             raise ValidationException("La duración debe ser mayor a 0", field="duration")
         
-        # Actualizar campos
         if service_data.name is not None:
             service.name = service_data.name
         if service_data.description is not None:

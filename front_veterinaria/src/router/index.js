@@ -1,17 +1,11 @@
-// src/router/index.js
 
 import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 
-// 1. Importamos los componentes (Lazy loading es recomendable)
 const Main = () => import('../views/Main.vue');
-// AGREGADO: Importar el componente de Adopción
-// Asegúrate de que la ruta '../views/Onlineadoption.vue' sea la correcta.
-// Si está en components, cambia 'views' por 'components'.
 const Onlineadoption = () => import('../views/Onlineadoption.vue');
 
 const routes = [
-  // Redirección para la ruta raíz
   {
     path: '/',
     redirect: '/home'
@@ -24,7 +18,6 @@ const routes = [
     meta: { title: 'Página Principal' },
   },
 
-  // --- NUEVA RUTA AGREGADA ---
   {
     path: '/adopcion',     // Esta es la URL que pusimos en el router-link del Header
     name: 'Adopcion',
@@ -56,7 +49,6 @@ const routes = [
     meta: { title: 'Registrarse' }
   },
 
-  // --- RUTAS DE VETERINARIO ---
   {
     path: '/veterinario',
     component: () => import('../layouts/VetLayout.vue'),
@@ -89,7 +81,6 @@ const routes = [
     ]
   },
 
-  // Ruta para manejar errores 404
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -107,20 +98,17 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
 
-  // Check if route requires authentication
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
     next({ path: '/login' });
     return;
   }
 
-  // Check if route requires veterinarian role
   if (to.path.startsWith('/veterinario')) {
     if (!userStore.isLoggedIn) {
       next({ path: '/login' });
       return;
     }
     if (userStore.userRole !== 'veterinario') {
-      // Regular users trying to access vet routes -> redirect to home
       next({ path: '/home' });
       return;
     }

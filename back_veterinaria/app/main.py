@@ -17,7 +17,6 @@ from app.core.exceptions import (
     BusinessRuleException
 )
 
-# Create FastAPI app
 app = FastAPI(
     title="Veterinaria API",
     description="API REST para sistema de gestión veterinaria con arquitectura limpia",
@@ -26,8 +25,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configure CORS
-# Configure CORS
 origins = [settings.FRONTEND_URL, "http://localhost:5173"]
 if settings.BACKEND_CORS_ORIGINS:
     origins.extend(settings.BACKEND_CORS_ORIGINS)
@@ -41,7 +38,6 @@ app.add_middleware(
 )
 
 
-# Exception handlers - Manejo centralizado de errores
 @app.exception_handler(NotFoundException)
 async def not_found_exception_handler(request: Request, exc: NotFoundException):
     return JSONResponse(
@@ -99,8 +95,6 @@ async def domain_exception_handler(request: Request, exc: DomainException):
     )
 
 
-# Include routers
-# Include routers
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(services.router, prefix="/api/v1/services", tags=["Services"])
@@ -111,7 +105,6 @@ app.include_router(adoptions.router, prefix="/api/v1/adoptions", tags=["Adoption
 app.include_router(ai_chat.router, prefix="/api/v1/ai", tags=["AI Chat"])
 app.include_router(service_requests.router, prefix="/api/v1/service-requests", tags=["Service Requests"])
 
-# Mount static files for uploads
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 

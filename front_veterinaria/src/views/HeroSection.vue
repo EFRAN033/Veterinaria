@@ -47,6 +47,5 @@
 <script setup>
 import principalImage from '@/assets/images/principal.svg';
 import patitasImage from '@/assets/images/patitas.svg';
-// Importamos el nuevo componente
 import Header from './Header.vue';
 </script>

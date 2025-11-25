@@ -102,11 +102,9 @@ import camaCestaImage from '@/assets/images/cama_cesta.svg';
 import camaCuadradaImage from '@/assets/images/cama_cuadrada.svg';
 import camaLiteraImage from '@/assets/images/cama_litera.svg';
 
-// Estado para las categorías (Interactividad)
 const activeCategory = ref('Camas');
 const categories = ['Camas', 'Alimento', 'Juguetes', 'Ropa', 'Accesorios'];
 
-// Datos de productos (DRY - Don't Repeat Yourself)
 const products = [
   { 
     name: 'Cama Circular Premium', 

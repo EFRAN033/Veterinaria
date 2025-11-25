@@ -241,7 +241,6 @@ const filters = [
   { id: 'cancelled', label: 'Canc.', icon: XMarkIcon }
 ];
 
-// Configuración del Calendario Compacto
 const calendarOptions = ref({
   plugins: [dayGridPlugin, interactionPlugin, listPlugin],
   initialView: 'dayGridMonth',
@@ -274,7 +273,6 @@ function renderEventContent(arg) {
   };
 }
 
-// COMPUTED: Métricas
 const metrics = computed(() => {
   const todayStr = new Date().toISOString().split('T')[0];
   return {
@@ -284,7 +282,6 @@ const metrics = computed(() => {
   };
 });
 
-// COMPUTED: Filtrado
 const filteredList = computed(() => {
   let list = allEvents.value;
 
@@ -318,7 +315,6 @@ const fetchAppointments = async () => {
       getAllRequests() // Fetch all requests to filter by date
     ]);
 
-    // Map Appointments
     const appointmentEvents = appointmentsRes.data.map(app => ({
       id: `app-${app.id}`,
       title: app.pet_id ? `Mascota #${app.pet_id}` : 'Consulta',
@@ -340,7 +336,6 @@ const fetchAppointments = async () => {
       }
     }));
 
-    // Map Service Requests (Only those with preferredDate)
     const requestEvents = requestsData
       .filter(req => req.service_data && req.service_data.preferredDate)
       .map(req => {

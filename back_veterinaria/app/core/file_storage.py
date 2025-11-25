@@ -8,7 +8,6 @@ from uuid import uuid4
 from typing import List, Optional
 
 
-# Base upload directory
 UPLOAD_DIR = Path("uploads/service_requests")
 
 
@@ -30,29 +29,23 @@ def save_base64_image(base64_string: str, user_id: int) -> str:
     """
     ensure_upload_dir()
     
-    # Remove data URI prefix if present (data:image/png;base64,...)
     if ',' in base64_string:
         base64_string = base64_string.split(',')[1]
     
-    # Decode base64
     try:
         image_data = base64.b64decode(base64_string)
     except Exception as e:
         raise ValueError(f"Invalid base64 image data: {e}")
     
-    # Create user directory
     user_dir = UPLOAD_DIR / str(user_id)
     user_dir.mkdir(parents=True, exist_ok=True)
     
-    # Generate unique filename
     filename = f"{uuid4()}.jpg"
     file_path = user_dir / filename
     
-    # Save image
     with open(file_path, 'wb') as f:
         f.write(image_data)
     
-    # Return relative path
     return str(file_path)
 
 

@@ -10,7 +10,6 @@ from datetime import date, time
 
 router = APIRouter()
 
-# --- Schemas for this router ---
 class AppointmentResponse(BaseModel):
     id: int
     user_id: int
@@ -28,7 +27,6 @@ class AppointmentResponse(BaseModel):
 class AppointmentStatusUpdate(BaseModel):
     status: str
 
-# --- Dependencies ---
 def get_current_vet(current_user: User = Depends(get_current_user)):
     if current_user.role != "veterinario":
         raise HTTPException(
@@ -37,7 +35,6 @@ def get_current_vet(current_user: User = Depends(get_current_user)):
         )
     return current_user
 
-# --- Endpoints ---
 
 @router.get("/pending", response_model=List[AppointmentResponse])
 async def get_pending_appointments(

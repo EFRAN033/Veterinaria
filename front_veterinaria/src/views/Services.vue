@@ -407,7 +407,6 @@ const serviceTypes = [
   { id: 'aesthetic', name: 'Estética' }
 ];
 
-// Función helper para disparar el submit desde el botón del sidebar
 const triggerSubmit = () => {
   const form = document.getElementById('mainForm');
   if (form) form.requestSubmit();
@@ -481,7 +480,6 @@ const currentServiceDetails = computed(() => {
 
 const nextStep = () => {
   if (currentStep.value === 1) {
-    // Validate step 1
     const form = document.getElementById('mainForm');
     if (form && !form.checkValidity()) {
       form.reportValidity();
@@ -489,7 +487,6 @@ const nextStep = () => {
     }
     currentStep.value = 2;
   } else if (currentStep.value === 2) {
-    // Validate step 2
     if (!dateTime.value.isUrgent && (!dateTime.value.date || !dateTime.value.timeSlot)) {
       addToast('Por favor selecciona una fecha y hora, o marca la opción de urgencia.', 'warning');
       return;
@@ -523,12 +520,10 @@ const submitRequest = async () => {
 
     let requestData = { ...commonData, service_type: selectedService.value };
 
-    // Specific data mapping if needed
     if (selectedService.value === 'consultation') {
       requestData.pet_name = consultation.value.petName;
     } else if (selectedService.value === 'general') {
       requestData.pet_name = general.value.petName;
-      // Remove old preferredDate from service_data if it exists in general form
       delete requestData.service_data.preferredDate; 
       requestData.service_data.preferredDate = dateTime.value.date; // Ensure new one is used
     } else if (selectedService.value === 'aesthetic') {
@@ -538,7 +533,6 @@ const submitRequest = async () => {
     await createServiceRequest(requestData);
     addToast('✅ Solicitud enviada exitosamente. Te contactaremos pronto.', 'success');
     
-    // Reset and redirect
     router.push('/home');
   } catch (err) {
     console.error(err);
@@ -546,12 +540,10 @@ const submitRequest = async () => {
   }
 };
 
-// Replaces individual submit functions
 const handleStep1Submit = () => {
   nextStep();
 };
 
-// Removed individual submit functions in favor of unified flow
 
 </script>
 

@@ -1,4 +1,3 @@
-# Import all models here for Alembic to detect them
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.pet import Pet
 from app.infrastructure.database.models.service import Service

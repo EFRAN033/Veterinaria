@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from app.config import settings
 
-# Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

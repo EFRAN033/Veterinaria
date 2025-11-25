@@ -216,12 +216,10 @@ const router = useRouter();
 const userStore = useUserStore();
 const { logout } = useAuth();
 
-// Check if current page is home
 const isHomePage = computed(() => {
   return route.path === '/' || route.path === '/home';
 });
 
-// Handle logout
 const handleLogout = async () => {
   await logout();
   router.push('/');

@@ -171,19 +171,15 @@ const fetchRequests = async () => {
 };
 
 const viewDetails = (request) => {
-  // TODO: Open modal or navigate to detail page
   console.log('View details:', request);
   addToast(`Detalles de solicitud #${request.id}\n\nEsta funcionalidad se implementará próximamente.`, 'info');
 };
 
 const updateStatus = async (request, newStatus) => {
   try {
-    // Optimistic update
     const originalStatus = request.status;
     request.status = newStatus;
     
-    // Here you would call the API to update the status
-    // await axios.patch(`${backendUrl}/api/v1/service-requests/${request.id}`, { status: newStatus });
     
     addToast('Estado actualizado correctamente', 'success');
   } catch (error) {

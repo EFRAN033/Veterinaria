@@ -47,15 +47,12 @@ class ProductService:
         - Precio mayor a 0
         - Stock no negativo
         """
-        # Validar precio
         if product_data.price <= 0:
             raise ValidationException("El precio debe ser mayor a 0", field="price")
         
-        # Validar stock
         if product_data.stock < 0:
             raise ValidationException("El stock no puede ser negativo", field="stock")
         
-        # Crear producto
         new_product = Product(
             name=product_data.name,
             description=product_data.description,
@@ -74,15 +71,12 @@ class ProductService:
         if not product:
             raise NotFoundException("Producto", product_id)
         
-        # Validar precio si se proporciona
         if product_data.price is not None and product_data.price <= 0:
             raise ValidationException("El precio debe ser mayor a 0", field="price")
         
-        # Validar stock si se proporciona
         if product_data.stock is not None and product_data.stock < 0:
             raise ValidationException("El stock no puede ser negativo", field="stock")
         
-        # Actualizar campos
         if product_data.name is not None:
             product.name = product_data.name
         if product_data.description is not None:

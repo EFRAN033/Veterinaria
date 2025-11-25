@@ -14,7 +14,6 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """
     Register a new user
     """
-    # Check if user already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(
@@ -22,7 +21,6 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
             detail="Este email ya está registrado"
         )
     
-    # Create new user
     hashed_password = get_password_hash(user_data.password)
     new_user = User(
         email=user_data.email,
@@ -45,7 +43,6 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Login user and return JWT token
     """
-    # Find user by email
     user = db.query(User).filter(User.email == credentials.email).first()
     
     if not user or not verify_password(credentials.password, user.password_hash):
@@ -61,7 +58,6 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             detail="Usuario inactivo"
         )
     
-    # Create access token
     access_token = create_access_token(data={
         "sub": user.email,
         "name": user.name,

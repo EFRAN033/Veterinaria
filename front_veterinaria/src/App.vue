@@ -1,5 +1,4 @@
 <script setup>
-// App.vue - Root component
 </script>
 
 <template>

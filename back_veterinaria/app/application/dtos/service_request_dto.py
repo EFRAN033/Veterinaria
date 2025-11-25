@@ -55,7 +55,6 @@ class ServiceRequestDTO(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime]
     
-    # Include user info for veterinarian view
     user_name: Optional[str] = None
     user_email: Optional[str] = None
     

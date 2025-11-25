@@ -18,6 +18,5 @@ class Appointment(Base):
     estimated_cost = Column(DECIMAL(10, 2))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationships
     user = relationship("User", back_populates="appointments")
     pet = relationship("Pet", back_populates="appointments")

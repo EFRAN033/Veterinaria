@@ -255,7 +255,6 @@ const validateField = (field) => {
   } else if (field === 'password') {
     const error = validatePassword(registerForm.value.password);
     if (error) setError(field, error);
-    // Re-validate password confirmation if it has been filled
     if (registerForm.value.passwordConfirm) {
       validateField('passwordConfirm');
     }
@@ -270,7 +269,6 @@ const validateField = (field) => {
 };
 
 const handleRegister = async () => {
-  // Validate all fields
   validateField('name');
   validateField('email');
   validateField('password');
@@ -278,7 +276,6 @@ const handleRegister = async () => {
   
   if (hasErrors.value) return;
   
-  // Attempt registration
   await register(registerForm.value);
 };
 </script>

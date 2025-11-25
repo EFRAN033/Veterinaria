@@ -144,7 +144,6 @@ const userStore = useUserStore();
 const searchTerm = ref('');
 const { getAllRequests } = useServiceRequests();
 
-// --- HELPERS DE FECHA ---
 const getDayName = (dateStr) => {
   const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('es-ES', { weekday: 'short' }).substring(0, 3);
@@ -158,7 +157,6 @@ const getMonthYear = (dateStr) => {
   return date.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
 };
 
-// --- HELPERS DE TIPO ---
 const getTypeClass = (type) => {
   if (type === 'appointment') return 'bg-blue-50 text-blue-700 border border-blue-200';
   if (type === 'service_request') return 'bg-purple-50 text-purple-700 border border-purple-200';
@@ -171,7 +169,6 @@ const getTypeLabel = (type) => {
   return type;
 };
 
-// --- HELPERS DE ESTILO ---
 const getStatusBorder = (status) => {
   if (status === 'completed') return 'bg-blue-500';
   if (status === 'cancelled') return 'bg-rose-500';
@@ -203,17 +200,14 @@ const getStatusLabel = (status) => {
   return status;
 };
 
-// --- LÓGICA ---
 const fetchHistory = async () => {
   loading.value = true;
   try {
-    // Fetch completed/cancelled appointments
     const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/appointments/history`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = appointmentsResponse.data;
     
-    // Fetch reviewed service requests
     const reviewedRequests = await getAllRequests({ status: 'reviewed' });
     serviceRequests.value = reviewedRequests;
   } catch (err) {
@@ -223,7 +217,6 @@ const fetchHistory = async () => {
   }
 };
 
-// Combine and normalize appointments and service requests
 const allRecords = computed(() => {
   const appointmentRecords = appointments.value.map(app => ({
     id: app.id,

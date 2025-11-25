@@ -108,7 +108,6 @@ const handleClick = (event) => {
 const buttonClasses = computed(() => {
   const classes = [];
 
-  // Size classes
   const sizeClasses = {
     sm: 'py-2 px-4 text-sm',
     md: 'py-3 px-6 text-base',
@@ -116,7 +115,6 @@ const buttonClasses = computed(() => {
   };
   classes.push(sizeClasses[props.size]);
 
-  // Variant classes
   const variantClasses = {
     primary: 'bg-gradient-to-r from-[#1BB0B9] to-[#16a0a8] text-white hover:shadow-lg hover:shadow-[#1BB0B9]/40',
     secondary: 'bg-gradient-to-r from-[#BEDC74] to-[#a8c965] text-white hover:shadow-lg hover:shadow-[#BEDC74]/30',
@@ -126,12 +124,10 @@ const buttonClasses = computed(() => {
   };
   classes.push(variantClasses[props.variant]);
 
-  // Width class
   if (props.fullWidth) {
     classes.push('w-full');
   }
 
-  // Disabled/Loading state
   if (props.disabled || props.loading) {
     classes.push('opacity-50 cursor-not-allowed');
   }

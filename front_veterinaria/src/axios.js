@@ -1,4 +1,3 @@
-// src/axios.js
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 
@@ -32,7 +31,6 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       const userStore = useUserStore();
       userStore.clearUser();
-      // Redirect to login if needed
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }

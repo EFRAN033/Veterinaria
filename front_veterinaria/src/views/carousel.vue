@@ -44,7 +44,6 @@
 <script setup>
 import { ref } from 'vue';
 
-// Datos de Marcas
 const carouselItems = ref([
   { id: 1, text: 'Royal Canin' },
   { id: 2, text: 'Purina' },
@@ -58,7 +57,6 @@ const carouselItems = ref([
   { id: 10, text: 'Ricocan' },
 ]);
 
-// ¡Ya no necesitamos lógica JS compleja! Todo lo hace el CSS.
 </script>
 
 <style scoped>

@@ -63,12 +63,8 @@ export const useAuth = () => {
                 password: credentials.password,
             });
 
-            // Guardar usuario y token en el store
-            // El backend devuelve { access_token: "...", token_type: "bearer" }
-            // setToken en el store se encarga de decodificar el token y establecer el usuario
             userStore.setToken(response.data.access_token);
 
-            // Redirigir según el rol del usuario
             const userRole = userStore.userRole;
             if (userRole === 'veterinario') {
                 await router.push('/veterinario');
@@ -101,12 +97,7 @@ export const useAuth = () => {
                 password: userData.password,
             });
 
-            // Guardar usuario y token en el store
-            // El registro fue exitoso, pero el backend no devuelve token automáticamente.
-            // Redirigimos al login para que el usuario inicie sesión.
-            // userStore.setUser(response.data); // Podríamos mostrar el nombre, pero mejor flujo limpio.
 
-            // Redirigir al login
             await router.push('/login');
 
             return true;
@@ -125,17 +116,14 @@ export const useAuth = () => {
         try {
             loading.value = true;
 
-            // Intentar cerrar sesión en el backend
             try {
                 await apiClient.post('/auth/logout');
             } catch (err) {
                 console.warn('Error al cerrar sesión en el servidor:', err);
             }
 
-            // Limpiar store local
             userStore.clearUser();
 
-            // Redirigir al home
             await router.push('/');
 
         } catch (err) {

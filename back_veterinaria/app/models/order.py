@@ -15,7 +15,6 @@ class Order(Base):
     payment_method = Column(String(50))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationships
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
@@ -29,5 +28,4 @@ class OrderItem(Base):
     quantity = Column(Integer, nullable=False)
     price = Column(DECIMAL(10, 2), nullable=False)
     
-    # Relationships
     order = relationship("Order", back_populates="items")

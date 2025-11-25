@@ -18,7 +18,6 @@ class ServiceRequestRepositoryImpl(ServiceRequestRepository):
         self.db.add(service_request)
         self.db.commit()
         self.db.refresh(service_request)
-        # Load user relationship using a fresh query
         return self.get_by_id(service_request.id)
     
     def get_by_id(self, request_id: int) -> Optional[ServiceRequest]:

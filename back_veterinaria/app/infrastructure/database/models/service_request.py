@@ -35,28 +35,18 @@ class ServiceRequest(Base):
     service_type = Column(String(20), nullable=False)  # Store enum value as string
     status = Column(String(20), default="pending")  # Store enum value as string
     
-    # Common fields
     pet_name = Column(String(100))
     estimated_cost = Column(DECIMAL(10, 2))
     
-    # Service-specific data stored as JSON
-    # For consultation: {species, symptoms, duration, urgency}
-    # For general: {serviceType, preferredDate, notes}
-    # For clinical: {description, history, isFollowUp, previousCase}
-    # For aesthetic: {breed, species, services: [{type, instructions}]}
     service_data = Column(JSON)
     
-    # Images stored as JSON array of file paths
     images = Column(JSON)  # ["uploads/service_requests/1/image1.jpg", ...]
     
-    # Veterinarian assignment
     assigned_vet_id = Column(Integer, ForeignKey("users.id"))
     vet_notes = Column(Text)
     
-    # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relationships
     user = relationship("User", foreign_keys=[user_id], back_populates="service_requests")
     assigned_vet = relationship("User", foreign_keys=[assigned_vet_id])

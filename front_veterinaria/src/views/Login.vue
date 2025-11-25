@@ -199,13 +199,11 @@ const validateField = (field) => {
 };
 
 const handleLogin = async () => {
-  // Validate all fields
   validateField('email');
   validateField('password');
   
   if (hasErrors.value) return;
   
-  // Attempt login
   await login(loginForm.value);
 };
 </script>

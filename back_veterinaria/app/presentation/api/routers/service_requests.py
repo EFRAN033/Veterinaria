@@ -64,7 +64,6 @@ async def get_all_service_requests(
     
     Supports filtering by status, service type, and assigned veterinarian
     """
-    # Only veterinarians can view all requests
     if current_user.role != "veterinario":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -110,7 +109,6 @@ async def get_service_request(
         service = ServiceRequestService(db)
         service_request = service.get_service_request(request_id)
         
-        # Check permissions
         if current_user.role != "veterinario" and service_request.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

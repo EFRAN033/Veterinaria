@@ -313,7 +313,6 @@ import {
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import { useUserStore } from '@/stores/user';
 
-// Importamos el nuevo componente
 import ChatAvatar from '@/components/ChatAvatar.vue';
 
 const messages = ref([
@@ -329,7 +328,6 @@ const { getAllRequests } = useServiceRequests();
 const userStore = useUserStore();
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-// DSS State
 const vitals = ref({
   heart_rate: '',
   temperature: '',
@@ -369,7 +367,6 @@ const closeCaseModal = () => {
 
 const filteredCases = ref([]);
 
-// Watchers para filtrar (usando ref simple por simplicidad en setup script)
 import { watch } from 'vue';
 
 const computedFilteredCases = computed(() => {
@@ -402,7 +399,6 @@ const selectCase = (item) => {
     prompt += `### Evidencia Visual\n`;
     prompt += `Se adjuntan las siguientes imágenes para tu análisis:\n`;
     item.images.forEach(img => {
-      // Usamos la URL completa para que la IA (si tiene visión) pueda acceder, o para mostrarla en el chat
       prompt += `![Imagen del Caso](${import.meta.env.VITE_BACKEND_URL}/${img})\n`;
     });
     prompt += `\n`;
@@ -416,28 +412,22 @@ const selectCase = (item) => {
 
   userInput.value = prompt;
   closeCaseModal();
-  // sendMessage(); // Auto-enviar removed to allow vitals input first
 };
 
 const formatMessage = (content) => {
   if (!content) return '';
   
-  // 1. Render Images: ![alt](url)
   let formatted = content.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
     return `<div class="my-2"><img src="${url}" alt="${alt}" class="rounded-lg max-w-full sm:max-w-xs h-auto shadow-sm border border-slate-200 object-cover" /></div>`;
   });
 
-  // 2. Render Headers: ### Header -> <strong>Header</strong>
   formatted = formatted.replace(/^###\s+(.*)$/gm, '<div class="font-bold text-slate-800 mt-3 mb-1 text-sm uppercase tracking-wide">$1</div>');
   formatted = formatted.replace(/^##\s+(.*)$/gm, '<div class="font-bold text-slate-800 mt-2 mb-1">$1</div>');
 
-  // 3. Render Bold: **text**
   formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  // 4. Render Lists: - item
   formatted = formatted.replace(/^\s*-\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>');
 
-  // 5. Render Newlines (handling lists correctly)
   formatted = formatted.replace(/\n/g, '<br>');
 
   return formatted;
@@ -459,7 +449,6 @@ const isVitalsInputVisible = computed(() => {
 
 const clearDssResult = () => {
   dssResult.value = null;
-  // Optionally clear vitals too
   vitals.value = {
     heart_rate: '',
     temperature: '',
@@ -480,7 +469,6 @@ const sendMessage = async () => {
   await scrollToBottom();
 
   try {
-    // Prepare payload with vitals if any field is filled
     const hasVitals = Object.values(vitals.value).some(v => v !== '');
     const payload = {
       messages: messages.value,
@@ -491,7 +479,6 @@ const sendMessage = async () => {
     
     messages.value.push({ role: 'assistant', content: response.data.response });
     
-    // Update DSS Dashboard if data returned
     if (response.data.dss_data) {
       dssResult.value = response.data.dss_data;
     }

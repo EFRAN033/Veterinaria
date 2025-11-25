@@ -297,34 +297,28 @@ const clearFilters = () => {
 const filteredProducts = computed(() => {
   let result = products;
 
-  // Search filter
   if (searchQuery.value) {
     result = result.filter(p => 
       p.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
   }
 
-  // Category filter
   if (filters.value.category.length > 0) {
     result = result.filter(p => filters.value.category.includes(p.category));
   }
 
-  // Color filter
   if (filters.value.colors.length > 0) {
     result = result.filter(p => filters.value.colors.includes(p.color));
   }
 
-  // Size filter
   if (filters.value.sizes.length > 0) {
     result = result.filter(p => filters.value.sizes.includes(p.size));
   }
 
-  // Brand filter
   if (filters.value.brands.length > 0) {
     result = result.filter(p => filters.value.brands.includes(p.brand));
   }
 
-  // Price filter
   if (filters.value.price.length > 0) {
     result = result.filter(p => {
       return filters.value.price.some(range => {
@@ -341,7 +335,6 @@ const filteredProducts = computed(() => {
 
 const addToCart = (product) => {
   cartCount.value++;
-  // Here you would typically add the product to a cart store/state
   console.log('Added to cart:', product.name);
 };
 </script>

@@ -22,7 +22,6 @@ async def chat_with_vet_ai(request: ChatRequest):
     """
     user_message = request.messages[-1].content.lower()
     
-    # Simple keyword-based mock responses
     if "vomit" in user_message or "vómito" in user_message:
         response = "El vómito en las mascotas puede deberse a muchas causas, desde una indigestión simple hasta algo más serio. Si es un episodio único y el animal está animado, puedes esperar. Si es persistente o hay sangre, acude al veterinario inmediatamente."
     elif "comer" in user_message or "appetite" in user_message:

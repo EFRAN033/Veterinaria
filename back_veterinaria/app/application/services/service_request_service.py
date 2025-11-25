@@ -40,10 +40,8 @@ class ServiceRequestService:
         """
         logger.info(f"Creating service request for user {user_id}, type: {request_data.service_type}")
         
-        # Validate service data based on type
         self._validate_service_data(request_data.service_type, request_data.service_data)
         
-        # Save images if provided
         image_paths = []
         if request_data.images:
             try:
@@ -53,7 +51,6 @@ class ServiceRequestService:
                 logger.error(f"Error saving images: {e}")
                 raise ValidationException(f"Error al guardar imágenes: {str(e)}")
         
-        # Create service request
         service_request = ServiceRequest(
             user_id=user_id,
             service_type=request_data.service_type.value,  # Use string value directly
@@ -123,7 +120,6 @@ class ServiceRequestService:
         Returns:
             Updated service request
         """
-        # Only veterinarians can update requests
         if user_role != "veterinario":
             raise ForbiddenException("Only veterinarians can update service requests")
         
@@ -131,7 +127,6 @@ class ServiceRequestService:
         if not service_request:
             raise NotFoundException(f"Service request {request_id} not found")
         
-        # Update fields
         if update_data.status:
             service_request.status = update_data.status.value  # Use string value directly
         
@@ -178,7 +173,6 @@ class ServiceRequestService:
             "updated_at": service_request.updated_at
         }
         
-        # Add user info if available
         if service_request.user:
             dto_data["user_name"] = service_request.user.name
             dto_data["user_email"] = service_request.user.email

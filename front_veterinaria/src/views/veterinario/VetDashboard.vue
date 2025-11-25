@@ -219,7 +219,6 @@ const activeTab = ref('Todos');
 const userStore = useUserStore();
 const { getAllRequests } = useServiceRequests();
 
-// Helpers para fechas
 const getDayName = (dateStr) => {
   const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('es-ES', { weekday: 'short' }).substring(0, 3);
@@ -230,7 +229,6 @@ const getDayNumber = (dateStr) => {
   return date.getDate();
 };
 
-// Lógica de Filtrado
 const filteredAppointments = computed(() => {
   let list = appointments.value;
 
@@ -254,19 +252,15 @@ const filteredAppointments = computed(() => {
   return list;
 });
 
-// Contador total de items por revisar (citas + solicitudes pendientes)
 const totalPendingCount = computed(() => {
   return appointments.value.length + serviceRequests.value.length;
 });
 
-// Contador total de items urgentes/prioridad alta
 const totalUrgentCount = computed(() => {
-  // Citas urgentes (basado en notas)
   const urgentAppointments = appointments.value.filter(app => 
     app.notes && (app.notes.toLowerCase().includes('urgente') || app.notes.toLowerCase().includes('dolor'))
   ).length;
   
-  // Solicitudes de servicio con urgencia alta
   const urgentRequests = serviceRequests.value.filter(req => 
     (req.service_data && req.service_data.urgency === 'alta') ||
     (req.service_data && req.service_data.isUrgent === true)
@@ -279,13 +273,11 @@ const fetchPendingAppointments = async () => {
   loading.value = true;
   error.value = null;
   try {
-    // Fetch appointments
     const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/appointments/pending`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = appointmentsResponse.data;
     
-    // Fetch pending service requests
     const requestsData = await getAllRequests({ status: 'pending' });
     serviceRequests.value = requestsData;
   } catch (err) {

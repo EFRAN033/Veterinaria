@@ -17,7 +17,6 @@ async def get_current_user(
     """
     token = credentials.credentials
     
-    # Decode token
     payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(
@@ -34,7 +33,6 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Get user from database
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise HTTPException(

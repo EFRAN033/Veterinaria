@@ -9,5 +9,4 @@
 </template>
 
 <script setup>
-// No se requiere lógica compleja aquí
 </script>

@@ -17,14 +17,12 @@ def assess_vitals(data: Dict[str, Any]) -> Dict[str, Any]:
     alerts: List[str] = []
     score = 0
     
-    # Extract Vitals (with defaults if missing to avoid crashes, but 0 indicates missing)
     hr = int(data.get('heart_rate', 0))
     sbp = int(data.get('systolic_bp', 0))
     temp = float(data.get('temperature', 0.0))
     rr = int(data.get('respiratory_rate', 0))
     crt = float(data.get('capillary_refill', 0.0))
     
-    # 1. Shock Index Analysis
     si = 0.0
     if hr > 0 and sbp > 0:
         si = calculate_shock_index(hr, sbp)
@@ -35,7 +33,6 @@ def assess_vitals(data: Dict[str, Any]) -> Dict[str, Any]:
             alerts.append(f"🟡 WARNING: Shock Index {si} (0.9-1.0). Monitor closely.")
             score += 1
             
-    # 2. Temperature Analysis
     if temp > 0:
         if temp > 39.5:
             alerts.append(f"🔴 CRITICAL: Hyperthermia ({temp}°C).")
@@ -47,7 +44,6 @@ def assess_vitals(data: Dict[str, Any]) -> Dict[str, Any]:
             alerts.append(f"🔴 CRITICAL: Hypothermia ({temp}°C).")
             score += 2
             
-    # 3. Respiratory Rate
     if rr > 0:
         if rr > 60:
             alerts.append(f"🔴 CRITICAL: Severe Tachypnea ({rr} bpm).")
@@ -56,7 +52,6 @@ def assess_vitals(data: Dict[str, Any]) -> Dict[str, Any]:
             alerts.append(f"🟡 WARNING: Tachypnea ({rr} bpm).")
             score += 1
             
-    # 4. Perfusion (CRT)
     if crt > 0:
         if crt >= 3.0:
             alerts.append(f"🔴 CRITICAL: CRT {crt}s (Poor Perfusion).")
@@ -65,7 +60,6 @@ def assess_vitals(data: Dict[str, Any]) -> Dict[str, Any]:
             alerts.append(f"🟡 WARNING: CRT {crt}s (Delayed).")
             score += 1
 
-    # Determine Triage Level
     triage_level = "GREEN"
     if score >= 4:
         triage_level = "RED (Immediate Resuscitation)"

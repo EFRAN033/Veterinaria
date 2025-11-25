@@ -25,6 +25,32 @@ class AppointmentService:
         appointments = self.appointment_repo.get_by_user(user_id, skip=skip, limit=limit)
         return [AppointmentDTO.model_validate(appointment) for appointment in appointments]
     
+    def get_history_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
+        """Obtener historial de citas (completadas, canceladas o pasadas)"""
+        # Por ahora filtramos en memoria, idealmente esto iría al repositorio
+        appointments = self.appointment_repo.get_by_user(user_id, skip=0, limit=1000)
+        
+        # Filtrar citas pasadas o con estado final
+        history = [
+            app for app in appointments 
+            if app.status in ["completed", "cancelled"] or 
+            (app.appointment_date < date.today() and app.status != "cancelled")
+        ]
+        
+        # Aplicar paginación en memoria
+        return [AppointmentDTO.model_validate(app) for app in history[skip:skip+limit]]
+
+    def get_pending_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
+        """Obtener citas pendientes (futuras y no canceladas)"""
+        appointments = self.appointment_repo.get_by_user(user_id, skip=0, limit=1000)
+        
+        pending = [
+            app for app in appointments 
+            if app.status in ["pending", "confirmed"] and app.appointment_date >= date.today()
+        ]
+        
+        return [AppointmentDTO.model_validate(app) for app in pending[skip:skip+limit]]
+    
     def get_by_id(self, appointment_id: int, user_id: int) -> AppointmentDTO:
         """Obtener cita por ID verificando que pertenece al usuario"""
         appointment = self.appointment_repo.get_by_id(appointment_id)

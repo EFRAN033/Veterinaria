@@ -14,6 +14,48 @@ from app.core.exceptions import NotFoundException, ValidationException, Business
 router = APIRouter()
 
 
+@router.get("/all", response_model=List[AppointmentDTO])
+async def get_all_appointments(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Obtener todas las citas del usuario autenticado
+    """
+    appointment_service = AppointmentService(db)
+    return appointment_service.get_by_user(current_user.id, skip=skip, limit=limit)
+
+
+@router.get("/history", response_model=List[AppointmentDTO])
+async def get_appointment_history(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Obtener historial de citas (completadas, canceladas o pasadas)
+    """
+    appointment_service = AppointmentService(db)
+    return appointment_service.get_history_by_user(current_user.id, skip=skip, limit=limit)
+
+
+@router.get("/pending", response_model=List[AppointmentDTO])
+async def get_pending_appointments(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Obtener citas pendientes (futuras y no canceladas)
+    """
+    appointment_service = AppointmentService(db)
+    return appointment_service.get_pending_by_user(current_user.id, skip=skip, limit=limit)
+
+
 @router.get("/", response_model=List[AppointmentDTO])
 async def get_appointments(
     skip: int = 0,

@@ -20,9 +20,9 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4">
-          <button class="bg-[#02939E] text-white px-8 py-4 rounded-lg text-lg font-bold shadow-lg hover:bg-[#027a83] transition-transform hover:-translate-y-1">
+          <router-link to="/servicios" class="bg-[#02939E] text-white px-8 py-4 rounded-lg text-lg font-bold shadow-lg hover:bg-[#027a83] transition-transform hover:-translate-y-1 inline-block text-center">
             Agendar Cita
-          </button>
+          </router-link>
           <button class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-white hover:text-black transition-colors">
             Conócenos
           </button>

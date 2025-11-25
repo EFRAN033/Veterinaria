@@ -118,7 +118,7 @@
           <img 
             v-for="(img, idx) in request.images.slice(0, 4)" 
             :key="idx"
-            :src="`http://localhost:8000/${img}`" 
+            :src="`${backendUrl}/${img}`" 
             class="w-16 h-16 object-cover rounded-lg border border-slate-200"
             @error="handleImageError"
           />
@@ -144,6 +144,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { 
@@ -155,6 +156,8 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const { getAllRequests, updateRequest, loading, error } = useServiceRequests();
+const router = useRouter(); // Added router
+const backendUrl = import.meta.env.VITE_BACKEND_URL; // Added backendUrl
 const requests = ref([]);
 
 const fetchRequests = async () => {

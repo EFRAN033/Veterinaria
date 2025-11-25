@@ -208,7 +208,7 @@ const fetchHistory = async () => {
   loading.value = true;
   try {
     // Fetch completed/cancelled appointments
-    const appointmentsResponse = await axios.get('http://localhost:8000/api/appointments/history', {
+    const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/appointments/history`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = appointmentsResponse.data;

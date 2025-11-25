@@ -170,6 +170,9 @@ const handleImageUpload = (event) => {
 };
 
 const handleSubmit = () => {
+  // Simulación de envío
+  alert("¡Gracias por registrar la mascota! Nos pondremos en contacto contigo pronto para verificar los datos.");
+  // Aquí iría la lógica real de envío al backend
   console.log("Formulario enviado");
 };
 </script>

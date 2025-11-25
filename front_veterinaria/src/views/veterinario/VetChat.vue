@@ -24,93 +24,193 @@
       </div>
     </div>
 
-    <div class="flex-1 bg-white rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.02)] border border-slate-200 overflow-hidden flex flex-col min-h-0 relative">
+    <div class="flex-1 flex gap-4 overflow-hidden min-h-0">
       
-      <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
+      <!-- Chat Area -->
+      <div class="flex-1 bg-white rounded-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.02)] border border-slate-200 overflow-hidden flex flex-col relative">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
 
-      <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar relative z-10">
-        
-        <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full text-center opacity-60 space-y-4">
-          <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center">
-            <CpuChipIcon class="h-8 w-8 text-indigo-500" />
+        <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar relative z-10">
+          
+          <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full text-center opacity-60 space-y-4">
+            <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center">
+              <CpuChipIcon class="h-8 w-8 text-indigo-500" />
+            </div>
+            <div>
+              <p class="text-slate-800 font-bold">¿En qué puedo ayudarte?</p>
+              <p class="text-sm text-slate-500">Pregunta sobre síntomas, dosis o procedimientos.</p>
+            </div>
           </div>
-          <div>
-            <p class="text-slate-800 font-bold">¿En qué puedo ayudarte?</p>
-            <p class="text-sm text-slate-500">Pregunta sobre síntomas, dosis o procedimientos.</p>
-          </div>
-        </div>
 
-        <div 
-          v-for="(msg, index) in messages" 
-          :key="index" 
-          class="flex w-full"
-          :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
-        >
-          <div class="flex max-w-[85%] sm:max-w-[75%] gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'">
-            
-            <ChatAvatar :role="msg.role" />
+          <div 
+            v-for="(msg, index) in messages" 
+            :key="index" 
+            class="flex w-full"
+            :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+          >
+            <div class="flex max-w-[85%] sm:max-w-[75%] gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'">
+              
+              <ChatAvatar :role="msg.role" />
 
-            <div 
-              class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
-              :class="[
-                msg.role === 'user' 
-                  ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none' 
-                  : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-2xl rounded-tl-none'
-              ]"
-            >
-              <div v-html="formatMessage(msg.content)" class="prose prose-sm max-w-none prose-indigo"></div>
-              <span class="text-[9px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 w-20"
-                :class="msg.role === 'user' ? 'right-0 text-right' : 'left-0 text-left'"
+              <div 
+                class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
+                :class="[
+                  msg.role === 'user' 
+                    ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none' 
+                    : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-2xl rounded-tl-none'
+                ]"
               >
-                Hace un momento
-              </span>
+                <div v-html="formatMessage(msg.content)" class="prose prose-sm max-w-none prose-indigo"></div>
+                <span class="text-[9px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 w-20"
+                  :class="msg.role === 'user' ? 'right-0 text-right' : 'left-0 text-left'"
+                >
+                  Hace un momento
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div v-if="loading" class="flex justify-start w-full">
-          <div class="flex gap-3 max-w-[75%]">
-            
-            <ChatAvatar role="assistant" />
-
-            <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
-              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
-              <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-200"></span>
+          <div v-if="loading" class="flex justify-start w-full">
+            <div class="flex gap-3 max-w-[75%]">
+              <ChatAvatar role="assistant" />
+              <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
+                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-200"></span>
+              </div>
             </div>
           </div>
+
         </div>
 
+        <div class="p-4 bg-white border-t border-slate-100 z-20">
+          <form @submit.prevent="sendMessage" class="relative flex items-end gap-2 max-w-4xl mx-auto">
+            <div class="relative flex-1">
+              <input 
+                v-model="userInput" 
+                type="text" 
+                placeholder="Escribe tu consulta veterinaria..." 
+                class="w-full pl-5 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner"
+                :disabled="loading"
+              >
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+                <CpuChipIcon class="h-5 w-5" />
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
+              :disabled="loading || (!userInput.trim() && !Object.values(vitals).some(v => v !== ''))"
+            >
+              <PaperAirplaneIcon class="h-5 w-5 transform -rotate-45 translate-x-0.5 -translate-y-0.5" />
+            </button>
+          </form>
+          <p class="text-center text-[10px] text-slate-400 mt-2">
+            La IA puede cometer errores. Verifica la información clínica importante.
+          </p>
+        </div>
       </div>
 
-      <div class="p-4 bg-white border-t border-slate-100 z-20">
-        <form @submit.prevent="sendMessage" class="relative flex items-end gap-2 max-w-4xl mx-auto">
+      <!-- DSS Sidebar -->
+      <div class="w-80 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b border-slate-100">
+          <h3 class="font-bold text-slate-700 flex items-center gap-2">
+            <ChartBarIcon class="h-5 w-5 text-indigo-600" />
+            Monitor Clínico (DSS)
+          </h3>
+          <p class="text-[10px] text-slate-400 mt-1">Ingresa constantes para análisis en tiempo real.</p>
+        </div>
+
+        <div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-6">
           
-          <div class="relative flex-1">
-            <input 
-              v-model="userInput" 
-              type="text" 
-              placeholder="Escribe tu consulta veterinaria..." 
-              class="w-full pl-5 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner"
-              :disabled="loading"
-            >
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
-              <CpuChipIcon class="h-5 w-5" />
+          <!-- Vitals Form -->
+          <div class="space-y-3">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Signos Vitales</label>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 flex items-center gap-1"><HeartIcon class="h-3 w-3"/> FC (lpm)</label>
+                <input v-model="vitals.heart_rate" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 100">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 flex items-center gap-1"><FireIcon class="h-3 w-3"/> Temp (°C)</label>
+                <input v-model="vitals.temperature" type="number" step="0.1" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 38.5">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 flex items-center gap-1"><BoltIcon class="h-3 w-3"/> FR (rpm)</label>
+                <input v-model="vitals.respiratory_rate" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 24">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-400 flex items-center gap-1"><ClockIcon class="h-3 w-3"/> TLLC (s)</label>
+                <input v-model="vitals.capillary_refill" type="number" step="0.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 1.5">
+              </div>
+              <div class="col-span-2 space-y-1">
+                <label class="text-[10px] text-slate-400 flex items-center gap-1">Presión Sistólica (mmHg)</label>
+                <input v-model="vitals.systolic_bp" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 120">
+              </div>
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
-            :disabled="loading || !userInput.trim()"
-          >
-            <PaperAirplaneIcon class="h-5 w-5 transform -rotate-45 translate-x-0.5 -translate-y-0.5" />
-          </button>
-        </form>
-        
-        <p class="text-center text-[10px] text-slate-400 mt-2">
-          La IA puede cometer errores. Verifica la información clínica importante.
-        </p>
+          <!-- DSS Results -->
+          <div v-if="dssResult" class="space-y-4 animate-fade-in-up">
+            <div class="h-px bg-slate-100"></div>
+            
+            <!-- Triage Section -->
+            <div v-if="dssResult.triage" class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Triaje Algorítmico</label>
+              
+              <div class="p-3 rounded-xl border" 
+                :class="{
+                  'bg-green-50 border-green-200 text-green-700': dssResult.triage.triage_level.includes('GREEN'),
+                  'bg-yellow-50 border-yellow-200 text-yellow-700': dssResult.triage.triage_level.includes('YELLOW'),
+                  'bg-red-50 border-red-200 text-red-700': dssResult.triage.triage_level.includes('RED')
+                }"
+              >
+                <div class="flex items-center gap-2 font-bold text-sm">
+                  <span class="w-2 h-2 rounded-full bg-current"></span>
+                  {{ dssResult.triage.triage_level }}
+                </div>
+                <div class="text-[10px] mt-1 opacity-80">Score: {{ dssResult.triage.triage_score }}</div>
+              </div>
+
+              <div v-if="dssResult.triage.alerts.length > 0" class="space-y-1">
+                <div v-for="(alert, idx) in dssResult.triage.alerts" :key="idx" class="text-[10px] px-2 py-1 bg-slate-100 rounded text-slate-600 flex items-start gap-1">
+                  <span class="text-amber-500 mt-0.5">⚠️</span> {{ alert }}
+                </div>
+              </div>
+            </div>
+
+            <!-- ML Prediction Section -->
+            <div v-if="dssResult.prediction" class="space-y-2">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Predicción ML (Local)</label>
+              
+              <div class="bg-slate-900 text-white p-3 rounded-xl shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 opacity-10">
+                  <CpuChipIcon class="w-12 h-12" />
+                </div>
+                <div class="relative z-10">
+                  <div class="text-[10px] text-slate-400 uppercase">Riesgo Estimado</div>
+                  <div class="text-lg font-bold text-indigo-300">{{ dssResult.prediction.ml_prediction }}</div>
+                  
+                  <div class="mt-2 flex items-center gap-2">
+                    <div class="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" :style="`width: ${dssResult.prediction.confidence}%`"></div>
+                    </div>
+                    <span class="text-[10px] font-mono">{{ dssResult.prediction.confidence }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div v-else class="text-center py-8 opacity-40">
+            <ChartBarIcon class="w-12 h-12 mx-auto text-slate-300 mb-2" />
+            <p class="text-xs text-slate-400">Ingresa datos y envía para analizar</p>
+          </div>
+
+        </div>
       </div>
 
     </div>
@@ -174,7 +274,7 @@
                 <img 
                   v-for="(img, idx) in item.images.slice(0, 3)" 
                   :key="idx"
-                  :src="`http://localhost:8000/${img}`"
+                  :src="`${backendUrl}/${img}`"
                   class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
                 />
                 <div v-if="item.images.length > 3" class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[9px] font-bold text-slate-500 shadow-sm">
@@ -193,7 +293,7 @@
 
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, computed } from 'vue';
 import axios from 'axios';
 import { 
   PaperAirplaneIcon, 
@@ -202,7 +302,13 @@ import {
   FolderPlusIcon,
   XMarkIcon,
   MagnifyingGlassIcon,
-  InboxIcon
+  InboxIcon,
+  HeartIcon,
+  FireIcon,
+  BoltIcon,
+  ClockIcon,
+  ChartBarIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import { useUserStore } from '@/stores/user';
@@ -221,6 +327,18 @@ const caseSearch = ref('');
 const requests = ref([]);
 const { getAllRequests } = useServiceRequests();
 const userStore = useUserStore();
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+// DSS State
+const vitals = ref({
+  heart_rate: '',
+  temperature: '',
+  respiratory_rate: '',
+  capillary_refill: '',
+  systolic_bp: ''
+});
+
+const dssResult = ref(null);
 
 const loadClinicalCase = async () => {
   isCaseModalOpen.value = true;
@@ -252,7 +370,7 @@ const closeCaseModal = () => {
 const filteredCases = ref([]);
 
 // Watchers para filtrar (usando ref simple por simplicidad en setup script)
-import { watch, computed } from 'vue';
+import { watch } from 'vue';
 
 const computedFilteredCases = computed(() => {
   let list = requests.value;
@@ -271,7 +389,7 @@ watch([caseSearch, requests], () => {
 });
 
 const selectCase = (item) => {
-  let prompt = `Actúa como un experto Veterinario Senior con especialización en medicina interna y diagnóstico por imagen. Analiza el siguiente caso clínico y proporciona tu opinión profesional.\n\n`;
+  let prompt = `Actúa como un experto Veterinario Senior con especialización en medicina interna. Analiza el siguiente caso clínico y proporciona tu opinión profesional.\n\n`;
   prompt += `### Información del Paciente\n`;
   prompt += `**Nombre:** ${item.petName}\n`;
   prompt += `**Especie:** ${item.species}\n`;
@@ -285,7 +403,7 @@ const selectCase = (item) => {
     prompt += `Se adjuntan las siguientes imágenes para tu análisis:\n`;
     item.images.forEach(img => {
       // Usamos la URL completa para que la IA (si tiene visión) pueda acceder, o para mostrarla en el chat
-      prompt += `![Imagen del Caso](http://localhost:8000/${img})\n`;
+      prompt += `![Imagen del Caso](${import.meta.env.VITE_BACKEND_URL}/${img})\n`;
     });
     prompt += `\n`;
   }
@@ -298,7 +416,7 @@ const selectCase = (item) => {
 
   userInput.value = prompt;
   closeCaseModal();
-  sendMessage(); // Auto-enviar
+  // sendMessage(); // Auto-enviar removed to allow vitals input first
 };
 
 const formatMessage = (content) => {
@@ -335,21 +453,49 @@ const scrollToBottom = async () => {
   }
 };
 
+const isVitalsInputVisible = computed(() => {
+  return userInput.value.includes('### Información del Paciente') || Object.values(vitals.value).some(v => v !== '');
+});
+
+const clearDssResult = () => {
+  dssResult.value = null;
+  // Optionally clear vitals too
+  vitals.value = {
+    heart_rate: '',
+    temperature: '',
+    respiratory_rate: '',
+    capillary_refill: '',
+    systolic_bp: ''
+  };
+};
+
 const sendMessage = async () => {
-  if (!userInput.value.trim() || loading.value) return;
+  if (!userInput.value.trim() && !Object.values(vitals.value).some(v => v !== '')) return; // Allow sending only vitals
 
   const content = userInput.value;
   messages.value.push({ role: 'user', content });
   userInput.value = '';
   loading.value = true;
+  dssResult.value = null; // Reset previous DSS result
   await scrollToBottom();
 
   try {
-    const response = await axios.post('http://localhost:8000/api/ai/chat', {
-      messages: messages.value
-    });
+    // Prepare payload with vitals if any field is filled
+    const hasVitals = Object.values(vitals.value).some(v => v !== '');
+    const payload = {
+      messages: messages.value,
+      vitals: hasVitals ? vitals.value : null
+    };
+
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/ai/chat`, payload);
     
     messages.value.push({ role: 'assistant', content: response.data.response });
+    
+    // Update DSS Dashboard if data returned
+    if (response.data.dss_data) {
+      dssResult.value = response.data.dss_data;
+    }
+
   } catch (err) {
     console.error('Error in chat:', err);
     messages.value.push({ role: 'assistant', content: 'Lo siento, tuve un problema de conexión. Por favor intenta de nuevo.' });

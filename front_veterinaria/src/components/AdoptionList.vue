@@ -57,7 +57,7 @@
           <p class="text-[#1BB0B9] text-sm font-medium mb-2">{{ pet.breed }}</p>
           <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ pet.description }}</p>
           
-          <button class="w-full py-3 rounded-xl border-2 border-[#BEDC74] text-[#1a5f63] font-bold hover:bg-[#BEDC74] hover:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+          <button @click="openAdoptionModal(pet)" class="w-full py-3 rounded-xl border-2 border-[#BEDC74] text-[#1a5f63] font-bold hover:bg-[#BEDC74] hover:text-white transition-colors duration-300 flex items-center justify-center gap-2">
             <span>Adoptar</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -73,27 +73,64 @@
     </div>
 
   </section>
+    <!-- Adoption Modal -->
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showModal = false"></div>
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-fade-in-up">
+        <div class="bg-[#1BB0B9] p-6 text-white text-center relative">
+          <button @click="showModal = false" class="absolute top-4 right-4 text-white/80 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <h3 class="text-2xl font-serif font-bold mb-1">¡Gracias por tu interés!</h3>
+          <p class="text-[#BFF1F6] text-sm">Estás a un paso de cambiar una vida.</p>
+        </div>
+        <div class="p-8 text-center">
+          <div class="w-20 h-20 bg-[#BEDC74]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#1a5f63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <p class="text-gray-600 mb-6">
+            Para iniciar el proceso de adopción de <span class="font-bold text-[#1BB0B9]">{{ selectedPet?.name }}</span>, por favor contáctanos o visítanos.
+          </p>
+          <div class="space-y-3">
+            <a href="tel:+51999999999" class="block w-full py-3 rounded-xl bg-[#BEDC74] text-[#1a5f63] font-bold hover:bg-[#d4ed95] transition-colors">
+              Llamar ahora
+            </a>
+            <button @click="showModal = false" class="block w-full py-3 rounded-xl border-2 border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-colors">
+              Seguir mirando
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 
-// Mock Data Images (using placeholders or imported assets if available, for now using placeholders/urls)
-// In a real app, these would be dynamic. Using generic placeholders for demo.
-const getPlaceholder = (type) => `https://source.unsplash.com/400x400/?${type}`;
-
 const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Hámsters', 'Peces'];
 const selectedCategory = ref('Todos');
+const showModal = ref(false);
+const selectedPet = ref(null);
+
+const openAdoptionModal = (pet) => {
+  selectedPet.value = pet;
+  showModal.value = true;
+};
 
 const pets = [
-  { id: 1, name: 'Max', category: 'Perros', breed: 'Golden Retriever', age: '2 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80', description: 'Max es un perro muy juguetón y cariñoso, le encanta correr por el parque.' },
-  { id: 2, name: 'Luna', category: 'Gatos', breed: 'Siamés', age: '1 año', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=400&q=80', description: 'Luna es tranquila y elegante, ideal para un hogar relajado.' },
-  { id: 3, name: 'Rocky', category: 'Perros', breed: 'Bulldog Francés', age: '3 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=400&q=80', description: 'Rocky es un compañero leal y protector, perfecto para familias.' },
-  { id: 4, name: 'Coco', category: 'Aves', breed: 'Periquito', age: '6 meses', gender: 'Macho', image: 'https://images.unsplash.com/photo-1552728089-57bdde30beb8?auto=format&fit=crop&w=400&q=80', description: 'Coco es muy alegre y le gusta cantar por las mañanas.' },
-  { id: 5, name: 'Molly', category: 'Hámsters', breed: 'Sirio', age: '5 meses', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=400&q=80', description: 'Molly es curiosa y activa, le encanta su rueda de ejercicios.' },
-  { id: 6, name: 'Nemo', category: 'Peces', breed: 'Payaso', age: '1 año', gender: 'Macho', image: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=400&q=80', description: 'Nemo es colorido y vivaz, una joya para cualquier acuario.' },
-  { id: 7, name: 'Simba', category: 'Gatos', breed: 'Persa', age: '4 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=400&q=80', description: 'Simba es majestuoso y le encantan las caricias suaves.' },
-  { id: 8, name: 'Bella', category: 'Perros', breed: 'Labrador', age: '1.5 años', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1591769225440-811ad7d6eca6?auto=format&fit=crop&w=400&q=80', description: 'Bella es inteligente y aprende trucos muy rápido.' },
+  { id: 1, name: 'Max', category: 'Perros', breed: 'Golden Retriever', age: '2 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80', description: 'Max es un perro muy juguetón y cariñoso, le encanta correr por el parque.' },
+  { id: 2, name: 'Luna', category: 'Gatos', breed: 'Siamés', age: '1 año', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=500&q=80', description: 'Luna es tranquila y elegante, ideal para un hogar relajado.' },
+  { id: 3, name: 'Rocky', category: 'Perros', breed: 'Bulldog Francés', age: '3 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=80', description: 'Rocky es un compañero leal y protector, perfecto para familias.' },
+  { id: 4, name: 'Coco', category: 'Aves', breed: 'Periquito', age: '6 meses', gender: 'Macho', image: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?auto=format&fit=crop&w=500&q=80', description: 'Coco es muy alegre y le gusta cantar por las mañanas.' },
+  { id: 5, name: 'Molly', category: 'Hámsters', breed: 'Sirio', age: '5 meses', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=500&q=80', description: 'Molly es curiosa y activa, le encanta su rueda de ejercicios.' },
+  { id: 6, name: 'Nemo', category: 'Peces', breed: 'Payaso', age: '1 año', gender: 'Macho', image: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=500&q=80', description: 'Nemo es colorido y vivaz, una joya para cualquier acuario.' },
+  { id: 7, name: 'Simba', category: 'Gatos', breed: 'Persa', age: '4 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=500&q=80', description: 'Simba es majestuoso y le encantan las caricias suaves.' },
+  { id: 8, name: 'Bella', category: 'Perros', breed: 'Labrador', age: '1.5 años', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=500&q=80', description: 'Bella es inteligente y aprende trucos muy rápido.' },
 ];
 
 const filteredPets = computed(() => {

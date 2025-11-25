@@ -17,10 +17,10 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        <a 
+        <router-link 
           v-for="(mascota, index) in mascotas" 
           :key="index" 
-          href="#" 
+          to="/adopcion" 
           class="group relative h-96 w-full rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-[#02939E]/20 transition-all duration-500 ease-out transform hover:-translate-y-2"
         >
           <div class="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
@@ -54,7 +54,7 @@
                 </div>
             </div>
           </div>
-        </a>
+        </router-link>
 
       </div>
 

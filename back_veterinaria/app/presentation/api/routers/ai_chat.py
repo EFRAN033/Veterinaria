@@ -1,9 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Dict, Any
 from openai import OpenAI
 from app.core.config import settings
 from app.core.vet_knowledge import SYSTEM_PROMPT, CLINICAL_EXAMPLES
+from app.core.dss.triage import assess_vitals
+from app.core.dss.predictor import predict_severity
+import re
 
 router = APIRouter()
 
@@ -16,20 +19,47 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
+    vitals: Optional[Dict[str, Any]] = None
 
 class ChatResponse(BaseModel):
     response: str
-
-import re
-import base64
-import os
+    dss_data: Optional[Dict[str, Any]] = None
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_vet_ai(request: ChatRequest):
-    """AI Veterinary Assistant Chat using OpenAI with Few-Shot Learning"""
+    """AI Veterinary Assistant Chat using OpenAI with Few-Shot Learning & DSS"""
     try:
         # 1. Start with the System Prompt
         messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
+        
+        dss_output = None
+        
+        # 1.5 Run DSS Analysis if vitals are provided
+        if request.vitals:
+            triage_result = assess_vitals(request.vitals)
+            ml_result = predict_severity(request.vitals)
+            
+            dss_output = {
+                "triage": triage_result,
+                "prediction": ml_result
+            }
+            
+            dss_context = f"""
+            [SISTEMA DE SOPORTE A LA DECISIÓN (DSS) - DATOS EN TIEMPO REAL]
+            
+            1. ANÁLISIS DE CONSTANTES (TRIAJE):
+            - Nivel de Triaje: {triage_result['triage_level']}
+            - Puntuación: {triage_result['triage_score']}
+            - Alertas Activas: {', '.join(triage_result['alerts']) if triage_result['alerts'] else 'Ninguna'}
+            - Índice de Shock: {triage_result['calculated_metrics'].get('shock_index', 'N/A')}
+            
+            2. PREDICCIÓN DE GRAVEDAD (MODELO ML LOCAL):
+            - Predicción: {ml_result.get('ml_prediction', 'N/A')}
+            - Confianza del Modelo: {ml_result.get('confidence', 0)}%
+            
+            INSTRUCCIÓN: Utiliza estos datos objetivos para fundamentar tu respuesta. Si el triaje es ROJO o la predicción es ALTA, prioriza la estabilización inmediata.
+            """
+            messages_payload.append({"role": "system", "content": dss_context})
         
         # 2. Add Few-Shot Examples
         messages_payload.extend(CLINICAL_EXAMPLES)
@@ -53,7 +83,7 @@ async def chat_with_vet_ai(request: ChatRequest):
         )
         
         ai_response = response.choices[0].message.content
-        return {"response": ai_response}
+        return {"response": ai_response, "dss_data": dss_output}
 
     except Exception as e:
         print(f"Error in OpenAI API call: {e}")

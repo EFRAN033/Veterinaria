@@ -130,3 +130,17 @@ Render es una excelente opción para desplegar este proyecto. Necesitarás dos s
 8.  Guarda y despliega.
 
 ¡Listo! Tu sistema debería estar funcionando en la nube.
+
+## ⚠️ Solución de Problemas Comunes
+
+### Error CORS o "Network Error" al intentar Login/Registro
+Si ves errores como `Solicitud de origen cruzado bloqueada` o intentos de conexión a `api.veterinaria.com`:
+
+1.  **Revisa las Variables de Entorno del Frontend en Render**:
+    *   Asegúrate de que `VITE_API_URL` apunte a tu **URL REAL del Backend en Render** (ej: `https://veterinaria-backend.onrender.com/api/v1`), NO a una URL de ejemplo.
+    *   Asegúrate de que `VITE_BACKEND_URL` apunte a la raíz del backend (ej: `https://veterinaria-backend.onrender.com`).
+    *   **Importante**: Después de cambiar variables en el Frontend, debes hacer un **Manual Deploy > Deploy latest commit** o **Clear build cache & deploy** para que los cambios surtan efecto, ya que Vite "quema" estas variables al momento de construir (build).
+
+2.  **Revisa las Variables de Entorno del Backend en Render**:
+    *   Asegúrate de que `BACKEND_CORS_ORIGINS` incluya la URL de tu frontend **sin barra al final** (ej: `["https://veterinaria-frontend.onrender.com"]`).
+    *   Si cambias esto, el backend se reiniciará automáticamente.

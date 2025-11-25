@@ -9,9 +9,9 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import models and database
-from app.database import Base
-from app.models import *  # Import all models
-from app.config import settings
+from app.core.database import Base
+from app.infrastructure.database.models import *  # Import all models
+from app.core.config import settings
 
 # this is the Alembic Config object
 config = context.config

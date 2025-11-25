@@ -6,6 +6,7 @@ from app.infrastructure.database.models.appointment import Appointment
 from app.infrastructure.database.models.product import Product
 from app.infrastructure.database.models.order import Order, OrderItem
 from app.infrastructure.database.models.adoption import Adoption
+from app.infrastructure.database.models.service_request import ServiceRequest
 
 __all__ = [
     "User",
@@ -15,5 +16,6 @@ __all__ = [
     "Product",
     "Order",
     "OrderItem",
-    "Adoption"
+    "Adoption",
+    "ServiceRequest"
 ]

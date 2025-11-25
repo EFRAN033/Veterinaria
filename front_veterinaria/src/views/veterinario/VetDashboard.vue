@@ -24,7 +24,7 @@
           <div class="flex justify-between items-start relative z-10">
             <div>
               <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Por Revisar</p>
-              <p class="text-3xl font-black text-slate-800">{{ appointments.length }}</p>
+              <p class="text-3xl font-black text-slate-800">{{ totalPendingCount }}</p>
             </div>
             <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-500 group-hover:text-white transition-colors">
               <InboxStackIcon class="h-6 w-6" />
@@ -37,7 +37,7 @@
           <div class="flex justify-between items-start relative z-10">
             <div>
               <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Prioridad Alta</p>
-              <p class="text-3xl font-black text-slate-800">{{ urgentCount }}</p>
+              <p class="text-3xl font-black text-slate-800">{{ totalUrgentCount }}</p>
             </div>
             <div class="p-2.5 bg-rose-50 text-rose-600 rounded-xl group-hover:bg-rose-500 group-hover:text-white transition-colors">
               <ExclamationTriangleIcon class="h-6 w-6" />
@@ -64,6 +64,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Service Requests Section -->
+    <div class="mb-8 shrink-0">
+      <ServiceRequestsList />
     </div>
 
     <div class="flex-1 flex flex-col min-h-0">
@@ -188,7 +193,9 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import ServiceRequestsList from '@/components/ServiceRequestsList.vue';
 import { 
   CheckIcon, 
   XMarkIcon, 
@@ -203,11 +210,13 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const appointments = ref([]);
+const serviceRequests = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const searchQuery = ref('');
 const activeTab = ref('Todos');
 const userStore = useUserStore();
+const { getAllRequests } = useServiceRequests();
 
 // Helpers para fechas
 const getDayName = (dateStr) => {
@@ -244,23 +253,42 @@ const filteredAppointments = computed(() => {
   return list;
 });
 
-// Lógica KPI Urgentes
-const urgentCount = computed(() => {
-  return appointments.value.filter(app => 
+// Contador total de items por revisar (citas + solicitudes pendientes)
+const totalPendingCount = computed(() => {
+  return appointments.value.length + serviceRequests.value.length;
+});
+
+// Contador total de items urgentes/prioridad alta
+const totalUrgentCount = computed(() => {
+  // Citas urgentes (basado en notas)
+  const urgentAppointments = appointments.value.filter(app => 
     app.notes && (app.notes.toLowerCase().includes('urgente') || app.notes.toLowerCase().includes('dolor'))
   ).length;
+  
+  // Solicitudes de servicio con urgencia alta
+  const urgentRequests = serviceRequests.value.filter(req => 
+    (req.service_data && req.service_data.urgency === 'alta') ||
+    (req.service_data && req.service_data.isUrgent === true)
+  ).length;
+  
+  return urgentAppointments + urgentRequests;
 });
 
 const fetchPendingAppointments = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const response = await axios.get('http://localhost:8000/api/appointments/pending', {
+    // Fetch appointments
+    const appointmentsResponse = await axios.get('http://localhost:8000/api/appointments/pending', {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
-    appointments.value = response.data;
+    appointments.value = appointmentsResponse.data;
+    
+    // Fetch pending service requests
+    const requestsData = await getAllRequests({ status: 'pending' });
+    serviceRequests.value = requestsData;
   } catch (err) {
-    console.error('Error fetching appointments:', err);
+    console.error('Error fetching data:', err);
     error.value = 'No se pudieron cargar las solicitudes.';
   } finally {
     loading.value = false;

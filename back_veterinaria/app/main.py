@@ -4,8 +4,9 @@ Punto de entrada principal de la aplicación con arquitectura limpia
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
-from app.presentation.api.routers import auth, users, services, appointments, products, orders, adoptions, ai_chat
+from app.presentation.api.routers import auth, users, services, appointments, products, orders, adoptions, ai_chat, service_requests
 from app.core.exceptions import (
     DomainException,
     NotFoundException,
@@ -102,6 +103,10 @@ app.include_router(products.router, prefix="/api/products", tags=["Products"])
 app.include_router(orders.router, prefix="/api/orders", tags=["Orders"])
 app.include_router(adoptions.router, prefix="/api/adoptions", tags=["Adoptions"])
 app.include_router(ai_chat.router, prefix="/api/ai", tags=["AI Chat"])
+app.include_router(service_requests.router, prefix="/api/service-requests", tags=["Service Requests"])
+
+# Mount static files for uploads
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")

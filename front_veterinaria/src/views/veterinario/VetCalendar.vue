@@ -222,6 +222,9 @@ import {
   ExclamationCircleIcon, XMarkIcon, DocumentTextIcon,
   InboxIcon
 } from '@heroicons/vue/24/outline';
+import { useServiceRequests } from '@/composables/useServiceRequests';
+
+const { getAllRequests } = useServiceRequests();
 
 const userStore = useUserStore();
 const isModalOpen = ref(false);
@@ -251,7 +254,25 @@ const calendarOptions = ref({
   dateClick: handleDateClick,
   eventClick: handleEventClick,
   editable: false,
+  eventContent: renderEventContent, // Custom render function
 });
+
+function renderEventContent(arg) {
+  const props = arg.event.extendedProps;
+  return {
+    html: `
+      <div class="flex flex-col gap-0.5 overflow-hidden">
+        <div class="flex items-center gap-1">
+          <span class="text-[9px] font-bold bg-white/80 px-1 rounded text-slate-600">${props.time}</span>
+          <span class="text-[9px] font-bold truncate text-slate-700">${arg.event.title}</span>
+        </div>
+        <div class="text-[8px] text-slate-500 truncate px-0.5">
+          ${props.species ? props.species + ' - ' : ''}${props.serviceType}
+        </div>
+      </div>
+    `
+  };
+}
 
 // COMPUTED: Métricas
 const metrics = computed(() => {
@@ -292,27 +313,71 @@ const filteredList = computed(() => {
 
 const fetchAppointments = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/appointments/all', { headers: { Authorization: `Bearer ${userStore.token}` } });
-    const mappedEvents = response.data.map(app => ({
-      id: app.id,
-      title: app.service_id || `Consulta General`,
+    const [appointmentsRes, requestsData] = await Promise.all([
+      axios.get('http://localhost:8000/api/appointments/all', { headers: { Authorization: `Bearer ${userStore.token}` } }),
+      getAllRequests() // Fetch all requests to filter by date
+    ]);
+
+    // Map Appointments
+    const appointmentEvents = appointmentsRes.data.map(app => ({
+      id: `app-${app.id}`,
+      title: app.pet_id ? `Mascota #${app.pet_id}` : 'Consulta',
       start: `${app.appointment_date}T${app.appointment_time}`,
       backgroundColor: getStatusColor(app.status),
       borderColor: 'transparent',
       textColor: '#475569', 
       classNames: ['compact-event'], 
       extendedProps: { 
+        type: 'appointment',
         status: app.status, 
         statusLabel: app.status === 'confirmed' ? 'OK' : (app.status === 'pending' ? 'Pend.' : 'Canc.'),
         notes: app.notes, 
-        client: app.user_id, 
-        pet: app.pet_id || 'Sin nombre', 
+        client: `Cliente #${app.user_id}`, 
+        pet: app.pet_id ? `ID: ${app.pet_id}` : 'Sin nombre',
+        species: '', // Backend doesn't provide species for appointments yet
+        serviceType: app.service_id || 'General',
         time: app.appointment_time.substring(0, 5) 
       }
     }));
-    allEvents.value = mappedEvents;
-    calendarOptions.value.events = mappedEvents;
+
+    // Map Service Requests (Only those with preferredDate)
+    const requestEvents = requestsData
+      .filter(req => req.service_data && req.service_data.preferredDate)
+      .map(req => {
+        const timeMap = { 'morning': '09:00', 'afternoon': '14:00', 'evening': '18:00' };
+        const time = timeMap[req.service_data.preferredTime] || '00:00';
+        
+        return {
+          id: `req-${req.id}`,
+          title: req.pet_name || req.service_data.petName || 'Solicitud',
+          start: `${req.service_data.preferredDate.split('T')[0]}T${time}`,
+          backgroundColor: req.service_data.isUrgent ? '#fee2e2' : '#e0f2fe', // Red tint for urgent, Blue for normal
+          borderColor: 'transparent',
+          textColor: '#475569',
+          classNames: ['compact-event'],
+          extendedProps: {
+            type: 'request',
+            status: req.status,
+            statusLabel: req.service_data.isUrgent ? 'URGENTE' : (req.status === 'pending' ? 'Solicitud' : 'Rev.'),
+            notes: req.service_data.symptoms || req.service_data.notes || req.service_data.description,
+            client: req.user_name || `Cliente #${req.user_id}`,
+            pet: req.pet_name || req.service_data.petName || 'Sin nombre',
+            species: req.service_data.species || '',
+            serviceType: req.service_type,
+            time: req.service_data.preferredTime ? translateTimeSlot(req.service_data.preferredTime) : '??:??'
+          }
+        };
+      });
+
+    const combinedEvents = [...appointmentEvents, ...requestEvents];
+    allEvents.value = combinedEvents;
+    calendarOptions.value.events = combinedEvents;
   } catch (err) { console.error(err); }
+};
+
+const translateTimeSlot = (slot) => {
+  const slots = { morning: 'Mañana', afternoon: 'Tarde', evening: 'Noche' };
+  return slots[slot] || slot;
 };
 
 function getStatusColor(s) { 
@@ -356,7 +421,7 @@ onMounted(() => { fetchAppointments(); });
 .fc-col-header-cell-cushion { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
 .fc-daygrid-day-frame { min-height: 40px !important; }
 .fc-daygrid-day-number { font-size: 0.7rem; color: #64748b; font-weight: 500; padding: 4px !important; }
-.compact-event { margin-top: 2px; border-radius: 3px; font-size: 9px; font-weight: 600; padding: 1px 2px; border: none !important; box-shadow: none; }
+.compact-event { margin-top: 2px; border-radius: 4px; font-size: 9px; font-weight: 600; padding: 2px; border: none !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }

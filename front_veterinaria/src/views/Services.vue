@@ -20,7 +20,28 @@
           <p class="text-gray-500 text-lg">Selecciona una categoría abajo para personalizar la atención.</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        <!-- Step Indicator -->
+        <div class="max-w-3xl mx-auto mb-12">
+          <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-100 -z-10"></div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[#1BB0B9] transition-all duration-500 -z-10" :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"></div>
+            
+            <div v-for="step in 3" :key="step" class="flex flex-col items-center gap-2 bg-white px-2">
+              <div 
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2"
+                :class="currentStep >= step ? 'bg-[#1BB0B9] border-[#1BB0B9] text-white' : 'bg-white border-gray-200 text-gray-400'"
+              >
+                {{ step }}
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider" :class="currentStep >= step ? 'text-[#1BB0B9]' : 'text-gray-400'">
+                {{ step === 1 ? 'Detalles' : step === 2 ? 'Fecha' : 'Confirmar' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Selection (Only visible in Step 1) -->
+        <div v-if="currentStep === 1" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
           <button 
             v-for="service in serviceTypes" 
             :key="service.id"
@@ -50,13 +71,15 @@
           <div class="flex-1 min-w-0">
             <Transition name="fade" mode="out-in">
               
-              <div v-if="selectedService === 'consultation'" key="consultation" class="space-y-10">
+              <!-- STEP 1: Service Details Forms -->
+              <div v-if="currentStep === 1">
+                <div v-if="selectedService === 'consultation'" key="consultation" class="space-y-10">
                 <div class="border-l-4 border-[#1BB0B9] pl-6">
                   <h2 class="text-3xl font-serif font-bold text-gray-900">Detalles de la Consulta</h2>
                   <p class="text-gray-500 mt-1">Cuéntanos qué le sucede a tu mascota.</p>
                 </div>
 
-                <form @submit.prevent="submitConsultation" id="mainForm" class="space-y-8">
+                <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-8">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="group relative">
                       <input type="text" v-model="consultation.petName" placeholder=" " class="floating-input peer" />
@@ -131,7 +154,7 @@
                   <p class="text-gray-500 mt-1">Mantenimiento y prevención.</p>
                 </div>
 
-                <form @submit.prevent="submitGeneral" id="mainForm" class="space-y-8">
+                <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-8">
                   <div class="grid grid-cols-1 gap-8">
                      <div class="group relative">
                       <select v-model="general.serviceType" class="floating-input peer pt-6 pb-2">
@@ -145,17 +168,8 @@
                       <label class="floating-label">Tipo de Servicio</label>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <div class="group relative">
-                        <input type="text" v-model="general.petName" placeholder=" " class="floating-input peer" />
-                        <label class="floating-label">Nombre de la Mascota</label>
-                      </div>
-                      <div class="group relative">
-                        <input type="date" v-model="general.preferredDate" placeholder=" " class="floating-input peer" />
-                        <label class="floating-label">Fecha Preferida</label>
-                      </div>
-                    </div>
-
+                    <!-- Removed preferredDate input as it's now in Step 2 -->
+                    
                     <div class="group relative">
                       <textarea v-model="general.notes" rows="4" placeholder=" " class="floating-input peer resize-none"></textarea>
                       <label class="floating-label">Indicaciones Generales</label>
@@ -170,7 +184,7 @@
                   <p class="text-gray-500 mt-1">Información detallada para diagnósticos complejos.</p>
                 </div>
 
-                <form @submit.prevent="submitClinical" id="mainForm" class="space-y-8">
+                <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-8">
                    <div class="group relative">
                     <textarea v-model="clinical.description" rows="6" placeholder=" " class="floating-input peer resize-none"></textarea>
                     <label class="floating-label">Descripción del Caso</label>
@@ -201,7 +215,7 @@
                   <p class="text-gray-500 mt-1">Belleza y cuidado para tu mejor amigo.</p>
                 </div>
 
-                <form @submit.prevent="submitAesthetic" id="mainForm" class="space-y-10">
+                <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-10">
                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                       <div class="group relative">
                         <input type="text" v-model="aesthetic.petName" placeholder=" " class="floating-input peer" />
@@ -258,6 +272,24 @@
                 </form>
               </div>
 
+              </div>
+
+              <!-- STEP 2: Date & Time -->
+              <div v-else-if="currentStep === 2" key="datetime">
+                <DateTimePicker v-model="dateTime" />
+              </div>
+
+              <!-- STEP 3: Confirmation -->
+              <div v-else-if="currentStep === 3" key="summary">
+                <ServiceSummary 
+                  :serviceType="selectedService"
+                  :details="currentServiceDetails"
+                  :dateTime="dateTime"
+                  :estimatedCost="estimatedCost"
+                  @edit="goToStep"
+                />
+              </div>
+
             </Transition>
           </div>
 
@@ -287,11 +319,38 @@
                   </div>
 
                   <button 
+                    v-if="currentStep === 1"
                     @click="triggerSubmit"
                     class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
                   >
-                    <span>Confirmar Solicitud</span>
+                    <span>Continuar</span>
                     <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                  </button>
+
+                  <button 
+                    v-else-if="currentStep === 2"
+                    @click="nextStep"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
+                  >
+                    <span>Revisar Solicitud</span>
+                    <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                  </button>
+
+                  <button 
+                    v-else
+                    @click="submitRequest"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
+                  >
+                    <span>Confirmar Solicitud</span>
+                    <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  </button>
+                  
+                  <button 
+                    v-if="currentStep > 1"
+                    @click="prevStep"
+                    class="w-full mt-3 py-3 text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                  >
+                    Atrás
                   </button>
                   
                   <p class="text-center text-gray-400 text-xs mt-4">*Pago presencial o vía App</p>
@@ -325,10 +384,19 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import Header from './Header.vue';
 import BackButton from '@/components/BackButton.vue';
+import DateTimePicker from '@/components/DateTimePicker.vue';
+import ServiceSummary from '@/components/ServiceSummary.vue';
+import { useServiceRequests } from '@/composables/useServiceRequests';
 
+const router = useRouter();
+const { createServiceRequest, loading, error } = useServiceRequests();
+
+const currentStep = ref(1);
 const selectedService = ref('consultation');
+const dateTime = ref({ date: null, timeSlot: '', isUrgent: false });
 
 const serviceTypes = [
   { id: 'consultation', name: 'Consulta' },
@@ -399,10 +467,90 @@ const estimatedCost = computed(() => {
   return cost;
 });
 
-const submitConsultation = () => { console.log('Enviado:', consultation.value); alert('Consulta enviada exitosamente'); };
-const submitGeneral = () => { console.log('Enviado:', general.value); alert('Servicio agendado exitosamente'); };
-const submitClinical = () => { console.log('Enviado:', clinical.value); alert('Caso clínico enviado exitosamente'); };
-const submitAesthetic = () => { console.log('Enviado:', aesthetic.value); alert('Servicios de estética solicitados exitosamente'); };
+const currentServiceDetails = computed(() => {
+  switch(selectedService.value) {
+    case 'consultation': return consultation.value;
+    case 'general': return general.value;
+    case 'clinical': return clinical.value;
+    case 'aesthetic': return aesthetic.value;
+    default: return {};
+  }
+});
+
+const nextStep = () => {
+  if (currentStep.value === 1) {
+    // Validate step 1
+    const form = document.getElementById('mainForm');
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    currentStep.value = 2;
+  } else if (currentStep.value === 2) {
+    // Validate step 2
+    if (!dateTime.value.isUrgent && (!dateTime.value.date || !dateTime.value.timeSlot)) {
+      alert('Por favor selecciona una fecha y hora, o marca la opción de urgencia.');
+      return;
+    }
+    currentStep.value = 3;
+  }
+};
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+  }
+};
+
+const goToStep = (step) => {
+  currentStep.value = step;
+};
+
+const submitRequest = async () => {
+  try {
+    const commonData = {
+      estimated_cost: estimatedCost.value,
+      service_data: {
+        ...currentServiceDetails.value,
+        preferredDate: dateTime.value.date,
+        preferredTime: dateTime.value.timeSlot,
+        isUrgent: dateTime.value.isUrgent
+      },
+      images: selectedService.value === 'consultation' ? Object.values(evidencePreviews.value).filter(img => img) : []
+    };
+
+    let requestData = { ...commonData, service_type: selectedService.value };
+
+    // Specific data mapping if needed
+    if (selectedService.value === 'consultation') {
+      requestData.pet_name = consultation.value.petName;
+    } else if (selectedService.value === 'general') {
+      requestData.pet_name = general.value.petName;
+      // Remove old preferredDate from service_data if it exists in general form
+      delete requestData.service_data.preferredDate; 
+      requestData.service_data.preferredDate = dateTime.value.date; // Ensure new one is used
+    } else if (selectedService.value === 'aesthetic') {
+      requestData.pet_name = aesthetic.value.petName;
+    }
+
+    await createServiceRequest(requestData);
+    alert('✅ Solicitud enviada exitosamente. Te contactaremos pronto.');
+    
+    // Reset and redirect
+    router.push('/dashboard');
+  } catch (err) {
+    console.error(err);
+    alert('❌ Error al enviar solicitud. Por favor intenta nuevamente.');
+  }
+};
+
+// Replaces individual submit functions
+const handleStep1Submit = () => {
+  nextStep();
+};
+
+// Removed individual submit functions in favor of unified flow
+
 </script>
 
 <style scoped>

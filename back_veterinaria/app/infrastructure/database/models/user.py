@@ -22,3 +22,4 @@ class User(Base):
     pets = relationship("Pet", back_populates="owner", cascade="all, delete-orphan")
     appointments = relationship("Appointment", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
+    service_requests = relationship("ServiceRequest", foreign_keys="[ServiceRequest.user_id]", back_populates="user", cascade="all, delete-orphan")

@@ -47,11 +47,7 @@
         >
           <div class="flex max-w-[85%] sm:max-w-[75%] gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'">
             
-            <div class="shrink-0 h-8 w-8 rounded-full flex items-center justify-center shadow-sm border" 
-              :class="msg.role === 'user' ? 'bg-indigo-100 border-indigo-200' : 'bg-emerald-50 border-emerald-100'">
-              <UserIcon v-if="msg.role === 'user'" class="h-4 w-4 text-indigo-700" />
-              <SparklesIcon v-else class="h-4 w-4 text-emerald-600" />
-            </div>
+            <ChatAvatar :role="msg.role" />
 
             <div 
               class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
@@ -73,9 +69,9 @@
 
         <div v-if="loading" class="flex justify-start w-full">
           <div class="flex gap-3 max-w-[75%]">
-            <div class="shrink-0 h-8 w-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
-              <SparklesIcon class="h-4 w-4 text-emerald-600" />
-            </div>
+            
+            <ChatAvatar role="assistant" />
+
             <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
               <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
@@ -125,11 +121,13 @@ import { ref, nextTick } from 'vue';
 import axios from 'axios';
 import { 
   PaperAirplaneIcon, 
-  UserIcon, 
   CpuChipIcon, 
-  SparklesIcon,
+  SparklesIcon, // Se mantiene para el título H2
   FolderPlusIcon 
 } from '@heroicons/vue/24/solid';
+
+// Importamos el nuevo componente
+import ChatAvatar from '@/components/ChatAvatar.vue';
 
 const messages = ref([
   { role: 'assistant', content: '¡Hola Dr.! Soy tu asistente veterinario. Puedo ayudarte a analizar síntomas, revisar dosis o buscar información clínica. ¿Por dónde empezamos?' }

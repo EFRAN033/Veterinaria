@@ -1,12 +1,9 @@
 <template>
   <Disclosure as="header" class="absolute top-0 left-0 w-full z-40 bg-transparent" v-slot="{ open }">
     <div class="container mx-auto flex items-center justify-between py-4 px-4 md:px-8">
-      <!-- Brand -->
       <div class="flex items-center gap-3">
-        <!-- Brand removed as requested -->
-      </div>
+        </div>
 
-      <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-4">
         <div class="flex items-center gap-4 bg-white/6 backdrop-blur-sm rounded-md px-2 py-1 shadow-sm">
           <router-link 
@@ -34,8 +31,6 @@
           </router-link>
         </div>
 
-        <!-- Auth Buttons (when not logged in) / User Menu (when logged in) -->
-        <!-- Only show on home page -->
         <div v-if="!userStore.isLoggedIn && isHomePage" class="flex items-center gap-3">
           <router-link 
             to="/login" 
@@ -51,7 +46,6 @@
           </router-link>
         </div>
 
-        <!-- User Menu (when logged in) -->
         <Menu v-else-if="userStore.isLoggedIn" as="div" class="relative">
           <MenuButton 
             class="flex items-center justify-center bg-[#1BB0B9] text-white rounded-full shadow w-11 h-11 border border-[#169aa0] hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-[#1BB0B9] focus:ring-offset-2"
@@ -70,16 +64,21 @@
             leave-from-class="transform scale-100 opacity-100"
             leave-to-class="transform scale-95 opacity-0"
           >
-            <MenuItems class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div class="px-4 py-3">
-                <p class="text-sm font-medium text-gray-900">{{ userStore.userShortName }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ userStore.userEmail }}</p>
+            <MenuItems class="absolute right-0 mt-0 w-48 origin-top-right rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden space-y-2">
+              
+              <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+                <p class="text-sm font-bold text-gray-800 truncate leading-snug mb-0">{{ userStore.userShortName }}</p>
+                <p class="text-[11px] text-gray-500 truncate leading-tight mb-0">{{ userStore.userEmail }}</p>
               </div>
-              <div class="py-1">
+              
+              <div>
                 <MenuItem v-slot="{ active }">
                   <a
                     href="#"
-                    :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']"
+                    :class="[
+                      active ? 'bg-[#1BB0B9]/10 text-[#169aa0]' : 'text-gray-700',
+                      'block w-full rounded-md px-3 py-2 text-sm transition-colors text-left font-medium'
+                    ]"
                   >
                     Mi Perfil
                   </a>
@@ -87,17 +86,24 @@
                 <MenuItem v-slot="{ active }">
                   <a
                     href="#"
-                    :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']"
+                    :class="[
+                      active ? 'bg-[#1BB0B9]/10 text-[#169aa0]' : 'text-gray-700',
+                      'block w-full rounded-md px-3 py-2 text-sm transition-colors text-left font-medium'
+                    ]"
                   >
                     Mis Citas
                   </a>
                 </MenuItem>
               </div>
-              <div class="py-1">
+
+              <div class="p-1 border-t border-gray-100">
                 <MenuItem v-slot="{ active }">
                   <button
                     @click="handleLogout"
-                    :class="[active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm text-red-600']"
+                    :class="[
+                      active ? 'bg-red-50 text-red-600' : 'text-red-500',
+                      'block w-full rounded-md px-3 py-2 text-sm font-medium transition-colors text-left'
+                    ]"
                   >
                     Cerrar Sesión
                   </button>
@@ -108,7 +114,6 @@
         </Menu>
       </nav>
 
-      <!-- Mobile menu button -->
       <div class="md:hidden">
         <DisclosureButton 
           class="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1BB0B9]"
@@ -124,7 +129,6 @@
       </div>
     </div>
 
-    <!-- Mobile menu panel -->
     <transition
       enter-active-class="transition duration-200 ease-out"
       enter-from-class="transform scale-95 opacity-0"
@@ -135,13 +139,11 @@
     >
       <DisclosurePanel class="md:hidden bg-white shadow-lg rounded-b-2xl">
         <div class="px-4 py-4 space-y-2">
-          <!-- User info (if logged in) -->
           <div v-if="userStore.isLoggedIn" class="pb-3 mb-3 border-b border-gray-200">
             <p class="text-sm font-medium text-gray-900">{{ userStore.userShortName }}</p>
             <p class="text-xs text-gray-500">{{ userStore.userEmail }}</p>
           </div>
 
-          <!-- Navigation links -->
           <router-link 
             to="/servicios" 
             class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors"
@@ -161,7 +163,6 @@
             Adopción
           </router-link>
 
-          <!-- Auth buttons or user actions -->
           <div v-if="!userStore.isLoggedIn && isHomePage" class="pt-3 mt-3 border-t border-gray-200 space-y-2">
             <router-link 
               to="/login" 

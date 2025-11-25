@@ -3,9 +3,10 @@
     <header class="bg-white shadow-sm border-b border-gray-200">
       <div class="container mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
-          <div></div> <router-link to="/login" class="text-sm font-bold text-gray-600 hover:text-[#1BB0B9] transition-colors flex items-center gap-2">
+          <div></div> 
+          <router-link to="/login" class="text-sm font-bold text-gray-600 hover:text-brand-primary transition-colors flex items-center gap-2">
             <span>¿Ya tienes cuenta?</span>
-            <span class="text-[#1BB0B9] bg-[#1BB0B9]/10 px-3 py-1 rounded-lg">Inicia sesión</span>
+            <span class="text-brand-primary bg-brand-primary/10 px-3 py-1 rounded-lg">Inicia sesión</span>
           </router-link>
         </div>
       </div>
@@ -20,15 +21,15 @@
         
         <div class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 relative overflow-hidden">
           
-          <div class="absolute top-0 right-0 w-64 h-64 bg-[#1BB0B9] rounded-full blur-[100px] opacity-10 pointer-events-none"></div>
-          <div class="absolute bottom-0 left-0 w-64 h-64 bg-[#BEDC74] rounded-full blur-[100px] opacity-10 pointer-events-none"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-brand-primary rounded-full blur-[100px] opacity-10 pointer-events-none"></div>
+          <div class="absolute bottom-0 left-0 w-64 h-64 bg-brand-accentPink rounded-full blur-[100px] opacity-15 pointer-events-none"></div>
 
           <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
             
-            <div class="p-8 md:p-12 lg:p-16 flex flex-col justify-center lg:border-r border-gray-100 bg-white">
+            <div class="p-6 md:p-8 lg:p-10 flex flex-col justify-center lg:border-r border-gray-100 bg-white">
               
-              <div class="mb-10 text-center lg:text-left">
-                <div class="inline-block bg-gradient-to-br from-[#BEDC74] to-[#a8c965] p-3 rounded-2xl shadow-lg shadow-[#BEDC74]/30 mb-6">
+              <div class="mb-8 text-center lg:text-left"> 
+                <div class="inline-block bg-gradient-to-br from-brand-accentPink to-brand-primary p-3 rounded-2xl shadow-lg shadow-brand-primary/30 mb-4"> 
                   <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
@@ -37,7 +38,6 @@
                 <p class="text-gray-500 text-lg">Únete a nuestra comunidad de amantes de las mascotas.</p>
               </div>
 
-              <!-- Error Message -->
               <ErrorMessage 
                 v-if="authError" 
                 :message="authError" 
@@ -46,7 +46,7 @@
                 @dismiss="clearAuthError"
               />
 
-              <form @submit.prevent="handleRegister" class="space-y-6 max-w-lg mx-auto lg:mx-0 w-full">
+              <form @submit.prevent="handleRegister" class="space-y-5 max-w-lg mx-auto lg:mx-0 w-full"> 
                 <FloatingInput
                   v-model="registerForm.name"
                   type="text"
@@ -78,7 +78,7 @@
                     <button 
                       type="button"
                       @click="showPassword = !showPassword"
-                      class="text-gray-400 hover:text-[#1BB0B9] transition-colors outline-none"
+                      class="text-gray-400 hover:text-brand-primary transition-colors outline-none"
                       :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                     >
                       <svg v-if="!showPassword" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@
                     <button 
                       type="button"
                       @click="showPasswordConfirm = !showPasswordConfirm"
-                      class="text-gray-400 hover:text-[#1BB0B9] transition-colors outline-none"
+                      class="text-gray-400 hover:text-brand-primary transition-colors outline-none"
                       :aria-label="showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                     >
                       <svg v-if="!showPasswordConfirm" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,12 +125,12 @@
                         type="checkbox" 
                         v-model="registerForm.acceptTerms" 
                         required
-                        class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-gray-300 transition-all checked:border-[#1BB0B9] checked:bg-[#1BB0B9]"
+                        class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-gray-300 transition-all checked:border-brand-primary checked:bg-brand-primary"
                       >
                       <svg class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
                     <span class="text-sm text-gray-500 leading-tight pt-0.5">
-                      He leído y acepto los <a href="#" class="text-[#1BB0B9] font-bold hover:underline">términos</a> y la <a href="#" class="text-[#1BB0B9] font-bold hover:underline">política de privacidad</a>.
+                      He leído y acepto los <a href="#" class="text-brand-primary font-bold hover:underline">términos</a> y la <a href="#" class="text-brand-primary font-bold hover:underline">política de privacidad</a>.
                     </span>
                   </label>
                 </div>
@@ -143,14 +143,15 @@
                   :disabled="!registerForm.acceptTerms || hasErrors"
                   full-width
                   loading-text="Creando cuenta..."
+                  class="bg-brand-primary hover:bg-brand-dark text-white border-none"
                 >
                   Crear mi Cuenta
                 </BaseButton>
               </form>
             </div>
 
-            <div class="p-8 md:p-12 lg:p-16 bg-gray-50/80 flex flex-col justify-center relative">
-               <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#1BB0B9 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="p-6 md:p-8 lg:p-10 bg-gray-50/80 flex flex-col justify-center relative">
+               <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#d60579 1px, transparent 1px); background-size: 20px 20px;"></div>
 
               <div class="space-y-8 relative z-10 max-w-lg mx-auto lg:mx-0">
                 <div>
@@ -161,7 +162,7 @@
                 </div>
 
                 <div class="space-y-4">
-                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-white border-2 border-gray-200 rounded-xl hover:border-[#BEDC74] hover:bg-gray-50 transition-all group duration-300">
+                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-white border-2 border-gray-200 rounded-xl hover:border-brand-accentPink hover:bg-gray-50 transition-all group duration-300">
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
                     <span class="text-gray-700 font-bold group-hover:text-gray-900">Registrarse con Google</span>
                   </button>
@@ -178,7 +179,7 @@
                   <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Beneficios de tu cuenta</h4>
                   <div class="grid gap-4">
                     <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                      <div class="w-10 h-10 bg-[#1BB0B9]/10 rounded-full flex items-center justify-center text-[#1BB0B9]">
+                      <div class="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </div>
                       <div>
@@ -188,7 +189,7 @@
                     </div>
                     
                     <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                      <div class="w-10 h-10 bg-[#BEDC74]/20 rounded-full flex items-center justify-center text-[#1a5f63]">
+                      <div class="w-10 h-10 bg-brand-medium/20 rounded-full flex items-center justify-center text-brand-dark">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </div>
                       <div>

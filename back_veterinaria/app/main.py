@@ -106,6 +106,7 @@ app.include_router(ai_chat.router, prefix="/api/v1/ai", tags=["AI Chat"])
 app.include_router(service_requests.router, prefix="/api/v1/service-requests", tags=["Service Requests"])
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")

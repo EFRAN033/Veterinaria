@@ -528,6 +528,10 @@ const submitRequest = async () => {
       requestData.service_data.preferredDate = dateTime.value.date; // Ensure new one is used
     } else if (selectedService.value === 'aesthetic') {
       requestData.pet_name = aesthetic.value.petName;
+    } else if (selectedService.value === 'clinical') {
+      // Clinical request doesn't have a specific pet name field in the current form
+      // We could add it, but for now we'll send it without if not present
+      // or we could assume it's part of the description
     }
 
     await createServiceRequest(requestData);

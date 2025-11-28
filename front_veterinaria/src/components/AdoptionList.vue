@@ -96,7 +96,7 @@
             Para iniciar el proceso de adopción de <span class="font-bold text-[#1BB0B9]">{{ selectedPet?.name }}</span>, por favor contáctanos o visítanos.
           </p>
           <div class="space-y-3">
-            <a href="tel:+51999999999" class="block w-full py-3 rounded-xl bg-[#BEDC74] text-[#1a5f63] font-bold hover:bg-[#d4ed95] transition-colors">
+            <a :href="`tel:${selectedPet?.phone}`" class="block w-full py-3 rounded-xl bg-[#BEDC74] text-[#1a5f63] font-bold hover:bg-[#d4ed95] transition-colors">
               Llamar ahora
             </a>
             <button @click="showModal = false" class="block w-full py-3 rounded-xl border-2 border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-colors">
@@ -110,31 +110,59 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import apiClient from '@/axios';
 
-const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Hámsters', 'Peces'];
+const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Hámsters', 'Peces', 'Otro'];
 const selectedCategory = ref('Todos');
 const showModal = ref(false);
 const selectedPet = ref(null);
+const pets = ref([]);
+const loading = ref(true);
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 const openAdoptionModal = (pet) => {
   selectedPet.value = pet;
   showModal.value = true;
 };
 
-const pets = [
-  { id: 1, name: 'Max', category: 'Perros', breed: 'Golden Retriever', age: '2 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=500&q=80', description: 'Max es un perro muy juguetón y cariñoso, le encanta correr por el parque.' },
-  { id: 2, name: 'Luna', category: 'Gatos', breed: 'Siamés', age: '1 año', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=500&q=80', description: 'Luna es tranquila y elegante, ideal para un hogar relajado.' },
-  { id: 3, name: 'Rocky', category: 'Perros', breed: 'Bulldog Francés', age: '3 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=80', description: 'Rocky es un compañero leal y protector, perfecto para familias.' },
-  { id: 4, name: 'Coco', category: 'Aves', breed: 'Periquito', age: '6 meses', gender: 'Macho', image: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?auto=format&fit=crop&w=500&q=80', description: 'Coco es muy alegre y le gusta cantar por las mañanas.' },
-  { id: 5, name: 'Molly', category: 'Hámsters', breed: 'Sirio', age: '5 meses', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=500&q=80', description: 'Molly es curiosa y activa, le encanta su rueda de ejercicios.' },
-  { id: 6, name: 'Nemo', category: 'Peces', breed: 'Payaso', age: '1 año', gender: 'Macho', image: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=500&q=80', description: 'Nemo es colorido y vivaz, una joya para cualquier acuario.' },
-  { id: 7, name: 'Simba', category: 'Gatos', breed: 'Persa', age: '4 años', gender: 'Macho', image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=500&q=80', description: 'Simba es majestuoso y le encantan las caricias suaves.' },
-  { id: 8, name: 'Bella', category: 'Perros', breed: 'Labrador', age: '1.5 años', gender: 'Hembra', image: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=500&q=80', description: 'Bella es inteligente y aprende trucos muy rápido.' },
-];
+const fetchAdoptions = async () => {
+  try {
+    const response = await apiClient.get('/v1/adoptions/');
+    pets.value = response.data.map(pet => ({
+      id: pet.id,
+      name: pet.name,
+      category: pet.species + 's', // Simple pluralization for matching categories
+      species: pet.species,
+      breed: pet.breed || 'Mestizo',
+      age: pet.age,
+      gender: pet.gender,
+      image: pet.images && pet.images.length > 0 ? `${backendUrl}${pet.images[0]}` : 'https://placehold.co/500x500?text=No+Image',
+      description: pet.description || 'Sin descripción',
+      phone: pet.phone
+    }));
+  } catch (error) {
+    console.error("Error fetching adoptions:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchAdoptions();
+});
 
 const filteredPets = computed(() => {
-  if (selectedCategory.value === 'Todos') return pets;
-  return pets.filter(pet => pet.category === selectedCategory.value);
+  if (selectedCategory.value === 'Todos') return pets.value;
+  // Normalize category matching
+  const cat = selectedCategory.value.slice(0, -1); // Remove 's' roughly
+  return pets.value.filter(pet => {
+    if (selectedCategory.value === 'Perros') return pet.species === 'Perro';
+    if (selectedCategory.value === 'Gatos') return pet.species === 'Gato';
+    if (selectedCategory.value === 'Aves') return pet.species === 'Aves';
+    if (selectedCategory.value === 'Hámsters') return pet.species === 'Hámster';
+    if (selectedCategory.value === 'Peces') return pet.species === 'Peces';
+    return pet.species === selectedCategory.value;
+  });
 });
 </script>

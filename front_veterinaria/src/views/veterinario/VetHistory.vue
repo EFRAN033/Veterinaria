@@ -203,7 +203,7 @@ const getStatusLabel = (status) => {
 const fetchHistory = async () => {
   loading.value = true;
   try {
-    const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/appointments/history`, {
+    const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/history`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = appointmentsResponse.data;

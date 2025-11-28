@@ -8,17 +8,28 @@
           <h2 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <SparklesIcon class="h-6 w-6 text-indigo-600" />
             Asistente IA
+            <span v-if="currentCategory !== 'GENERAL'" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200">{{ currentCategory }}</span>
           </h2>
           <p class="text-sm text-slate-500 mt-1">Consultas clínicas y apoyo diagnóstico.</p>
         </div>
         
-        <div>
+        <div class="flex items-center gap-3">
+          <button 
+            @click="generateReport"
+            :disabled="messages.length < 2 || generatingReport"
+            class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <DocumentTextIcon class="h-5 w-5 text-indigo-600" />
+            <span v-if="generatingReport">Generando...</span>
+            <span v-else>Generar Reporte</span>
+          </button>
+
           <button 
             @click="loadClinicalCase"
-            class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wide rounded-full shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 text-sm font-medium"
           >
-            <FolderPlusIcon class="h-4 w-4" />
-            <span>Cargar Caso</span>
+            <FolderPlusIcon class="h-5 w-5" />
+            Cargar Caso
           </button>
         </div>
       </div>
@@ -50,7 +61,11 @@
           >
             <div class="flex max-w-[85%] sm:max-w-[75%] gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'">
               
-              <ChatAvatar :role="msg.role" />
+              <ChatAvatar 
+                :role="msg.role" 
+                :isAnimated="index === messages.length - 1 && msg.role === 'assistant'"
+                :isLatest="index === messages.length - 1"
+              />
 
               <div 
                 class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
@@ -72,7 +87,7 @@
 
           <div v-if="loading" class="flex justify-start w-full">
             <div class="flex gap-3 max-w-[75%]">
-              <ChatAvatar role="assistant" />
+              <ChatAvatar role="assistant" :isAnimated="true" :isLatest="true" />
               <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
                 <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
@@ -84,24 +99,83 @@
         </div>
 
         <div class="p-4 bg-white border-t border-slate-100 z-20">
-          <form @submit.prevent="sendMessage" class="relative flex items-end gap-2 max-w-4xl mx-auto">
+          <form @submit.prevent="sendMessage" class="flex gap-3 items-end">
+            <!-- Image Preview -->
+            <div v-if="selectedImagePreview" class="absolute bottom-full mb-2 left-0 bg-white p-2 rounded-xl shadow-lg border border-slate-200 animate-fade-in-up">
+              <div class="relative">
+                <img :src="selectedImagePreview" class="h-20 w-20 object-cover rounded-lg" />
+                <button @click="clearImage" type="button" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600">
+                  <XMarkIcon class="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="absolute bottom-full mb-3 left-0 right-0 flex gap-2 overflow-x-auto pb-2 px-1 custom-scrollbar-hide mask-fade-sides">
+              <button 
+                v-for="action in quickActions" 
+                :key="action"
+                type="button"
+                @click="useQuickAction(action)"
+                class="whitespace-nowrap px-3 py-1.5 bg-white border border-indigo-100 text-indigo-600 text-xs font-bold rounded-lg shadow-sm hover:bg-indigo-50 hover:border-indigo-200 transition-all active:scale-95"
+              >
+                {{ action }}
+              </button>
+            </div>
+
             <div class="relative flex-1">
+              <!-- Ghost Text Overlay -->
+              <div class="absolute inset-0 pl-12 py-3.5 text-sm pointer-events-none overflow-hidden whitespace-pre">
+                <span class="invisible">{{ userInput }}</span><span class="text-slate-400 opacity-60">{{ suggestionSuffix }}</span>
+              </div>
+
               <input 
                 v-model="userInput" 
+                @input="checkAutocomplete"
+                @keydown="handleKeydown"
                 type="text" 
                 placeholder="Escribe tu consulta veterinaria..." 
-                class="w-full pl-5 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner"
+                class="w-full pl-12 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner relative z-10 bg-transparent"
                 :disabled="loading"
               >
-              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
-                <CpuChipIcon class="h-5 w-5" />
+              <!-- Image Upload Button -->
+              <div class="absolute left-2 top-1/2 -translate-y-1/2">
+                <button 
+                  type="button"
+                  @click="$refs.fileInput.click()"
+                  class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-slate-100"
+                  title="Adjuntar imagen clínica"
+                >
+                  <PaperClipIcon class="h-5 w-5" />
+                </button>
+                <input 
+                  ref="fileInput"
+                  type="file" 
+                  accept="image/*" 
+                  class="hidden"
+                  @change="handleImageUpload"
+                >
+              </div>
+              
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <!-- Voice Input -->
+                <button 
+                  type="button"
+                  @click="toggleVoiceRecording"
+                  class="p-1.5 rounded-full transition-all duration-300"
+                  :class="isRecording ? 'bg-rose-100 text-rose-600 animate-pulse' : 'text-slate-300 hover:text-indigo-600 hover:bg-slate-100'"
+                  title="Dictado por voz"
+                >
+                  <MicrophoneIcon class="h-5 w-5" />
+                </button>
+                <CpuChipIcon class="h-5 w-5 text-slate-300" />
               </div>
             </div>
 
             <button 
               type="submit" 
               class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
-              :disabled="loading || (!userInput.trim() && !Object.values(vitals).some(v => v !== ''))"
+              :disabled="loading || !userInput.trim()"
             >
               <PaperAirplaneIcon class="h-5 w-5 transform -rotate-45 translate-x-0.5 -translate-y-0.5" />
             </button>
@@ -112,106 +186,9 @@
         </div>
       </div>
 
-      <!-- DSS Sidebar -->
-      <div class="w-80 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
-        <div class="p-4 bg-slate-50 border-b border-slate-100">
-          <h3 class="font-bold text-slate-700 flex items-center gap-2">
-            <ChartBarIcon class="h-5 w-5 text-indigo-600" />
-            Monitor Clínico (DSS)
-          </h3>
-          <p class="text-[10px] text-slate-400 mt-1">Ingresa constantes para análisis en tiempo real.</p>
-        </div>
+      <!-- Clinical Insights Panel -->
+      <ClinicalInsights :insights="clinicalInsights" />
 
-        <div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-6">
-          
-          <!-- Vitals Form -->
-          <div class="space-y-3">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Signos Vitales</label>
-            
-            <div class="grid grid-cols-2 gap-3">
-              <div class="space-y-1">
-                <label class="text-[10px] text-slate-400 flex items-center gap-1"><HeartIcon class="h-3 w-3"/> FC (lpm)</label>
-                <input v-model="vitals.heart_rate" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 100">
-              </div>
-              <div class="space-y-1">
-                <label class="text-[10px] text-slate-400 flex items-center gap-1"><FireIcon class="h-3 w-3"/> Temp (°C)</label>
-                <input v-model="vitals.temperature" type="number" step="0.1" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 38.5">
-              </div>
-              <div class="space-y-1">
-                <label class="text-[10px] text-slate-400 flex items-center gap-1"><BoltIcon class="h-3 w-3"/> FR (rpm)</label>
-                <input v-model="vitals.respiratory_rate" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 24">
-              </div>
-              <div class="space-y-1">
-                <label class="text-[10px] text-slate-400 flex items-center gap-1"><ClockIcon class="h-3 w-3"/> TLLC (s)</label>
-                <input v-model="vitals.capillary_refill" type="number" step="0.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 1.5">
-              </div>
-              <div class="col-span-2 space-y-1">
-                <label class="text-[10px] text-slate-400 flex items-center gap-1">Presión Sistólica (mmHg)</label>
-                <input v-model="vitals.systolic_bp" type="number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="Ej: 120">
-              </div>
-            </div>
-          </div>
-
-          <!-- DSS Results -->
-          <div v-if="dssResult" class="space-y-4 animate-fade-in-up">
-            <div class="h-px bg-slate-100"></div>
-            
-            <!-- Triage Section -->
-            <div v-if="dssResult.triage" class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Triaje Algorítmico</label>
-              
-              <div class="p-3 rounded-xl border" 
-                :class="{
-                  'bg-green-50 border-green-200 text-green-700': dssResult.triage.triage_level.includes('GREEN'),
-                  'bg-yellow-50 border-yellow-200 text-yellow-700': dssResult.triage.triage_level.includes('YELLOW'),
-                  'bg-red-50 border-red-200 text-red-700': dssResult.triage.triage_level.includes('RED')
-                }"
-              >
-                <div class="flex items-center gap-2 font-bold text-sm">
-                  <span class="w-2 h-2 rounded-full bg-current"></span>
-                  {{ dssResult.triage.triage_level }}
-                </div>
-                <div class="text-[10px] mt-1 opacity-80">Score: {{ dssResult.triage.triage_score }}</div>
-              </div>
-
-              <div v-if="dssResult.triage.alerts.length > 0" class="space-y-1">
-                <div v-for="(alert, idx) in dssResult.triage.alerts" :key="idx" class="text-[10px] px-2 py-1 bg-slate-100 rounded text-slate-600 flex items-start gap-1">
-                  <span class="text-amber-500 mt-0.5">⚠️</span> {{ alert }}
-                </div>
-              </div>
-            </div>
-
-            <!-- ML Prediction Section -->
-            <div v-if="dssResult.prediction" class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Predicción ML (Local)</label>
-              
-              <div class="bg-slate-900 text-white p-3 rounded-xl shadow-lg relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-2 opacity-10">
-                  <CpuChipIcon class="w-12 h-12" />
-                </div>
-                <div class="relative z-10">
-                  <div class="text-[10px] text-slate-400 uppercase">Riesgo Estimado</div>
-                  <div class="text-lg font-bold text-indigo-300">{{ dssResult.prediction.ml_prediction }}</div>
-                  
-                  <div class="mt-2 flex items-center gap-2">
-                    <div class="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                      <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" :style="`width: ${dssResult.prediction.confidence}%`"></div>
-                    </div>
-                    <span class="text-[10px] font-mono">{{ dssResult.prediction.confidence }}%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div v-else class="text-center py-8 opacity-40">
-            <ChartBarIcon class="w-12 h-12 mx-auto text-slate-300 mb-2" />
-            <p class="text-xs text-slate-400">Ingresa datos y envía para analizar</p>
-          </div>
-
-        </div>
-      </div>
 
     </div>
   </div>
@@ -288,12 +265,42 @@
       </div>
     </div>
 
+    <!-- Report Modal -->
+    <div v-if="showReportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showReportModal = false">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden animate-fade-in-up">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <DocumentTextIcon class="h-6 w-6 text-indigo-600" />
+            Reporte Clínico Generado
+          </h3>
+          <button @click="showReportModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div class="p-8 overflow-y-auto custom-scrollbar bg-white">
+          <div class="prose prose-slate max-w-none prose-headings:text-indigo-900 prose-a:text-indigo-600">
+            <div v-html="formatMessage(reportContent)"></div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+          <button @click="showReportModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">
+            Cerrar
+          </button>
+          <button @click="downloadReport" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+            <ArrowDownTrayIcon class="h-5 w-5" />
+            Descargar Markdown
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 
 <script setup>
-import { ref, nextTick, computed } from 'vue';
+import { ref, nextTick, computed, watch } from 'vue';
 import axios from 'axios';
 import { 
   PaperAirplaneIcon, 
@@ -303,17 +310,16 @@ import {
   XMarkIcon,
   MagnifyingGlassIcon,
   InboxIcon,
-  HeartIcon,
-  FireIcon,
-  BoltIcon,
-  ClockIcon,
-  ChartBarIcon,
-  ExclamationTriangleIcon
+  DocumentTextIcon,
+  ArrowDownTrayIcon,
+  PaperClipIcon,
+  MicrophoneIcon
 } from '@heroicons/vue/24/outline';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import { useUserStore } from '@/stores/user';
 
 import ChatAvatar from '@/components/ChatAvatar.vue';
+import ClinicalInsights from '@/components/ClinicalInsights.vue';
 
 const messages = ref([
   { role: 'assistant', content: '¡Hola Dr.! Soy tu asistente veterinario. Puedo ayudarte a analizar síntomas, revisar dosis o buscar información clínica. ¿Por dónde empezamos?' }
@@ -328,25 +334,74 @@ const { getAllRequests } = useServiceRequests();
 const userStore = useUserStore();
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const vitals = ref({
-  heart_rate: '',
-  temperature: '',
-  respiratory_rate: '',
-  capillary_refill: '',
-  systolic_bp: ''
-});
+// New state for AI enhancements
+const currentCategory = ref('GENERAL');
+const clinicalInsights = ref(null);
 
-const dssResult = ref(null);
+const quickActions = [
+  'Diagnóstico Diferencial',
+  'Plan Terapéutico',
+  'Dosis Farmacológica',
+  'Interpretación Labs',
+  'Protocolo de Vacunación'
+];
+
+import { veterinaryDictionary } from '@/data/veterinaryDictionary';
+
+const commonPhrases = veterinaryDictionary;
+
+const suggestionSuffix = ref('');
+
+const checkAutocomplete = () => {
+  const input = userInput.value.toLowerCase();
+  if (!input) {
+    suggestionSuffix.value = '';
+    return;
+  }
+
+  const match = commonPhrases.find(phrase => 
+    phrase.toLowerCase().startsWith(input) && phrase.length > input.length
+  );
+
+  if (match) {
+    // Get the part of the phrase that hasn't been typed yet, preserving original case
+    suggestionSuffix.value = match.slice(input.length);
+  } else {
+    suggestionSuffix.value = '';
+  }
+};
+
+const handleKeydown = (e) => {
+  if (e.key === 'Tab' && suggestionSuffix.value) {
+    e.preventDefault();
+    userInput.value += suggestionSuffix.value;
+    suggestionSuffix.value = '';
+  }
+};
+
+const useQuickAction = (action) => {
+  userInput.value = action + ' ';
+  suggestionSuffix.value = ''; // Clear suggestion when using quick action
+  // Focus input manually if needed, but v-model binding usually suffices for next type
+  const inputEl = document.querySelector('input[type="text"]');
+  if (inputEl) inputEl.focus();
+};
 
 const loadClinicalCase = async () => {
   isCaseModalOpen.value = true;
   loading.value = true;
   try {
     const reqData = await getAllRequests();
+    
+    // Filter for AI relevant cases only (Consultation and Clinical)
+    const medicalCases = reqData.filter(req => 
+      req.service_type === 'consultation' || req.service_type === 'clinical'
+    );
 
-    requests.value = reqData.map(req => ({
+    requests.value = medicalCases.map(req => ({
       id: `req-${req.id}`,
       type: 'request',
+      pet_id: req.pet_id, // Capture pet_id
       date: req.service_data.preferredDate ? req.service_data.preferredDate.split('T')[0] : 'Pendiente',
       petName: req.pet_name || req.service_data.petName || 'Sin nombre',
       species: req.service_data.species || 'General',
@@ -367,8 +422,6 @@ const closeCaseModal = () => {
 
 const filteredCases = ref([]);
 
-import { watch } from 'vue';
-
 const computedFilteredCases = computed(() => {
   let list = requests.value;
   if (caseSearch.value) {
@@ -385,30 +438,74 @@ watch([caseSearch, requests], () => {
   filteredCases.value = computedFilteredCases.value;
 });
 
-const selectCase = (item) => {
-  let prompt = `Actúa como un experto Veterinario Senior con especialización en medicina interna. Analiza el siguiente caso clínico y proporciona tu opinión profesional.\n\n`;
-  prompt += `### Información del Paciente\n`;
-  prompt += `**Nombre:** ${item.petName}\n`;
-  prompt += `**Especie:** ${item.species}\n`;
-  prompt += `**Fecha del Caso:** ${item.date}\n\n`;
-  
-  prompt += `### Cuadro Clínico\n`;
-  prompt += `**Descripción/Síntomas:**\n${item.description}\n\n`;
-  
-  if (item.images.length > 0) {
-    prompt += `### Evidencia Visual\n`;
-    prompt += `Se adjuntan las siguientes imágenes para tu análisis:\n`;
-    item.images.forEach(img => {
-      prompt += `![Imagen del Caso](${import.meta.env.VITE_BACKEND_URL}/${img})\n`;
-    });
-    prompt += `\n`;
-  }
+const currentPetId = ref(null); // Store selected pet ID
+const selectedImage = ref(null);
+const selectedImagePreview = ref(null);
 
-  prompt += `### Solicitud\n`;
-  prompt += `Por favor, estructura tu respuesta de la siguiente manera:\n`;
-  prompt += `1. **Resumen del Caso**: Breve interpretación de los datos.\n`;
-  prompt += `2. **Pre-diagnóstico Diferencial**: Lista de posibles causas ordenadas por probabilidad.\n`;
-  prompt += `4. **Plan Sugerido**: Pruebas diagnósticas recomendadas y tratamiento inicial.\n`;
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    selectedImage.value = e.target.result.split(',')[1]; // Base64 content only
+    selectedImagePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+const clearImage = () => {
+  selectedImage.value = null;
+  selectedImagePreview.value = null;
+};
+
+// Voice Recognition
+const isRecording = ref(false);
+let recognition = null;
+
+const toggleVoiceRecording = () => {
+  if (isRecording.value) {
+    if (recognition) recognition.stop();
+    isRecording.value = false;
+  } else {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Tu navegador no soporta reconocimiento de voz.');
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'es-ES';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isRecording.value = true;
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      userInput.value += (userInput.value ? ' ' : '') + transcript;
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Voice error:', event.error);
+      isRecording.value = false;
+    };
+
+    recognition.onend = () => {
+      isRecording.value = false;
+    };
+
+    recognition.start();
+  }
+};
+
+const selectCase = (item) => {
+  currentPetId.value = item.pet_id; // Store pet_id
+  let prompt = `Paciente: ${item.petName} (${item.species})\n`;
+  prompt += `Fecha: ${item.date}\n\n`;
+  prompt += `Síntomas/Descripción:\n${item.description}`;
 
   userInput.value = prompt;
   closeCaseModal();
@@ -417,7 +514,7 @@ const selectCase = (item) => {
 const formatMessage = (content) => {
   if (!content) return '';
   
-  let formatted = content.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+  let formatted = content.replace(/!\[.*?\]\((.*?)\)/g, (match, alt, url) => {
     return `<div class="my-2"><img src="${url}" alt="${alt}" class="rounded-lg max-w-full sm:max-w-xs h-auto shadow-sm border border-slate-200 object-cover" /></div>`;
   });
 
@@ -443,53 +540,108 @@ const scrollToBottom = async () => {
   }
 };
 
-const isVitalsInputVisible = computed(() => {
-  return userInput.value.includes('### Información del Paciente') || Object.values(vitals.value).some(v => v !== '');
-});
-
-const clearDssResult = () => {
-  dssResult.value = null;
-  vitals.value = {
-    heart_rate: '',
-    temperature: '',
-    respiratory_rate: '',
-    capillary_refill: '',
-    systolic_bp: ''
-  };
+const streamResponse = async (fullText) => {
+  messages.value.push({ role: 'assistant', content: '' });
+  const messageIndex = messages.value.length - 1;
+  
+  const chunkSize = 3; // Characters per tick
+  let currentIndex = 0;
+  
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (currentIndex >= fullText.length) {
+        clearInterval(interval);
+        resolve();
+        return;
+      }
+      
+      const chunk = fullText.slice(currentIndex, currentIndex + chunkSize);
+      messages.value[messageIndex].content += chunk;
+      currentIndex += chunkSize;
+      scrollToBottom();
+    }, 15); // Speed in ms
+  });
 };
 
 const sendMessage = async () => {
-  if (!userInput.value.trim() && !Object.values(vitals.value).some(v => v !== '')) return; // Allow sending only vitals
+  if (!userInput.value.trim() && !selectedImage.value) return;
 
   const content = userInput.value;
   messages.value.push({ role: 'user', content });
+  
+  if (selectedImagePreview.value) {
+    messages.value.push({ role: 'user', content: `![Imagen adjunta](${selectedImagePreview.value})` });
+  }
+
   userInput.value = '';
   loading.value = true;
-  dssResult.value = null; // Reset previous DSS result
   await scrollToBottom();
 
   try {
-    const hasVitals = Object.values(vitals.value).some(v => v !== '');
     const payload = {
-      messages: messages.value,
-      vitals: hasVitals ? vitals.value : null
+      messages: messages.value.filter(m => !m.content.startsWith('![')), 
+      pet_id: currentPetId.value,
+      image_data: selectedImage.value
     };
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/ai/chat`, payload);
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/v1/ai/chat`, payload);
     
-    messages.value.push({ role: 'assistant', content: response.data.response });
+    // Stop loading animation before streaming starts
+    loading.value = false;
     
-    if (response.data.dss_data) {
-      dssResult.value = response.data.dss_data;
+    // Stream the response
+    await streamResponse(response.data.response);
+    
+    if (response.data.category) {
+      currentCategory.value = response.data.category;
     }
+
+    if (response.data.clinical_insights) {
+      clinicalInsights.value = response.data.clinical_insights;
+    }
+    
+    // Clear image after sending
+    clearImage();
 
   } catch (err) {
     console.error('Error in chat:', err);
+    loading.value = false;
     messages.value.push({ role: 'assistant', content: 'Lo siento, tuve un problema de conexión. Por favor intenta de nuevo.' });
   } finally {
-    loading.value = false;
+    // loading is already false here
     await scrollToBottom();
   }
+};
+
+const generatingReport = ref(false);
+const showReportModal = ref(false);
+const reportContent = ref('');
+
+const generateReport = async () => {
+  generatingReport.value = true;
+  try {
+    const payload = {
+      messages: messages.value,
+      pet_id: currentPetId.value
+    };
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/v1/ai/report`, payload);
+    reportContent.value = response.data.report;
+    showReportModal.value = true;
+  } catch (err) {
+    console.error('Error generating report:', err);
+    alert('Error al generar el reporte.');
+  } finally {
+    generatingReport.value = false;
+  }
+};
+
+const downloadReport = () => {
+  const blob = new Blob([reportContent.value], { type: 'text/markdown' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Reporte_Clinico_${new Date().toISOString().split('T')[0]}.md`;
+  a.click();
 };
 </script>
 

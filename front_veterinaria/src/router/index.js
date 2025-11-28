@@ -103,6 +103,12 @@ router.beforeEach((to, from, next) => {
     return;
   }
 
+  // Restrict veterinarian from accessing user portal
+  if (userStore.isLoggedIn && userStore.userRole === 'veterinario' && !to.path.startsWith('/veterinario')) {
+    next({ path: '/veterinario' });
+    return;
+  }
+
   if (to.path.startsWith('/veterinario')) {
     if (!userStore.isLoggedIn) {
       next({ path: '/login' });

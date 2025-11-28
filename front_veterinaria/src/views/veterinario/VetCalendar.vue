@@ -311,7 +311,7 @@ const filteredList = computed(() => {
 const fetchAppointments = async () => {
   try {
     const [appointmentsRes, requestsData] = await Promise.all([
-      axios.get(`${import.meta.env.VITE_API_URL}/appointments/all`, { headers: { Authorization: `Bearer ${userStore.token}` } }),
+      axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, { headers: { Authorization: `Bearer ${userStore.token}` } }),
       getAllRequests() // Fetch all requests to filter by date
     ]);
 

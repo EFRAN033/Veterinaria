@@ -71,39 +71,45 @@
                 <div class="w-full sm:w-8/12 grid grid-cols-2 gap-4 content-start">
                   <div class="col-span-2">
                     <label class="label-standar">Nombre</label>
-                    <input type="text" class="form-input" placeholder="Ej. Max" />
+                    <input v-model="form.name" type="text" class="form-input" placeholder="Ej. Max" required />
                   </div>
                   
                   <div>
                     <label class="label-standar">Edad</label>
-                    <input type="text" class="form-input" placeholder="Ej. 2 años" />
+                    <input v-model="form.age" type="text" class="form-input" placeholder="Ej. 2 años" required />
                   </div>
                   
                   <div class="relative">
                     <label class="label-standar">Categoría</label>
-                    <select class="form-input appearance-none cursor-pointer">
-                      <option>Perro</option>
-                      <option>Gato</option>
-                      <option>Hámster</option>
-                      <option>Peces</option>
-                      <option>Aves</option>
+                    <select v-model="form.species" class="form-input appearance-none cursor-pointer">
+                      <option value="Perro">Perro</option>
+                      <option value="Gato">Gato</option>
+                      <option value="Hámster">Hámster</option>
+                      <option value="Peces">Peces</option>
+                      <option value="Aves">Aves</option>
+                      <option value="Otro">Otro</option>
                     </select>
                     <div class="absolute right-3 top-[2.35rem] pointer-events-none text-gray-400">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                   </div>
 
+                  <div class="col-span-2">
+                    <label class="label-standar">Raza (Opcional)</label>
+                    <input v-model="form.breed" type="text" class="form-input" placeholder="Ej. Golden Retriever" />
+                  </div>
+
                   <div class="col-span-2 relative">
                      <label class="label-standar">Género</label>
                      <div class="flex gap-4 mt-1">
                         <label class="flex-1 cursor-pointer">
-                          <input type="radio" name="gender" class="peer sr-only" />
+                          <input type="radio" v-model="form.gender" value="Macho" name="gender" class="peer sr-only" />
                           <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-xl peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
                             Macho
                           </div>
                         </label>
                         <label class="flex-1 cursor-pointer">
-                          <input type="radio" name="gender" class="peer sr-only" />
+                          <input type="radio" v-model="form.gender" value="Hembra" name="gender" class="peer sr-only" />
                           <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-xl peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
                             Hembra
                           </div>
@@ -116,23 +122,24 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label class="label-standar">Teléfono </label>
-                  <input type="tel" class="form-input" placeholder="+51 999 999 999" />
+                  <input v-model="form.phone" type="tel" class="form-input" placeholder="+51 999 999 999" required />
                 </div>
                 <div>
                   <label class="label-standar">Email (Opcional)</label>
-                  <input type="email" class="form-input" placeholder="contacto@email.com" />
+                  <input v-model="form.email" type="email" class="form-input" placeholder="contacto@email.com" />
                 </div>
               </div>
 
               <div>
                 <label class="label-standar">Historia / Descripción</label>
-                <textarea rows="3" class="form-input resize-none leading-relaxed" placeholder="Cuéntanos sobre su personalidad, gustos y por qué busca un hogar..."></textarea>
+                <textarea v-model="form.description" rows="3" class="form-input resize-none leading-relaxed" placeholder="Cuéntanos sobre su personalidad, gustos y por qué busca un hogar..."></textarea>
               </div>
 
               <div class="pt-2">
-                <button type="submit" class="w-full bg-[#BEDC74] text-[#1a5f63] font-serif font-bold text-xl py-4 rounded-xl shadow-[0_10px_30px_-10px_rgba(190,220,116,0.5)] hover:bg-[#d4ed95] hover:shadow-[0_15px_35px_-10px_rgba(190,220,116,0.7)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group">
-                  <span>Registrar Mascota</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button type="submit" :disabled="loading" class="w-full bg-[#BEDC74] text-[#1a5f63] font-serif font-bold text-xl py-4 rounded-xl shadow-[0_10px_30px_-10px_rgba(190,220,116,0.5)] hover:bg-[#d4ed95] hover:shadow-[0_15px_35px_-10px_rgba(190,220,116,0.7)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-not-allowed">
+                  <span v-if="loading">Registrando...</span>
+                  <span v-else>Registrar Mascota</span>
+                  <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </button>
@@ -153,8 +160,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useToast } from '@/composables/useToast';
+import apiClient from '@/axios';
 
 const { addToast } = useToast();
 import Header from './Header.vue';
@@ -164,17 +172,65 @@ import AdoptionList from '@/components/AdoptionList.vue';
 import doghuella from '@/assets/images/doghuella.png';
 
 const previewImage = ref(null);
+const loading = ref(false);
+
+const form = reactive({
+  name: '',
+  age: '',
+  species: 'Perro',
+  breed: '',
+  gender: 'Macho',
+  phone: '',
+  email: '',
+  description: '',
+  images: []
+});
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
-    previewImage.value = URL.createObjectURL(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImage.value = e.target.result;
+      form.images = [e.target.result]; // Store base64
+    };
+    reader.readAsDataURL(file);
   }
 };
 
-const handleSubmit = () => {
-  addToast("¡Gracias por registrar la mascota! Nos pondremos en contacto contigo pronto para verificar los datos.", "success");
-  console.log("Formulario enviado");
+const handleSubmit = async () => {
+  if (!form.name || !form.age || !form.phone) {
+    addToast("Por favor completa los campos obligatorios.", "error");
+    return;
+  }
+
+  loading.value = true;
+  try {
+    await apiClient.post('/v1/adoptions/', form);
+    addToast("¡Gracias por registrar la mascota! Nos pondremos en contacto contigo pronto.", "success");
+    
+    // Reset form
+    form.name = '';
+    form.age = '';
+    form.breed = '';
+    form.phone = '';
+    form.email = '';
+    form.description = '';
+    form.images = [];
+    previewImage.value = null;
+    
+    // Reload list (using event bus or simple reload for now, or just let the component refresh if it was reactive)
+    // Since AdoptionList is a separate component, we might need to trigger a refresh. 
+    // For simplicity, we can reload the page or use a global store. 
+    // Let's just reload the page for now to be safe and simple.
+    setTimeout(() => window.location.reload(), 1500);
+
+  } catch (error) {
+    console.error(error);
+    addToast("Hubo un error al registrar la mascota.", "error");
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 

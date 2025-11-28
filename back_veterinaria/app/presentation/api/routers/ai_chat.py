@@ -1,16 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from openai import OpenAI
-from app.core.config import settings
-from app.core.vet_knowledge import SYSTEM_PROMPT, CLINICAL_EXAMPLES
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.application.services.ai_service import AIService
 from app.core.dss.triage import assess_vitals
 from app.core.dss.predictor import predict_severity
 import re
 
 router = APIRouter()
-
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 class ChatMessage(BaseModel):
     role: str  # "user" or "assistant"
@@ -19,16 +17,20 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
     vitals: Optional[Dict[str, Any]] = None
+    pet_id: Optional[int] = None
+    image_data: Optional[str] = None # Base64 encoded image
 
 class ChatResponse(BaseModel):
     response: str
     dss_data: Optional[Dict[str, Any]] = None
+    clinical_insights: Optional[Dict[str, Any]] = None
+    category: str = "GENERAL"
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat_with_vet_ai(request: ChatRequest):
+async def chat_with_vet_ai(request: ChatRequest, db: Session = Depends(get_db)):
     """AI Veterinary Assistant Chat using OpenAI with Few-Shot Learning & DSS"""
     try:
-        messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
+        ai_service = AIService()
         
         dss_output = None
         
@@ -40,42 +42,37 @@ async def chat_with_vet_ai(request: ChatRequest):
                 "triage": triage_result,
                 "prediction": ml_result
             }
-            
-            dss_context = f"""
-            [SISTEMA DE SOPORTE A LA DECISIÓN (DSS) - DATOS EN TIEMPO REAL]
-            
-            1. ANÁLISIS DE CONSTANTES (TRIAJE):
-            - Nivel de Triaje: {triage_result['triage_level']}
-            - Puntuación: {triage_result['triage_score']}
-            - Alertas Activas: {', '.join(triage_result['alerts']) if triage_result['alerts'] else 'Ninguna'}
-            - Índice de Shock: {triage_result['calculated_metrics'].get('shock_index', 'N/A')}
-            
-            2. PREDICCIÓN DE GRAVEDAD (MODELO ML LOCAL):
-            - Predicción: {ml_result.get('ml_prediction', 'N/A')}
-            - Confianza del Modelo: {ml_result.get('confidence', 0)}%
-            
-            INSTRUCCIÓN: Utiliza estos datos objetivos para fundamentar tu respuesta. Si el triaje es ROJO o la predicción es ALTA, prioriza la estabilización inmediata.
-            """
-            messages_payload.append({"role": "system", "content": dss_context})
         
-        messages_payload.extend(CLINICAL_EXAMPLES)
-        
-        for msg in request.messages:
-            clean_text = re.sub(r'!\[.*?\]\((.*?)\)', '', msg.content).strip()
-            if not clean_text:
-                clean_text = msg.content # Fallback if everything was an image link
-            
-            messages_payload.append({"role": msg.role, "content": clean_text})
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini", 
-            messages=messages_payload,
-            temperature=0.3
+        # Generate AI response using the new service
+        ai_result = ai_service.generate_response(
+            messages=request.messages, 
+            vitals=request.vitals,
+            pet_id=request.pet_id,
+            image_data=request.image_data,
+            db=db
         )
         
-        ai_response = response.choices[0].message.content
-        return {"response": ai_response, "dss_data": dss_output}
-
+        return {
+            "response": ai_result["response"],
+            "dss_data": dss_output,
+            "clinical_insights": ai_result.get("clinical_insights"),
+            "category": ai_result["category"]
+        }
     except Exception as e:
-        print(f"Error in OpenAI API call: {e}")
+        print(f"Error in AI Chat API: {e}")
         raise HTTPException(status_code=500, detail="Error communicating with AI service")
+
+@router.post("/report", response_model=Dict[str, str])
+async def generate_clinical_report(request: ChatRequest, db: Session = Depends(get_db)):
+    """Generate a formal clinical report from the chat session"""
+    try:
+        ai_service = AIService()
+        report = ai_service.generate_report(
+            messages=request.messages,
+            pet_id=request.pet_id,
+            db=db
+        )
+        return {"report": report}
+    except Exception as e:
+        print(f"Error generating report: {e}")
+        raise HTTPException(status_code=500, detail="Error generating report")

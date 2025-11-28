@@ -200,10 +200,10 @@ const getServiceTypeName = (type) => {
 
 const getServiceTypeClass = (type) => {
   const classes = {
-    consultation: 'bg-blue-100 text-blue-700',
-    general: 'bg-green-100 text-green-700',
-    clinical: 'bg-purple-100 text-purple-700',
-    aesthetic: 'bg-pink-100 text-pink-700'
+    consultation: 'bg-sky-100 text-sky-700', // Celeste (IA/Consulta)
+    general: 'bg-orange-100 text-orange-700', // Naranja (Nutrición/General)
+    clinical: 'bg-purple-100 text-purple-700', // Clínico (Mantenemos purple o cambiamos si se pide)
+    aesthetic: 'bg-pink-100 text-pink-700' // Rosado (Estética)
   };
   return classes[type] || 'bg-gray-100 text-gray-700';
 };

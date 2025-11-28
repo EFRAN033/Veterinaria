@@ -273,7 +273,7 @@ const fetchPendingAppointments = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/appointments/pending`, {
+    const appointmentsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/pending`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = appointmentsResponse.data;
@@ -295,7 +295,7 @@ const updateStatus = async (id, status) => {
   appointments.value = appointments.value.filter(app => app.id !== id);
 
   try {
-    await axios.patch(`${import.meta.env.VITE_API_URL}/appointments/${id}/status`, 
+    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/appointments/${id}/status`, 
       { status },
       { headers: { Authorization: `Bearer ${userStore.token}` } }
     );

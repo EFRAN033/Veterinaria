@@ -19,7 +19,7 @@ export const useServiceRequests = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.post('/service-requests', requestData);
+            const response = await apiClient.post('/v1/service-requests', requestData);
             return response.data;
         } catch (err) {
             console.error('Error creating service request:', err);
@@ -39,7 +39,7 @@ export const useServiceRequests = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.get('/service-requests/my-requests');
+            const response = await apiClient.get('/v1/service-requests/my-requests');
             return response.data;
         } catch (err) {
             console.error('Error fetching my requests:', err);
@@ -60,7 +60,7 @@ export const useServiceRequests = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.get('/service-requests', { params: filters });
+            const response = await apiClient.get(`/v1/service-requests`, { params: filters });
             return response.data;
         } catch (err) {
             console.error('Error fetching all requests:', err);
@@ -81,7 +81,7 @@ export const useServiceRequests = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.get(`/service-requests/${requestId}`);
+            const response = await apiClient.get(`/v1/service-requests/${requestId}`);
             return response.data;
         } catch (err) {
             console.error('Error fetching request:', err);
@@ -103,7 +103,7 @@ export const useServiceRequests = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.patch(`/service-requests/${requestId}`, updateData);
+            const response = await apiClient.patch(`/v1/service-requests/${requestId}`, updateData);
             return response.data;
         } catch (err) {
             console.error('Error updating request:', err);

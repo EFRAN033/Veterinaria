@@ -1,10 +1,18 @@
 <template>
-  <div class="shrink-0 h-8 w-8 flex items-center justify-center">
-    <UserIcon v-if="role === 'user'" class="h-6 w-6 text-indigo-700" />
+  <div class="shrink-0 h-8 w-8 flex items-center justify-center transition-colors duration-500">
+    <UserIcon 
+      v-if="role === 'user'" 
+      class="h-6 w-6 transition-colors duration-500"
+      :class="isLatest ? 'text-indigo-700' : 'text-slate-300'" 
+    />
 
     <SparklesIcon 
       v-else 
-      class="h-6 w-6 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-thinking" 
+      class="h-6 w-6 transition-all duration-500"
+      :class="[
+        isLatest ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]' : 'text-slate-300',
+        { 'animate-thinking': isAnimated }
+      ]"
     />
   </div>
 </template>
@@ -17,6 +25,14 @@ defineProps({
     type: String,
     required: true,
     validator: (value) => ['user', 'assistant'].includes(value)
+  },
+  isAnimated: {
+    type: Boolean,
+    default: false
+  },
+  isLatest: {
+    type: Boolean,
+    default: false
   }
 });
 </script>

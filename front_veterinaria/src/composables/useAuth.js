@@ -58,7 +58,7 @@ export const useAuth = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.post('/auth/login', {
+            const response = await apiClient.post('/v1/auth/login', {
                 email: credentials.email,
                 password: credentials.password,
             });
@@ -91,7 +91,7 @@ export const useAuth = () => {
             loading.value = true;
             error.value = '';
 
-            const response = await apiClient.post('/auth/register', {
+            const response = await apiClient.post('/v1/auth/register', {
                 name: userData.name,
                 email: userData.email,
                 password: userData.password,
@@ -117,7 +117,7 @@ export const useAuth = () => {
             loading.value = true;
 
             try {
-                await apiClient.post('/auth/logout');
+                await apiClient.post('/v1/auth/logout');
             } catch (err) {
                 console.warn('Error al cerrar sesión en el servidor:', err);
             }

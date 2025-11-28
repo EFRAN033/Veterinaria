@@ -20,7 +20,7 @@ function parseJwt(token) {
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('access_token') || null)
   const user = ref(JSON.parse(localStorage.getItem('user_info')) || null)
-  const isLoggedIn = ref(!!token.value)
+  const isLoggedIn = computed(() => !!token.value)
 
   const userRole = computed(() => user.value?.role || null)
   const userName = computed(() => user.value?.name || '')
@@ -37,7 +37,6 @@ export const useUserStore = defineStore('user', () => {
   function setUser(userData) {
     user.value = userData
     localStorage.setItem('user_info', JSON.stringify(userData))
-    isLoggedIn.value = true
   }
 
   function setToken(newToken) {
@@ -56,7 +55,6 @@ export const useUserStore = defineStore('user', () => {
   function clearUser() {
     token.value = null
     user.value = null
-    isLoggedIn.value = false
     localStorage.removeItem('access_token')
     localStorage.removeItem('user_info')
   }

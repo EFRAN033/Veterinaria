@@ -40,6 +40,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function setToken(newToken) {
+    console.log('userStore: setToken called', newToken ? 'with token' : 'null');
     token.value = newToken
     if (newToken) {
       localStorage.setItem('access_token', newToken)

@@ -2,8 +2,12 @@
   <div class="space-y-8">
     <!-- Header -->
     <div class="text-center">
-      <h3 class="text-2xl font-serif font-bold text-gray-900">¿Cuándo prefieres la atención?</h3>
-      <p class="text-gray-500 mt-2">Selecciona la fecha y hora que mejor se adapte a ti.</p>
+      <h3 class="text-2xl font-serif font-bold text-gray-900">
+        {{ mode === 'vet' ? 'Agendar Cita' : '¿Cuándo prefieres la atención?' }}
+      </h3>
+      <p class="text-gray-500 mt-2">
+        {{ mode === 'vet' ? 'Selecciona fecha y hora para el paciente.' : 'Selecciona la fecha y hora que mejor se adapte a ti.' }}
+      </p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -61,7 +65,9 @@
                 <svg v-if="modelValue.isUrgent" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
               </div>
             </div>
-            <p class="text-sm text-[#FF6B6B]/80 mt-1">Selecciona esto si es una emergencia. Nos pondremos en contacto de inmediato.</p>
+            <p class="text-sm text-[#FF6B6B]/80 mt-1">
+              {{ mode === 'vet' ? 'Marcar como cita de urgencia prioritaria.' : 'Selecciona esto si es una emergencia. Nos pondremos en contacto de inmediato.' }}
+            </p>
           </div>
         </div>
 
@@ -78,9 +84,11 @@
               :key="slot.id"
               @click="selectTime(slot.id)"
               class="flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 group"
-              :class="modelValue.timeSlot === slot.id 
-                ? 'border-[#1BB0B9] bg-[#1BB0B9]/5' 
-                : 'border-gray-100 bg-white hover:border-[#1BB0B9]/30'"
+              :class="[
+                modelValue.timeSlot === slot.id ? 'border-[#1BB0B9] bg-[#1BB0B9]/5' : 'border-gray-100 bg-white hover:border-[#1BB0B9]/30',
+                takenSlots.includes(slot.id) ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
+              ]"
+              :disabled="takenSlots.includes(slot.id)"
             >
               <div class="flex items-center gap-3">
                 <div class="p-2 rounded-lg" :class="modelValue.timeSlot === slot.id ? 'bg-[#1BB0B9] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-[#1BB0B9]/10 group-hover:text-[#1BB0B9]'">
@@ -88,7 +96,9 @@
                 </div>
                 <div class="text-left">
                   <span class="block font-bold text-sm" :class="modelValue.timeSlot === slot.id ? 'text-[#1BB0B9]' : 'text-gray-700'">{{ slot.label }}</span>
-                  <span class="text-xs text-gray-400">{{ slot.hours }}</span>
+                  <span class="text-xs text-gray-400">
+                    {{ takenSlots.includes(slot.id) ? 'No disponible' : slot.hours }}
+                  </span>
                 </div>
               </div>
               <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
@@ -112,6 +122,14 @@ const props = defineProps({
     type: Object,
     required: true,
     default: () => ({ date: null, timeSlot: '', isUrgent: false })
+  },
+  mode: {
+    type: String,
+    default: 'client' // 'client' | 'vet'
+  },
+  takenSlots: {
+    type: Array,
+    default: () => []
   }
 });
 

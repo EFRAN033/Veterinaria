@@ -52,6 +52,9 @@ async def chat_with_vet_ai(request: ChatRequest, db: Session = Depends(get_db)):
             db=db
         )
         
+        print(f"DEBUG: AI Result keys: {ai_result.keys()}")
+        print(f"DEBUG: Clinical Insights: {ai_result.get('clinical_insights')}")
+        
         return {
             "response": ai_result["response"],
             "dss_data": dss_output,

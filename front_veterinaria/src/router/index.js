@@ -73,6 +73,12 @@ const routes = [
         meta: { title: 'Veterinario - Dashboard' }
       },
       {
+        path: 'citas',
+        name: 'VetAppointments',
+        component: () => import('../views/veterinario/VetAppointments.vue'),
+        meta: { title: 'Veterinario - Gestión de Citas' }
+      },
+      {
         path: 'calendar',
         name: 'VetCalendar',
         component: () => import('../views/veterinario/VetCalendar.vue'),

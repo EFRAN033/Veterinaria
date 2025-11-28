@@ -339,10 +339,13 @@
                   <button 
                     v-else
                     @click="submitRequest"
-                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
+                    :disabled="loading"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    <span>Confirmar Solicitud</span>
-                    <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                    <span v-if="loading" class="animate-spin mr-2">⌛</span>
+                    <span v-if="loading">Enviando...</span>
+                    <span v-else>Confirmar Solicitud</span>
+                    <svg v-if="!loading" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                   </button>
                   
                   <button 

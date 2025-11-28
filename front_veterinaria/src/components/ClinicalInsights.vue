@@ -159,6 +159,10 @@
         <p class="text-xs text-slate-400">Analizando conversación...</p>
       </div>
 
+      <div v-else-if="Object.keys(insights).length === 0" class="flex flex-col items-center justify-center py-10 opacity-40 text-center">
+        <p class="text-xs text-slate-400">No se generaron insights clínicos para esta respuesta.</p>
+      </div>
+
     </div>
   </div>
 </template>

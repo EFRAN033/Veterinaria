@@ -313,7 +313,7 @@
         </div>
         
         <div class="p-8 overflow-y-auto custom-scrollbar bg-white">
-          <DateTimePicker v-model="appointmentData" />
+          <DateTimePicker v-model="appointmentData" mode="vet" :takenSlots="takenSlots" />
           
           <div class="mt-6">
             <label class="block text-sm font-bold text-slate-700 mb-2">Notas Adicionales</label>
@@ -346,7 +346,8 @@
 
 
 <script setup>
-import { ref, nextTick, computed, watch } from 'vue';
+import { ref, nextTick, computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { 
   PaperAirplaneIcon, 
@@ -363,6 +364,7 @@ import {
   CalendarDaysIcon
 } from '@heroicons/vue/24/outline';
 import { useServiceRequests } from '@/composables/useServiceRequests';
+import { usePets } from '@/composables/usePets';
 import { useUserStore } from '@/stores/user';
 
 import ChatAvatar from '@/components/ChatAvatar.vue';
@@ -381,9 +383,11 @@ const chatContainer = ref(null);
 const isCaseModalOpen = ref(false);
 const caseSearch = ref('');
 const requests = ref([]);
-const { getAllRequests } = useServiceRequests();
+const { getAllRequests, getRequestById } = useServiceRequests();
+const { getPetsByUserId } = usePets();
 const userStore = useUserStore();
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const route = useRoute();
 
 // New state for AI enhancements
 const currentCategory = ref('GENERAL');
@@ -452,12 +456,13 @@ const loadClinicalCase = async () => {
     requests.value = medicalCases.map(req => ({
       id: `req-${req.id}`,
       type: 'request',
-      pet_id: req.pet_id, // Capture pet_id
+      pet_id: req.pet_id || (req.service_data && req.service_data.pet_id), // Capture pet_id from top level or service_data
       date: req.service_data.preferredDate ? req.service_data.preferredDate.split('T')[0] : 'Pendiente',
       petName: req.pet_name || req.service_data.petName || 'Sin nombre',
       species: req.service_data.species || 'General',
       description: req.service_data.symptoms || req.service_data.description || req.service_data.notes || 'Solicitud de servicio',
-      images: req.images || []
+      images: req.images || [],
+      clinical_insights: req.service_data.clinical_insights // Capture existing insights
     }));
 
   } catch (err) {
@@ -559,6 +564,15 @@ const selectCase = (item) => {
   prompt += `Síntomas/Descripción:\n${item.description}`;
 
   userInput.value = prompt;
+  
+  // Load existing insights if available
+  if (item.clinical_insights) {
+    console.log('Loading existing insights:', item.clinical_insights);
+    clinicalInsights.value = item.clinical_insights;
+  } else {
+    clinicalInsights.value = null;
+  }
+
   closeCaseModal();
 };
 
@@ -626,6 +640,7 @@ const sendMessage = async () => {
 
   userInput.value = '';
   loading.value = true;
+  clinicalInsights.value = null; // Clear previous insights to show analyzing state
   await scrollToBottom();
 
   try {
@@ -639,17 +654,25 @@ const sendMessage = async () => {
     
     // Stop loading animation before streaming starts
     loading.value = false;
-    
-    // Stream the response
-    await streamResponse(response.data.response);
-    
+
+    // Update insights IMMEDIATELY before streaming text
+    if (response.data.clinical_insights) {
+      console.log('Received Clinical Insights:', response.data.clinical_insights);
+      clinicalInsights.value = response.data.clinical_insights;
+    } else {
+      console.log('No Clinical Insights in response');
+      // Optional: Set to empty object or specific state if needed, 
+      // but null keeps "Analizando..." or we can add a "No insights" state.
+      // For now, let's leave it null or set to empty object to remove "Analizando" spinner
+      clinicalInsights.value = {}; 
+    }
+
     if (response.data.category) {
       currentCategory.value = response.data.category;
     }
-
-    if (response.data.clinical_insights) {
-      clinicalInsights.value = response.data.clinical_insights;
-    }
+    
+    // Stream the response
+    await streamResponse(response.data.response);
     
     // Clear image after sending
     clearImage();
@@ -696,6 +719,37 @@ const appointmentData = ref({
   isUrgent: false
 });
 const scheduleNotes = ref('');
+const takenSlots = ref([]);
+
+watch(() => appointmentData.value.date, async (newDate) => {
+  if (!newDate) {
+    takenSlots.value = [];
+    return;
+  }
+  
+  try {
+    const dateStr = newDate.toISOString().split('T')[0];
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+      headers: { Authorization: `Bearer ${userStore.token}` }
+    });
+    
+    // Filter for selected date
+    const dayAppointments = response.data.filter(app => app.appointment_date === dateStr && app.status !== 'cancelled');
+    
+    // Map times to slots
+    const timeToSlot = {
+      '09:00:00': 'morning',
+      '08:00:00': 'morning',
+      '14:00:00': 'afternoon',
+      '18:00:00': 'evening'
+    };
+    
+    takenSlots.value = dayAppointments.map(app => timeToSlot[app.appointment_time]).filter(Boolean);
+    
+  } catch (err) {
+    console.error('Error checking availability:', err);
+  }
+});
 
 const handleSchedule = (followUpData) => {
   if (!currentPetId.value) {
@@ -748,6 +802,58 @@ const confirmAppointment = async () => {
     loading.value = false;
   }
 };
+
+onMounted(async () => {
+  if (route.query.petId) {
+    currentPetId.value = route.query.petId;
+    const petName = route.query.petName || 'el paciente';
+    messages.value.push({
+      role: 'assistant',
+      content: `Entendido, analicemos el caso de **${petName}**. ¿Qué síntomas presenta o qué consulta tienes sobre este paciente?`
+    });
+
+    // If requestId is present, fetch insights
+    if (route.query.requestId) {
+      try {
+        const req = await getRequestById(route.query.requestId);
+        if (req) {
+          // Ensure pet_id is set if missing from query
+          // Check top level or inside service_data
+          const foundPetId = req.pet_id || (req.service_data && req.service_data.pet_id);
+          
+          if (!currentPetId.value && foundPetId) {
+            currentPetId.value = foundPetId;
+            console.log('Set currentPetId from request details:', currentPetId.value);
+          } else if (!currentPetId.value && req.user_id && req.pet_name) {
+             // Fallback: Try to find pet by name for this user
+             try {
+               console.log('Attempting to find pet by name:', req.pet_name, 'for user:', req.user_id);
+               const userPets = await getPetsByUserId(req.user_id);
+               const matchedPet = userPets.find(p => p.name.toLowerCase() === req.pet_name.toLowerCase());
+               if (matchedPet) {
+                 currentPetId.value = matchedPet.id;
+                 console.log('Found matched pet by name:', matchedPet);
+               } else {
+                 console.warn('No pet found with name:', req.pet_name);
+               }
+             } catch (e) {
+               console.error('Error fetching user pets for fallback:', e);
+             }
+          } else if (!currentPetId.value) {
+             console.warn('Could not find pet_id in request details');
+          }
+
+          if (req.service_data && req.service_data.clinical_insights) {
+            console.log('Loaded insights from URL requestId:', req.service_data.clinical_insights);
+            clinicalInsights.value = req.service_data.clinical_insights;
+          }
+        }
+      } catch (err) {
+        console.error('Error loading request details:', err);
+      }
+    }
+  }
+});
 </script>
 
 <style scoped>

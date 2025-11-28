@@ -148,6 +148,7 @@ const sidebarOpen = ref(true);
 
 const navigation = [
   { name: 'Dashboard', href: '/veterinario', icon: Squares2X2Icon },
+  { name: 'Citas', href: '/veterinario/citas', icon: CalendarDaysIcon },
   { name: 'Calendario', href: '/veterinario/calendar', icon: CalendarDaysIcon },
   { name: 'Historial Clínico', href: '/veterinario/history', icon: ClockIcon },
   { name: 'Asistente IA', href: '/veterinario/chat', icon: ChatBubbleLeftRightIcon },

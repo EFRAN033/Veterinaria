@@ -97,12 +97,27 @@
             </td>
 
             <td class="py-4 px-4 text-right">
-              <button 
-                @click.stop="updateStatus(request, 'reviewed')"
-                class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded transition-colors opacity-0 group-hover:opacity-100"
-              >
-                Marcar Revisado
-              </button>
+                  <button 
+                    @click.stop="updateStatus(request, 'reviewed')"
+                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded transition-colors opacity-0 group-hover:opacity-100 mr-2"
+                  >
+                    Revisar
+                  </button>
+                  <button 
+                    @click="analyzeRequest(request)"
+                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-lg transition-colors text-xs font-medium flex items-center gap-1 mr-1"
+                    title="Generar análisis automático"
+                  >
+                    <SparklesIcon class="h-3 w-3" />
+                    Analizar
+                  </button>
+                  <button 
+                    @click="$router.push(`/veterinario/chat?petId=${request.pet_id}&petName=${request.pet_name || 'Paciente'}&requestId=${request.id}`)"
+                    class="text-slate-400 hover:text-indigo-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                    title="Abrir chat con IA"
+                  >
+                    <ChatBubbleLeftRightIcon class="h-4 w-4" />
+                  </button>
             </td>
           </tr>
         </tbody>
@@ -274,17 +289,67 @@
       </div>
     </div>
 
+    <!-- SCHEDULE MODAL -->
+    <div v-if="showScheduleModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showScheduleModal = false">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <CalendarDaysIcon class="h-6 w-6 text-indigo-600" />
+            Agendar Cita
+          </h3>
+          <button @click="showScheduleModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div class="p-8 overflow-y-auto custom-scrollbar bg-white">
+          <DateTimePicker v-model="appointmentData" mode="vet" :takenSlots="takenSlots" />
+          
+          <div class="mt-6">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Notas para la Cita</label>
+            <textarea 
+              v-model="scheduleNotes"
+              rows="3"
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+              placeholder="Instrucciones adicionales..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+          <button @click="showScheduleModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">
+            Cancelar
+          </button>
+          <button 
+            @click="confirmAppointment" 
+            class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
+            :disabled="scheduling"
+          >
+            <span v-if="scheduling" class="animate-spin">⌛</span>
+            Confirmar y Agendar
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import DateTimePicker from '@/components/DateTimePicker.vue';
 import { 
-  ArrowPathIcon, 
+  CheckCircleIcon, 
+  XCircleIcon, 
+  ClockIcon, 
+  SparklesIcon, 
+  CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
+  ArrowPathIcon,
   ClipboardDocumentCheckIcon,
   CalendarIcon,
   PhotoIcon,
@@ -300,6 +365,47 @@ const analyzing = ref(false);
 const { addToast } = useToast();
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+
+const showScheduleModal = ref(false);
+const appointmentData = ref({
+  date: null,
+  timeSlot: '',
+  isUrgent: false
+});
+const scheduleNotes = ref('');
+const scheduling = ref(false);
+const takenSlots = ref([]);
+
+watch(() => appointmentData.value.date, async (newDate) => {
+  if (!newDate) {
+    takenSlots.value = [];
+    return;
+  }
+  
+  try {
+    const dateStr = newDate.toISOString().split('T')[0];
+    const userStore = useUserStore();
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+      headers: { Authorization: `Bearer ${userStore.token}` }
+    });
+    
+    // Filter for selected date
+    const dayAppointments = response.data.filter(app => app.appointment_date === dateStr && app.status !== 'cancelled');
+    
+    // Map times to slots
+    const timeToSlot = {
+      '09:00:00': 'morning',
+      '08:00:00': 'morning', // Urgent usually takes morning slot or special
+      '14:00:00': 'afternoon',
+      '18:00:00': 'evening'
+    };
+    
+    takenSlots.value = dayAppointments.map(app => timeToSlot[app.appointment_time]).filter(Boolean);
+    
+  } catch (err) {
+    console.error('Error checking availability:', err);
+  }
+});
 
 const fetchRequests = async () => {
   try {
@@ -327,13 +433,15 @@ const analyzeRequest = async (request) => {
     const userStore = useUserStore();
     try {
         const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/v1/service_requests/${request.id}/analyze`,
+            `${import.meta.env.VITE_API_URL}/v1/service-requests/${request.id}/analyze`,
             {},
             { headers: { Authorization: `Bearer ${userStore.token}` } }
         );
         
         // Update local state
         const updatedRequest = response.data;
+        console.log('AI Analysis Response:', updatedRequest);
+        console.log('Clinical Insights:', updatedRequest.service_data?.clinical_insights);
         selectedRequest.value = updatedRequest;
         
         // Update in list
@@ -352,17 +460,98 @@ const analyzeRequest = async (request) => {
 };
 
 const updateStatus = async (request, newStatus) => {
+  if (newStatus === 'reviewed') {
+    // Open Schedule Modal instead of direct update
+    selectedRequest.value = request;
+    appointmentData.value = {
+      date: request.service_data.preferredDate ? new Date(request.service_data.preferredDate) : null,
+      timeSlot: request.service_data.preferredTime || '',
+      isUrgent: request.service_data.isUrgent || false
+    };
+    scheduleNotes.value = `Solicitud #${request.id}: ${request.service_data.symptoms || request.service_data.description || ''}`;
+    showScheduleModal.value = true;
+    return;
+  }
+
+  if (newStatus === 'cancelled') {
+    if (!confirm('¿Estás seguro de rechazar esta solicitud?')) return;
+  }
+
   try {
+    // Optimistic update
     const originalStatus = request.status;
     request.status = newStatus;
     
-    // Here you would call updateRequest from composable if implemented, or axios directly
-    // await updateRequest(request.id, { status: newStatus });
+    // Call API to update status
+    const userStore = useUserStore();
+    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/service-requests/${request.id}`, 
+      { status: newStatus },
+      { headers: { Authorization: `Bearer ${userStore.token}` } }
+    );
     
     addToast('Estado actualizado correctamente', 'success');
   } catch (error) {
     console.error('Error updating status:', error);
     addToast('Error al actualizar estado', 'error');
+    // Revert on error (would need to fetch again or store original)
+    fetchRequests(); 
+  }
+};
+
+const confirmAppointment = async () => {
+  if (!appointmentData.value.date || (!appointmentData.value.timeSlot && !appointmentData.value.isUrgent)) {
+    addToast('Por favor selecciona fecha y hora', 'warning');
+    return;
+  }
+
+  scheduling.value = true;
+  const userStore = useUserStore();
+
+  try {
+    // 1. Create Appointment
+    const timeMap = {
+      'morning': '09:00:00',
+      'afternoon': '14:00:00',
+      'evening': '18:00:00'
+    };
+
+    const serviceTypeToId = {
+      'consultation': 1,
+      'general': 2,
+      'clinical': 3,
+      'aesthetic': 4
+    };
+
+    const payload = {
+      pet_id: selectedRequest.value.pet_id,
+      service_id: serviceTypeToId[selectedRequest.value.service_type] || 1, // Default to 1 if unknown
+      appointment_date: appointmentData.value.date.toISOString().split('T')[0],
+      appointment_time: appointmentData.value.isUrgent ? '08:00:00' : (timeMap[appointmentData.value.timeSlot] || '10:00:00'),
+      notes: scheduleNotes.value
+    };
+
+    await axios.post(`${import.meta.env.VITE_API_URL}/v1/appointments/`, payload, {
+      headers: { Authorization: `Bearer ${userStore.token}` }
+    });
+
+    // 2. Update Request Status to 'scheduled' (or 'completed'/'reviewed' depending on workflow)
+    // We'll use 'reviewed' as per current flow, or maybe 'scheduled' if backend supports it.
+    // Let's stick to 'reviewed' as the "Done" state for requests for now, or 'completed'.
+    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/service-requests/${selectedRequest.value.id}`, 
+      { status: 'completed' }, // Mark as completed since it's now an appointment
+      { headers: { Authorization: `Bearer ${userStore.token}` } }
+    );
+
+    addToast('Cita agendada y solicitud procesada', 'success');
+    showScheduleModal.value = false;
+    closeModal(); // Close details modal if open
+    fetchRequests(); // Refresh list
+
+  } catch (err) {
+    console.error('Error scheduling:', err);
+    addToast('Error al agendar la cita', 'error');
+  } finally {
+    scheduling.value = false;
   }
 };
 

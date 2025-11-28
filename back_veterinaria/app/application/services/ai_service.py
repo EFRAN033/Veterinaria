@@ -107,28 +107,35 @@ class AIService:
         ai_messages.append({
             "role": "system", 
             "content": """
-            Responde SIEMPRE en formato JSON con la siguiente estructura:
+            Responde SIEMPRE en formato JSON válido.
+            Tu respuesta DEBE incluir DOS claves principales: "response" y "clinical_insights".
+            
+            Estructura requerida:
             {
-                "response": "Tu respuesta clínica detallada aquí (usa markdown)",
+                "response": "Tu respuesta conversacional al usuario (usa markdown).",
                 "clinical_insights": {
                     "differentials": [
-                        {"name": "Enfermedad A", "probability": "Alta/Media/Baja", "reasoning": "Breve explicación de por qué se sospecha esto basado en los síntomas."}
+                        {"name": "Diagnóstico 1", "probability": "Alta/Media/Baja", "reasoning": "Razón..."}
                     ],
                     "recommended_tests": [
-                        {"name": "Hemograma completo", "purpose": "Evaluar anemia e infección"}
+                        {"name": "Prueba 1", "purpose": "Propósito..."}
                     ],
-                    "treatment_focus": ["Hidratación", "Antibioterapia"],
-                    "calculated_dosages": [{"drug": "Amoxicilina", "dose": "250mg", "frequency": "Cada 12h", "notes": "Dosis basada en peso 10kg"}],
-                    "safety_alerts": [{"level": "High/Medium/Low", "message": "Riesgo de interacción entre X e Y"}],
-                    "follow_up": {"duration": "24 horas", "reason": "Reevaluar hidratación"},
-                    "references": ["Cita bibliográfica o guía clínica relevante (opcional)"]
+                    "treatment_focus": ["Tratamiento 1", "Tratamiento 2"],
+                    "calculated_dosages": [
+                        {"drug": "Fármaco", "dose": "Dosis", "frequency": "Frecuencia", "notes": "Notas"}
+                    ],
+                    "safety_alerts": [
+                        {"level": "High/Medium/Low", "message": "Alerta..."}
+                    ],
+                    "follow_up": {"duration": "Tiempo", "reason": "Motivo"},
+                    "references": ["Referencia 1"]
                 }
             }
-            Los 'differentials' deben ser las 3-5 causas más probables. INCLUYE SIEMPRE el campo 'reasoning'.
-            En 'recommended_tests', INCLUYE SIEMPRE el campo 'purpose' explicando qué buscamos con esa prueba.
-            SIEMPRE que sugieras medicamentos en 'treatment_focus' o 'response', intenta calcular la dosis exacta en 'calculated_dosages' usando el peso del paciente (si está disponible en el contexto).
-            SIEMPRE verifica interacciones medicamentosas. Si sugieres combinaciones con riesgo (ej. AINEs + Corticoides), agrega una alerta en 'safety_alerts'.
-            SIEMPRE sugiere un tiempo de seguimiento ('follow_up') basado en la gravedad del caso.
+            
+            IMPORTANTE:
+            1. Si no hay suficiente información para 'clinical_insights', devuelve listas vacías en sus campos, NO devuelvas null.
+            2. 'differentials' debe tener al menos 1 elemento si hay síntomas.
+            3. 'response' debe ser amable y profesional.
             """
         })
 
@@ -143,9 +150,22 @@ class AIService:
             content = response.choices[0].message.content
             parsed_content = json.loads(content)
             
+            # Fallback para clinical_insights si no existe o es None
+            insights = parsed_content.get("clinical_insights")
+            if not insights:
+                insights = {
+                    "differentials": [],
+                    "recommended_tests": [],
+                    "treatment_focus": [],
+                    "calculated_dosages": [],
+                    "safety_alerts": [],
+                    "follow_up": None,
+                    "references": []
+                }
+            
             return {
                 "response": parsed_content.get("response", ""),
-                "clinical_insights": parsed_content.get("clinical_insights", None),
+                "clinical_insights": insights,
                 "category": category
             }
             

@@ -176,20 +176,21 @@ class ServiceRequestService:
             ai_service = AIService()
             
             # Prepare data for analysis
-            analysis_data = service_request.service_data.copy()
+            analysis_data = (service_request.service_data or {}).copy()
             analysis_data['service_type'] = service_request.service_type
             analysis_data['pet_name'] = service_request.pet_name
             
             ai_insights = ai_service.analyze_service_request(analysis_data)
+            logger.info(f"AI Insights generated: {ai_insights}")
             
             # Merge insights into service_data
             # We need to create a new dict to ensure SQLAlchemy detects the change in JSON field
-            new_service_data = service_request.service_data.copy()
+            new_service_data = (service_request.service_data or {}).copy()
             new_service_data['clinical_insights'] = ai_insights
             service_request.service_data = new_service_data
             
             updated_request = self.repo.update(service_request)
-            logger.info(f"AI analysis generated for request {request_id}")
+            logger.info(f"AI analysis generated and saved for request {request_id}")
             
             return self._to_dto(updated_request)
             

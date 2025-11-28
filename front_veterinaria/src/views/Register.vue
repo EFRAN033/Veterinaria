@@ -281,5 +281,5 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-/* Estilos específicos si son necesarios */
+
 </style>

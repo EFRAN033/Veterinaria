@@ -32,15 +32,15 @@ class ServiceRequest(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    service_type = Column(String(20), nullable=False)  # Store enum value as string
-    status = Column(String(20), default="pending")  # Store enum value as string
+    service_type = Column(String(20), nullable=False)
+    status = Column(String(20), default="pending") 
     
     pet_name = Column(String(100))
     estimated_cost = Column(DECIMAL(10, 2))
     
     service_data = Column(JSON)
     
-    images = Column(JSON)  # ["uploads/service_requests/1/image1.jpg", ...]
+    images = Column(JSON) 
     
     assigned_vet_id = Column(Integer, ForeignKey("users.id"))
     vet_notes = Column(Text)

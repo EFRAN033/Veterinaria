@@ -13,7 +13,7 @@ class Appointment(Base):
     service_id = Column(Integer, ForeignKey("services.id"))
     appointment_date = Column(Date, nullable=False)
     appointment_time = Column(Time, nullable=False)
-    status = Column(String(20), default="pending")  # pending, confirmed, completed, cancelled
+    status = Column(String(20), default="pending")
     notes = Column(String)
     estimated_cost = Column(DECIMAL(10, 2))
     created_at = Column(DateTime(timezone=True), server_default=func.now())

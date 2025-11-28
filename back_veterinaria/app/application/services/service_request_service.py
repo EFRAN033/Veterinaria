@@ -14,6 +14,7 @@ from app.application.dtos.service_request_dto import (
 )
 from app.infrastructure.repositories.service_request_repository_impl import ServiceRequestRepositoryImpl
 from app.infrastructure.database.models.service_request import ServiceRequest, ServiceType, RequestStatus
+from app.infrastructure.database.models.pet import Pet
 from app.core.file_storage import save_base64_images, delete_images
 from app.core.exceptions import NotFoundException, ValidationException, ForbiddenException
 
@@ -51,20 +52,42 @@ class ServiceRequestService:
                 logger.error(f"Error saving images: {e}")
                 raise ValidationException(f"Error al guardar imágenes: {str(e)}")
         
-        # Generate AI Clinical Insights
+        try:
+            pet = self.db.query(Pet).filter(
+                Pet.owner_id == user_id, 
+                Pet.name == request_data.pet_name
+            ).first()
+            
+            if not pet:
+
+                pet = Pet(
+                    owner_id=user_id,
+                    name=request_data.pet_name,
+                    species=request_data.service_data.get('species', 'unknown'),
+                    breed=request_data.service_data.get('breed'),
+
+                )
+                self.db.add(pet)
+                self.db.flush() 
+                logger.info(f"Auto-created new pet '{pet.name}' (ID: {pet.id}) for user {user_id}")
+            
+            request_data.service_data['pet_id'] = pet.id
+            
+        except Exception as e:
+            logger.error(f"Error managing pet record: {e}")
+
         ai_insights = {}
         try:
             from app.application.services.ai_service import AIService
             ai_service = AIService()
             
-            # Prepare data for analysis
+ 
             analysis_data = request_data.service_data.copy()
             analysis_data['service_type'] = request_data.service_type.value
             analysis_data['pet_name'] = request_data.pet_name
             
             ai_insights = ai_service.analyze_service_request(analysis_data)
             
-            # Merge insights into service_data
             request_data.service_data['clinical_insights'] = ai_insights
             
         except Exception as e:
@@ -74,8 +97,8 @@ class ServiceRequestService:
 
         service_request = ServiceRequest(
             user_id=user_id,
-            service_type=request_data.service_type.value,  # Use string value directly
-            status="pending",  # Use string value directly
+            service_type=request_data.service_type.value, 
+            status="pending", 
             pet_name=request_data.pet_name,
             estimated_cost=request_data.estimated_cost,
             service_data=request_data.service_data,
@@ -149,7 +172,7 @@ class ServiceRequestService:
             raise NotFoundException(f"Service request {request_id} not found")
         
         if update_data.status:
-            service_request.status = update_data.status.value  # Use string value directly
+            service_request.status = update_data.status.value 
         
         if update_data.assigned_vet_id is not None:
             service_request.assigned_vet_id = update_data.assigned_vet_id
@@ -170,12 +193,10 @@ class ServiceRequestService:
         if not service_request:
             raise NotFoundException(f"Service request {request_id} not found")
             
-        # Generate AI Clinical Insights
         try:
             from app.application.services.ai_service import AIService
             ai_service = AIService()
             
-            # Prepare data for analysis
             analysis_data = (service_request.service_data or {}).copy()
             analysis_data['service_type'] = service_request.service_type
             analysis_data['pet_name'] = service_request.pet_name
@@ -183,8 +204,6 @@ class ServiceRequestService:
             ai_insights = ai_service.analyze_service_request(analysis_data)
             logger.info(f"AI Insights generated: {ai_insights}")
             
-            # Merge insights into service_data
-            # We need to create a new dict to ensure SQLAlchemy detects the change in JSON field
             new_service_data = (service_request.service_data or {}).copy()
             new_service_data['clinical_insights'] = ai_insights
             service_request.service_data = new_service_data

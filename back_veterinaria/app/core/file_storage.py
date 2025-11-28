@@ -65,7 +65,7 @@ def save_base64_images(base64_images: List[str], user_id: int) -> List[str]:
     
     file_paths = []
     for base64_img in base64_images:
-        if base64_img:  # Skip empty strings
+        if base64_img: 
             try:
                 file_path = save_base64_image(base64_img, user_id)
                 file_paths.append(file_path)

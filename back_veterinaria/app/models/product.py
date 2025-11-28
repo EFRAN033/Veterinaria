@@ -9,7 +9,7 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(String)
-    category = Column(String(50))  # beds, food, toys, clothes, accessories
+    category = Column(String(50)) 
     price = Column(DECIMAL(10, 2), nullable=False)
     old_price = Column(DECIMAL(10, 2))
     discount = Column(String(10))

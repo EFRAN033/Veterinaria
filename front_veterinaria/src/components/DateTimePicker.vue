@@ -125,7 +125,7 @@ const props = defineProps({
   },
   mode: {
     type: String,
-    default: 'client' // 'client' | 'vet'
+    default: 'client' 
   },
   takenSlots: {
     type: Array,

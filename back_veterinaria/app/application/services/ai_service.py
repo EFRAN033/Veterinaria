@@ -278,7 +278,6 @@ class AIService:
         Analiza una nueva solicitud de servicio para generar insights clínicos preliminares.
         """
         try:
-            # Construir prompt basado en el tipo de servicio
             service_type = data.get('service_type', 'general')
             pet_info = f"Mascota: {data.get('pet_name', 'Desconocido')} ({data.get('species', 'Desconocido')})"
             
@@ -292,7 +291,6 @@ class AIService:
                 context += f"Descripción: {data.get('description', 'No especificado')}\n"
                 context += f"Historia: {data.get('history', 'No especificado')}\n"
             else:
-                # Para otros servicios (estética, general), el análisis es más simple
                 context += f"Detalles: {str(data)}\n"
 
             messages = [
@@ -314,10 +312,6 @@ class AIService:
                 """},
                 {"role": "user", "content": f"Analiza esta solicitud:\n{context}"}
             ]
-
-            # Soporte para imágenes (si las hubiera en base64 o URL, aquí asumimos que pasamos descripciones o placeholders si no procesamos la imagen real aún en este flujo rápido)
-            # En una implementación real, pasaríamos las imágenes al modelo si son URLs accesibles o base64.
-            # Por ahora, nos basamos en el texto.
             
             response = self.client.chat.completions.create(
                 model=self.model,

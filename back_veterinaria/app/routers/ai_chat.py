@@ -6,7 +6,7 @@ import random
 router = APIRouter()
 
 class ChatMessage(BaseModel):
-    role: str  # "user" or "assistant"
+    role: str
     content: str
 
 class ChatRequest(BaseModel):

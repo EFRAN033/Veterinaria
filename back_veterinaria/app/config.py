@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
     
     PORT: int = 8000
     HOST: str = "0.0.0.0"

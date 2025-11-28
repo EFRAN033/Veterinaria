@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api', // Use environment variable or fallback to '/api'
+  baseURL: import.meta.env.VITE_API_URL || '/api', 
   headers: {
     'Content-Type': 'application/json',
   },

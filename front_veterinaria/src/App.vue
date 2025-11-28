@@ -12,7 +12,6 @@ import ToastNotification from '@/components/ToastNotification.vue';
 </template>
 
 <style>
-/* Global transition styles */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;

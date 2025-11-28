@@ -9,6 +9,7 @@ from decimal import Decimal
 
 class AppointmentCreateDTO(BaseModel):
     """DTO para crear una cita"""
+    user_id: Optional[int] = None 
     pet_id: Optional[int] = None
     service_id: int
     appointment_date: date

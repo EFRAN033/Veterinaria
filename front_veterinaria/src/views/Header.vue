@@ -227,5 +227,4 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
-/* Estilos específicos si son necesarios */
 </style>

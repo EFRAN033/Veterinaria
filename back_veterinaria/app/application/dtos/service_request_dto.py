@@ -29,8 +29,8 @@ class ServiceRequestCreateDTO(BaseModel):
     service_type: ServiceTypeEnum
     pet_name: Optional[str] = None
     estimated_cost: float = Field(ge=0)
-    service_data: Dict[str, Any]  # All form fields specific to service type
-    images: Optional[List[str]] = []  # Base64 encoded images
+    service_data: Dict[str, Any]  
+    images: Optional[List[str]] = [] 
 
 
 class ServiceRequestUpdateDTO(BaseModel):

@@ -1,7 +1,3 @@
-"""
-Servicio de autenticación
-Contiene la lógica de negocio para registro, login y autenticación
-"""
 import logging
 from typing import Optional
 from sqlalchemy.orm import Session

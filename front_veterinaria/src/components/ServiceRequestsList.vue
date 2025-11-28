@@ -395,7 +395,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
     // Map times to slots
     const timeToSlot = {
       '09:00:00': 'morning',
-      '08:00:00': 'morning', // Urgent usually takes morning slot or special
+      '08:00:00': 'morning', 
       '14:00:00': 'afternoon',
       '18:00:00': 'evening'
     };

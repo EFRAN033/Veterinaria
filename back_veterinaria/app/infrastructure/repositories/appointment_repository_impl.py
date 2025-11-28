@@ -22,6 +22,10 @@ class AppointmentRepositoryImpl:
         return self.db.query(Appointment).filter(
             Appointment.user_id == user_id
         ).offset(skip).limit(limit).all()
+
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[Appointment]:
+        """Obtener todas las citas (para veterinarios/admin)"""
+        return self.db.query(Appointment).offset(skip).limit(limit).all()
     
     def get_by_date(self, appointment_date: date) -> List[Appointment]:
         """Obtener citas de una fecha específica"""

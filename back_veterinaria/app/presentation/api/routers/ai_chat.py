@@ -18,7 +18,7 @@ class ChatRequest(BaseModel):
     messages: List[ChatMessage]
     vitals: Optional[Dict[str, Any]] = None
     pet_id: Optional[int] = None
-    image_data: Optional[str] = None # Base64 encoded image
+    image_data: Optional[str] = None 
 
 class ChatResponse(BaseModel):
     response: str
@@ -43,7 +43,6 @@ async def chat_with_vet_ai(request: ChatRequest, db: Session = Depends(get_db)):
                 "prediction": ml_result
             }
         
-        # Generate AI response using the new service
         ai_result = ai_service.generate_response(
             messages=request.messages, 
             vitals=request.vitals,

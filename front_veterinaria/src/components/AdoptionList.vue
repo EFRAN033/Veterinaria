@@ -119,7 +119,7 @@ const showModal = ref(false);
 const selectedPet = ref(null);
 const pets = ref([]);
 const loading = ref(true);
-const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const openAdoptionModal = (pet) => {
   selectedPet.value = pet;
@@ -132,7 +132,7 @@ const fetchAdoptions = async () => {
     pets.value = response.data.map(pet => ({
       id: pet.id,
       name: pet.name,
-      category: pet.species + 's', // Simple pluralization for matching categories
+      category: pet.species + 's', 
       species: pet.species,
       breed: pet.breed || 'Mestizo',
       age: pet.age,
@@ -154,8 +154,8 @@ onMounted(() => {
 
 const filteredPets = computed(() => {
   if (selectedCategory.value === 'Todos') return pets.value;
-  // Normalize category matching
-  const cat = selectedCategory.value.slice(0, -1); // Remove 's' roughly
+  
+  const cat = selectedCategory.value.slice(0, -1);
   return pets.value.filter(pet => {
     if (selectedCategory.value === 'Perros') return pet.species === 'Perro';
     if (selectedCategory.value === 'Gatos') return pet.species === 'Gato';

@@ -10,7 +10,7 @@ class Order(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     total = Column(DECIMAL(10, 2), nullable=False)
-    status = Column(String(20), default="pending")  # pending, processing, shipped, delivered, cancelled
+    status = Column(String(20), default="pending") 
     shipping_address = Column(String)
     payment_method = Column(String(50))
     created_at = Column(DateTime(timezone=True), server_default=func.now())

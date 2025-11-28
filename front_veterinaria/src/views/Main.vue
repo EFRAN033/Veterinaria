@@ -29,5 +29,5 @@ const Footer = defineAsyncComponent(() => import('./Footer.vue'));
 </script>
 
 <style scoped>
-/* Estilos específicos si los necesitas */
+
 </style>

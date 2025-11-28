@@ -188,7 +188,8 @@ defineProps({
 });
 
 const getProbabilityWidth = (prob) => {
-  const p = prob.toLowerCase();
+  if (!prob) return '10%';
+  const p = String(prob).toLowerCase();
   if (p.includes('alta') || p.includes('high')) return '85%';
   if (p.includes('media') || p.includes('medium')) return '50%';
   if (p.includes('baja') || p.includes('low')) return '25%';
@@ -196,7 +197,8 @@ const getProbabilityWidth = (prob) => {
 };
 
 const getProbabilityColor = (prob) => {
-  const p = prob.toLowerCase();
+  if (!prob) return 'bg-slate-200';
+  const p = String(prob).toLowerCase();
   if (p.includes('alta') || p.includes('high')) return 'bg-rose-500';
   if (p.includes('media') || p.includes('medium')) return 'bg-amber-500';
   return 'bg-emerald-500';

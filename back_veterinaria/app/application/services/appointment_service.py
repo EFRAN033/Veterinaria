@@ -24,6 +24,11 @@ class AppointmentService:
         """Obtener citas de un usuario"""
         appointments = self.appointment_repo.get_by_user(user_id, skip=skip, limit=limit)
         return [AppointmentDTO.model_validate(appointment) for appointment in appointments]
+
+    def get_all_appointments(self, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
+        """Obtener todas las citas (para veterinarios)"""
+        appointments = self.appointment_repo.get_all(skip=skip, limit=limit)
+        return [AppointmentDTO.model_validate(appointment) for appointment in appointments]
     
     def get_history_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener historial de citas (completadas, canceladas o pasadas)"""
@@ -78,8 +83,10 @@ class AppointmentService:
         ):
             raise BusinessRuleException("El horario seleccionado no está disponible")
         
+        final_user_id = appointment_data.user_id if appointment_data.user_id else user_id
+
         new_appointment = Appointment(
-            user_id=user_id,
+            user_id=final_user_id,
             pet_id=appointment_data.pet_id,
             service_id=appointment_data.service_id,
             appointment_date=appointment_data.appointment_date,
@@ -98,7 +105,11 @@ class AppointmentService:
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
         
-        if appointment.user_id != user_id:
+        from app.infrastructure.database.models.user import User
+        user = self.db.query(User).filter(User.id == user_id).first()
+        is_vet = user.role == "veterinario" if user else False
+
+        if appointment.user_id != user_id and not is_vet:
             raise BusinessRuleException("No tienes permiso para modificar esta cita")
         
         if (appointment_data.appointment_date or appointment_data.appointment_time):
@@ -127,7 +138,11 @@ class AppointmentService:
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
         
-        if appointment.user_id != user_id:
+        from app.infrastructure.database.models.user import User
+        user = self.db.query(User).filter(User.id == user_id).first()
+        is_vet = user.role == "veterinario" if user else False
+
+        if appointment.user_id != user_id and not is_vet:
             raise BusinessRuleException("No tienes permiso para cancelar esta cita")
         
         appointment.status = "cancelled"

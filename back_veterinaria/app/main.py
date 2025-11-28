@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
-from app.presentation.api.routers import auth, users, services, appointments, products, orders, adoptions, ai_chat, service_requests
+from app.presentation.api.routers import auth, users, services, appointments, products, orders, adoptions, ai_chat, service_requests, pets
 from app.core.exceptions import (
     DomainException,
     NotFoundException,
@@ -104,6 +104,7 @@ app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 app.include_router(adoptions.router, prefix="/api/v1/adoptions", tags=["Adoptions"])
 app.include_router(ai_chat.router, prefix="/api/v1/ai", tags=["AI Chat"])
 app.include_router(service_requests.router, prefix="/api/v1/service-requests", tags=["Service Requests"])
+app.include_router(pets.router, prefix="/api/v1/pets", tags=["Pets"])
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/static", StaticFiles(directory="static"), name="static")

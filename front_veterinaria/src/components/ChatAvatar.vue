@@ -44,7 +44,6 @@ defineProps({
     filter: drop-shadow(0 0 5px rgba(34,211,238,0.5));
   }
   50% {
-    /* A la mitad del pensamiento: Gira, crece un poco y brilla más */
     transform: rotate(180deg) scale(1.15);
     filter: drop-shadow(0 0 12px rgba(34,211,238,0.9));
   }
@@ -55,7 +54,6 @@ defineProps({
 }
 
 .animate-thinking {
-  /* 2.5 segundos es el ritmo ideal para parecer "inteligente" y no solo "cargando" */
   animation: thinking 2.5s infinite ease-in-out;
 }
 </style>

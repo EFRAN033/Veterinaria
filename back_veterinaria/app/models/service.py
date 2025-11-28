@@ -9,8 +9,8 @@ class Service(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(String)
-    category = Column(String(50))  # consultation, general, clinical, aesthetic
+    category = Column(String(50)) 
     price = Column(DECIMAL(10, 2), nullable=False)
-    duration = Column(Integer)  # in minutes
+    duration = Column(Integer) 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

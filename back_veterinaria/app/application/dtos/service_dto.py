@@ -12,7 +12,7 @@ class ServiceCreateDTO(BaseModel):
     description: Optional[str] = None
     category: str
     price: Decimal
-    duration: Optional[int] = None  # en minutos
+    duration: Optional[int] = None 
 
 
 class ServiceUpdateDTO(BaseModel):

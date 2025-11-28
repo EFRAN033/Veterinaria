@@ -12,9 +12,6 @@ class AdoptionService:
         os.makedirs(self.UPLOAD_DIR, exist_ok=True)
 
     def create_adoption(self, adoption_data: AdoptionCreate) -> AdoptionResponse:
-        # Handle image processing if needed (assuming images are already URLs or handled elsewhere, 
-        # but if they are base64 strings, we should save them here. 
-        # For now, let's assume the frontend sends base64 and we save it)
         
         processed_images = []
         for img in adoption_data.images:
@@ -31,7 +28,6 @@ class AdoptionService:
                     processed_images.append(f"/static/uploads/adoptions/{filename}")
                 except Exception as e:
                     print(f"Error saving image: {e}")
-                    # If error, maybe skip or keep original if it's a URL
                     processed_images.append(img) 
             else:
                 processed_images.append(img)

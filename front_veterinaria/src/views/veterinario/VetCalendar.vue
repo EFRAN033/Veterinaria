@@ -312,7 +312,7 @@ const fetchAppointments = async () => {
   try {
     const [appointmentsRes, requestsData] = await Promise.all([
       axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, { headers: { Authorization: `Bearer ${userStore.token}` } }),
-      getAllRequests() // Fetch all requests to filter by date
+      getAllRequests() 
     ]);
 
     const appointmentEvents = appointmentsRes.data.map(app => ({
@@ -330,7 +330,7 @@ const fetchAppointments = async () => {
         notes: app.notes, 
         client: `Cliente #${app.user_id}`, 
         pet: app.pet_id ? `ID: ${app.pet_id}` : 'Sin nombre',
-        species: '', // Backend doesn't provide species for appointments yet
+        species: '',
         serviceType: app.service_id || 'General',
         time: app.appointment_time.substring(0, 5) 
       }
@@ -346,7 +346,7 @@ const fetchAppointments = async () => {
           id: `req-${req.id}`,
           title: req.pet_name || req.service_data.petName || 'Solicitud',
           start: `${req.service_data.preferredDate.split('T')[0]}T${time}`,
-          backgroundColor: req.service_data.isUrgent ? '#fee2e2' : '#e0f2fe', // Red tint for urgent, Blue for normal
+          backgroundColor: req.service_data.isUrgent ? '#fee2e2' : '#e0f2fe',
           borderColor: 'transparent',
           textColor: '#475569',
           classNames: ['compact-event'],
@@ -406,7 +406,6 @@ onMounted(() => { fetchAppointments(); });
 </script>
 
 <style>
-/* ESTILOS FINOS */
 .micro-calendar { font-size: 11px; --fc-border-color: #f1f5f9; --fc-today-bg-color: #f8fafc; }
 .fc .fc-toolbar-title { font-size: 0.9rem; font-weight: 800; color: #334155; text-transform: capitalize; }
 .fc .fc-button { padding: 0.15rem 0.5rem; font-size: 0.7rem; background: white; border: 1px solid #e2e8f0; color: #64748b; border-radius: 6px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); font-weight: 600; text-transform: capitalize; }

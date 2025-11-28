@@ -73,26 +73,26 @@
               
               <div>
                 <MenuItem v-slot="{ active }">
-                  <a
-                    href="#"
+                  <router-link
+                    to="/profile"
                     :class="[
                       active ? 'bg-[#1BB0B9]/10 text-[#169aa0]' : 'text-gray-700',
                       'block w-full rounded-md px-3 py-2 text-sm transition-colors text-left font-medium'
                     ]"
                   >
                     Mi Perfil
-                  </a>
+                  </router-link>
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
-                  <a
-                    href="#"
+                  <router-link
+                    to="/appointments"
                     :class="[
                       active ? 'bg-[#1BB0B9]/10 text-[#169aa0]' : 'text-gray-700',
                       'block w-full rounded-md px-3 py-2 text-sm transition-colors text-left font-medium'
                     ]"
                   >
                     Mis Citas
-                  </a>
+                  </router-link>
                 </MenuItem>
               </div>
 
@@ -179,18 +179,18 @@
           </div>
 
           <div v-else-if="userStore.isLoggedIn" class="pt-3 mt-3 border-t border-gray-200 space-y-2">
-            <a 
-              href="#" 
+            <router-link 
+              to="/profile" 
               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors"
             >
               Mi Perfil
-            </a>
-            <a 
-              href="#" 
+            </router-link>
+            <router-link 
+              to="/appointments" 
               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors"
             >
               Mis Citas
-            </a>
+            </router-link>
             <button
               @click="handleLogout"
               class="block w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 font-medium transition-colors"

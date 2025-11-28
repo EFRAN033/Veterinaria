@@ -48,6 +48,18 @@ const routes = [
     component: () => import('../views/Register.vue'),
     meta: { title: 'Registrarse' }
   },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: () => import('../views/UserProfile.vue'),
+    meta: { requiresAuth: true, title: 'Mi Perfil' }
+  },
+  {
+    path: '/appointments',
+    name: 'UserAppointments',
+    component: () => import('../views/UserAppointments.vue'),
+    meta: { requiresAuth: true, title: 'Mis Citas' }
+  },
 
   {
     path: '/veterinario',

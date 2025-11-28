@@ -65,6 +65,29 @@ export const useUserStore = defineStore('user', () => {
     clearUser()
   }
 
+  async function fetchProfile() {
+    try {
+      const { default: axios } = await import('../axios');
+      const response = await axios.get('/v1/auth/me');
+      setUser(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      throw error;
+    }
+  }
+
+  async function fetchAppointments() {
+    try {
+      const { default: axios } = await import('../axios');
+      const response = await axios.get('/v1/appointments/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      throw error;
+    }
+  }
+
   return {
     token,
     user,
@@ -76,6 +99,8 @@ export const useUserStore = defineStore('user', () => {
     setUser,
     setToken,
     clearUser,
-    logout
+    logout,
+    fetchProfile,
+    fetchAppointments
   }
 })

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col relative overflow-hidden">
+  <div class="min-h-screen bg-white flex flex-col relative overflow-hidden">
     <!-- Decorative Background Elements -->
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1BB0B9]/10 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3"></div>
     <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#BEDC74]/20 rounded-full blur-[100px] pointer-events-none -translate-x-1/3 translate-y-1/3"></div>

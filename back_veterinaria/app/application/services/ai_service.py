@@ -153,7 +153,7 @@ class AIService:
             print(f"Error generating AI response: {e}")
             error_msg = "Lo siento, hubo un error al procesar tu consulta."
             if "rate_limit" in str(e).lower() or "429" in str(e):
-                error_msg = "⚠️ El sistema está saturado (Límite de cuota OpenAI alcanzado). Por favor espera unos segundos."
+                error_msg = "El sistema está saturado (Límite de cuota OpenAI alcanzado). Por favor espera unos segundos."
             
             return {
                 "response": error_msg,
@@ -253,3 +253,70 @@ class AIService:
         except Exception as e:
             print(f"Error fetching patient history: {e}")
             return ""
+    def analyze_service_request(self, data: dict, images: list = None) -> dict:
+        """
+        Analiza una nueva solicitud de servicio para generar insights clínicos preliminares.
+        """
+        try:
+            # Construir prompt basado en el tipo de servicio
+            service_type = data.get('service_type', 'general')
+            pet_info = f"Mascota: {data.get('pet_name', 'Desconocido')} ({data.get('species', 'Desconocido')})"
+            
+            context = f"Tipo de Servicio: {service_type}\n{pet_info}\n"
+            
+            if service_type == 'consultation':
+                context += f"Síntomas: {data.get('symptoms', 'No especificado')}\n"
+                context += f"Duración: {data.get('duration', 'No especificado')}\n"
+                context += f"Urgencia Reportada: {data.get('urgency', 'No especificado')}\n"
+            elif service_type == 'clinical':
+                context += f"Descripción: {data.get('description', 'No especificado')}\n"
+                context += f"Historia: {data.get('history', 'No especificado')}\n"
+            else:
+                # Para otros servicios (estética, general), el análisis es más simple
+                context += f"Detalles: {str(data)}\n"
+
+            messages = [
+                {"role": "system", "content": """
+                Eres un Asistente Veterinario de IA experto en triaje y análisis clínico preliminar.
+                Tu objetivo es analizar la solicitud de un cliente y proporcionar "Clinical Insights" para el veterinario.
+                
+                Responde SIEMPRE en formato JSON con la siguiente estructura:
+                {
+                    "triage_level": "Red/Yellow/Green",
+                    "summary": "Resumen clínico breve (1 línea)",
+                    "differentials": ["Posible causa 1", "Posible causa 2"],
+                    "recommendations": ["Acción sugerida 1", "Acción sugerida 2"],
+                    "risk_factors": ["Factor de riesgo identificado"]
+                }
+                
+                - triage_level: Red (Urgencia inmediata), Yellow (Atención pronta), Green (Rutina).
+                - differentials: Solo si aplica (síntomas clínicos).
+                """},
+                {"role": "user", "content": f"Analiza esta solicitud:\n{context}"}
+            ]
+
+            # Soporte para imágenes (si las hubiera en base64 o URL, aquí asumimos que pasamos descripciones o placeholders si no procesamos la imagen real aún en este flujo rápido)
+            # En una implementación real, pasaríamos las imágenes al modelo si son URLs accesibles o base64.
+            # Por ahora, nos basamos en el texto.
+            
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.3,
+                response_format={"type": "json_object"}
+            )
+            
+            content = response.choices[0].message.content
+            return json.loads(content)
+
+        except Exception as e:
+            print(f"Error analyzing service request: {e}")
+            import traceback
+            traceback.print_exc()
+            return {
+                "triage_level": "Green",
+                "summary": "Análisis no disponible",
+                "differentials": [],
+                "recommendations": ["Evaluar presencialmente"],
+                "risk_factors": []
+            }

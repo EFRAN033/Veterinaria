@@ -13,7 +13,7 @@
       
       <!-- Differential Diagnosis -->
       <div v-if="insights?.differentials?.length" class="space-y-3 animate-fade-in">
-        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
           <ChartPieIcon class="h-3 w-3" /> Diagnóstico Diferencial
         </label>
         
@@ -40,7 +40,7 @@
 
       <!-- Recommended Tests -->
       <div v-if="insights?.recommended_tests?.length" class="space-y-3 animate-fade-in delay-100">
-        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
           <BeakerIcon class="h-3 w-3" /> Pruebas Sugeridas
         </label>
         
@@ -61,7 +61,7 @@
 
       <!-- Treatment Focus -->
       <div v-if="insights?.treatment_focus?.length" class="space-y-3 animate-fade-in delay-200">
-        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
           <HeartIcon class="h-3 w-3" /> Enfoque Terapéutico
         </label>
         
@@ -78,7 +78,7 @@
 
       <!-- Smart Dosage Calculator -->
       <div v-if="insights?.calculated_dosages?.length" class="space-y-3 animate-fade-in delay-200">
-        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
           <CalculatorIcon class="h-3 w-3" /> Dosis Inteligentes
         </label>
         
@@ -101,7 +101,7 @@
 
       <!-- Safety Alerts -->
       <div v-if="insights?.safety_alerts?.length" class="space-y-3 animate-fade-in delay-200">
-        <label class="text-xs font-bold text-rose-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1">
           <ExclamationTriangleIcon class="h-3 w-3" /> Alertas de Seguridad
         </label>
         
@@ -122,7 +122,7 @@
 
       <!-- Smart Follow-up -->
       <div v-if="insights?.follow_up" class="space-y-3 animate-fade-in delay-300">
-        <label class="text-xs font-bold text-indigo-500 uppercase tracking-wider block flex items-center gap-1">
+        <label class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1">
           <CalendarDaysIcon class="h-3 w-3" /> Seguimiento Inteligente
         </label>
         
@@ -132,7 +132,10 @@
               <div class="text-sm font-bold text-indigo-900">{{ insights.follow_up.duration }}</div>
               <div class="text-[10px] text-indigo-600 leading-tight mt-0.5">{{ insights.follow_up.reason }}</div>
             </div>
-            <button class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors">
+            <button 
+              @click="$emit('schedule', insights.follow_up)"
+              class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
+            >
               Agendar
             </button>
           </div>
@@ -210,7 +213,6 @@ const getProbabilityColor = (prob) => {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
-  opacity: 0;
 }
 
 .delay-100 { animation-delay: 150ms; }

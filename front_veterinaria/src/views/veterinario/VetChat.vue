@@ -187,7 +187,10 @@
       </div>
 
       <!-- Clinical Insights Panel -->
-      <ClinicalInsights :insights="clinicalInsights" />
+      <ClinicalInsights 
+        :insights="clinicalInsights" 
+        @schedule="handleSchedule"
+      />
 
 
     </div>
@@ -295,6 +298,49 @@
         </div>
       </div>
     </div>
+
+    <!-- Schedule Modal -->
+    <div v-if="showScheduleModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showScheduleModal = false">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <CalendarDaysIcon class="h-6 w-6 text-indigo-600" />
+            Agendar Seguimiento
+          </h3>
+          <button @click="showScheduleModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <XMarkIcon class="h-6 w-6" />
+          </button>
+        </div>
+        
+        <div class="p-8 overflow-y-auto custom-scrollbar bg-white">
+          <DateTimePicker v-model="appointmentData" />
+          
+          <div class="mt-6">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Notas Adicionales</label>
+            <textarea 
+              v-model="scheduleNotes"
+              rows="3"
+              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+              placeholder="Detalles adicionales para la cita..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+          <button @click="showScheduleModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">
+            Cancelar
+          </button>
+          <button 
+            @click="confirmAppointment" 
+            class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
+            :disabled="loading"
+          >
+            <span v-if="loading" class="animate-spin">⌛</span>
+            Confirmar Cita
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -313,13 +359,18 @@ import {
   DocumentTextIcon,
   ArrowDownTrayIcon,
   PaperClipIcon,
-  MicrophoneIcon
+  MicrophoneIcon,
+  CalendarDaysIcon
 } from '@heroicons/vue/24/outline';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import { useUserStore } from '@/stores/user';
 
 import ChatAvatar from '@/components/ChatAvatar.vue';
 import ClinicalInsights from '@/components/ClinicalInsights.vue';
+import DateTimePicker from '@/components/DateTimePicker.vue';
+import { useToast } from '@/composables/useToast';
+
+const { addToast } = useToast();
 
 const messages = ref([
   { role: 'assistant', content: '¡Hola Dr.! Soy tu asistente veterinario. Puedo ayudarte a analizar síntomas, revisar dosis o buscar información clínica. ¿Por dónde empezamos?' }
@@ -635,13 +686,67 @@ const generateReport = async () => {
   }
 };
 
-const downloadReport = () => {
-  const blob = new Blob([reportContent.value], { type: 'text/markdown' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Reporte_Clinico_${new Date().toISOString().split('T')[0]}.md`;
-  a.click();
+
+
+// Appointment Scheduling
+const showScheduleModal = ref(false);
+const appointmentData = ref({
+  date: null,
+  timeSlot: '',
+  isUrgent: false
+});
+const scheduleNotes = ref('');
+
+const handleSchedule = (followUpData) => {
+  if (!currentPetId.value) {
+    addToast('Debes seleccionar un paciente primero', 'warning');
+    return;
+  }
+  
+  scheduleNotes.value = `Seguimiento sugerido por IA: ${followUpData.reason}`;
+  showScheduleModal.value = true;
+};
+
+const confirmAppointment = async () => {
+  if (!appointmentData.value.date || (!appointmentData.value.timeSlot && !appointmentData.value.isUrgent)) {
+    addToast('Por favor selecciona fecha y hora', 'warning');
+    return;
+  }
+
+  loading.value = true;
+  try {
+    // Map time slots to specific times
+    const timeMap = {
+      'morning': '09:00:00',
+      'afternoon': '14:00:00',
+      'evening': '18:00:00'
+    };
+
+    const payload = {
+      pet_id: currentPetId.value,
+      service_id: 1, // Assuming 1 is consultation/general for now
+      appointment_date: appointmentData.value.date.toISOString().split('T')[0],
+      appointment_time: appointmentData.value.isUrgent ? '08:00:00' : timeMap[appointmentData.value.timeSlot],
+      notes: scheduleNotes.value
+    };
+
+    await axios.post(`${import.meta.env.VITE_API_URL}/v1/appointments/`, payload, {
+      headers: { Authorization: `Bearer ${userStore.token}` }
+    });
+
+    addToast('Cita agendada exitosamente', 'success');
+    showScheduleModal.value = false;
+    
+    // Reset form
+    appointmentData.value = { date: null, timeSlot: '', isUrgent: false };
+    scheduleNotes.value = '';
+
+  } catch (err) {
+    console.error('Error scheduling appointment:', err);
+    addToast('Error al agendar la cita', 'error');
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 

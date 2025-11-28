@@ -38,7 +38,7 @@
           
           <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-bl-full pointer-events-none"></div>
 
-          <div class="p-6 md:p-8">
+          <div class="p-4 md:p-5">
             
             <div class="mb-8">
               <h2 class="text-white text-3xl font-serif font-bold tracking-wide">
@@ -247,7 +247,7 @@ const handleSubmit = async () => {
 
 /* Input cómodo: Buen tamaño de texto y padding */
 .form-input {
-  @apply w-full bg-white text-gray-800 rounded-xl px-4 py-3.5 text-sm md:text-base outline-none border-0 shadow-sm placeholder-gray-400 transition-all duration-200;
+  @apply w-full bg-white text-gray-800 rounded-xl px-4 py-2 text-sm md:text-base outline-none border-0 shadow-sm placeholder-gray-400 transition-all duration-200;
 }
 
 .form-input:focus {

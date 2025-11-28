@@ -535,12 +535,12 @@ const submitRequest = async () => {
     }
 
     await createServiceRequest(requestData);
-    addToast('✅ Solicitud enviada exitosamente. Te contactaremos pronto.', 'success');
+    addToast('Solicitud enviada exitosamente. Te contactaremos pronto.', 'success');
     
     router.push('/home');
   } catch (err) {
     console.error(err);
-    addToast('❌ Error al enviar solicitud. Por favor intenta nuevamente.', 'error');
+    addToast('Error al enviar solicitud. Por favor intenta nuevamente.', 'error');
   }
 };
 

@@ -7,7 +7,7 @@
       </div>
       <button 
         @click="fetchRequests" 
-        class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+        class="text-xs font-bold text-[#02939E] hover:text-[#027a83] flex items-center gap-1"
         :disabled="loading"
       >
         <ArrowPathIcon class="h-4 w-4" :class="{ 'animate-spin': loading }" />
@@ -21,7 +21,7 @@
 
     <div v-else-if="error" class="text-center py-8">
       <p class="text-red-500 text-sm">{{ error }}</p>
-      <button @click="fetchRequests" class="mt-2 text-xs text-indigo-600 hover:underline">Reintentar</button>
+      <button @click="fetchRequests" class="mt-2 text-xs text-[#02939E] hover:underline">Reintentar</button>
     </div>
 
     <div v-else-if="requests.length === 0" class="text-center py-12 border-b border-slate-100">
@@ -63,7 +63,7 @@
             </td>
 
             <td class="py-4 px-4">
-              <span class="px-2 py-1 rounded text-xs font-bold uppercase tracking-wide" :class="getServiceTypeClass(request.service_type)">
+              <span class="px-2 py-1 rounded-none text-xs font-bold uppercase tracking-wide" :class="getServiceTypeClass(request.service_type)">
                 {{ getServiceTypeName(request.service_type) }}
               </span>
             </td>
@@ -99,13 +99,13 @@
             <td class="py-4 px-4 text-right">
                   <button 
                     @click.stop="updateStatus(request, 'reviewed')"
-                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded transition-colors opacity-0 group-hover:opacity-100 mr-2"
+                    class="text-xs font-bold text-[#02939E] hover:text-[#027a83] hover:bg-[#02939E]/10 px-3 py-1.5 rounded-none transition-colors opacity-0 group-hover:opacity-100 mr-2"
                   >
                     Revisar
                   </button>
                   <button 
                     @click="analyzeRequest(request)"
-                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-lg transition-colors text-xs font-medium flex items-center gap-1 mr-1"
+                    class="text-[#02939E] hover:text-[#027a83] bg-[#02939E]/10 hover:bg-[#02939E]/15 px-3 py-1 rounded-none transition-colors text-xs font-medium flex items-center gap-1 mr-1"
                     title="Generar análisis automático"
                   >
                     <SparklesIcon class="h-3 w-3" />
@@ -113,7 +113,7 @@
                   </button>
                   <button 
                     @click="$router.push(`/veterinario/chat?petId=${request.pet_id}&petName=${request.pet_name || 'Paciente'}&requestId=${request.id}`)"
-                    class="text-slate-400 hover:text-indigo-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                    class="text-slate-400 hover:text-[#02939E] p-1 rounded-none hover:bg-slate-100 transition-colors"
                     title="Abrir chat con IA"
                   >
                     <ChatBubbleLeftRightIcon class="h-4 w-4" />
@@ -128,16 +128,16 @@
     <div v-if="selectedRequest" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm transition-opacity" @click="closeModal"></div>
       
-      <div class="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-3xl flex flex-col animate-fade-in-up">
+      <div class="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl rounded-none flex flex-col animate-fade-in-up">
         <!-- Modal Content -->
         <div class="p-8 sm:p-12">
             <!-- Header with Actions -->
             <div class="flex justify-between items-start mb-8">
                 <div>
-                    <h2 class="text-3xl font-serif font-bold text-slate-900 mb-2">Solicitud #{{ selectedRequest.id }}</h2>
+                    <h2 class="app-type-title text-slate-900 mb-2">Solicitud #{{ selectedRequest.id }}</h2>
                     <p class="text-slate-500">Recibida el {{ formatDate(selectedRequest.created_at) }}</p>
                 </div>
-                <button @click="closeModal" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                <button @click="closeModal" class="p-2 hover:bg-slate-100 rounded-none transition-colors">
                     <XMarkIcon class="h-8 w-8 text-slate-400" />
                 </button>
             </div>
@@ -149,11 +149,11 @@
                     <div>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Paciente</h3>
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-2xl">
+                            <div class="w-16 h-16 bg-slate-100 rounded-none flex items-center justify-center text-2xl">
                                 🐾
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-slate-900">{{ selectedRequest.pet_name || 'Sin Nombre' }}</p>
+                                <p class="app-type-panel-heading text-slate-900">{{ selectedRequest.pet_name || 'Sin Nombre' }}</p>
                                 <p class="text-slate-500 capitalize">{{ selectedRequest.service_data.species || 'Especie no especificada' }}</p>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                     <div>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Cliente</h3>
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                            <div class="w-10 h-10 rounded-none bg-[#02939E]/10 text-[#02939E] flex items-center justify-center font-bold border border-[#02939E]/25">
                                 {{ (selectedRequest.user_name || 'C')[0] }}
                             </div>
                             <div>
@@ -178,10 +178,10 @@
                     <div>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Detalles del Servicio</h3>
                         <div class="flex items-start gap-4 mb-4">
-                             <span class="px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wide" :class="getServiceTypeClass(selectedRequest.service_type)">
+                             <span class="px-3 py-1 rounded-none text-sm font-bold uppercase tracking-wide" :class="getServiceTypeClass(selectedRequest.service_type)">
                                 {{ getServiceTypeName(selectedRequest.service_type) }}
                             </span>
-                            <span v-if="selectedRequest.service_data.isUrgent" class="px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wide bg-red-50 text-red-600 animate-pulse">
+                            <span v-if="selectedRequest.service_data.isUrgent" class="px-3 py-1 rounded-none text-sm font-bold uppercase tracking-wide bg-red-50 text-red-600 animate-pulse">
                                 Urgente
                             </span>
                         </div>
@@ -202,16 +202,16 @@
                                 v-for="(img, idx) in selectedRequest.images" 
                                 :key="idx"
                                 :src="`${backendUrl}/${img}`" 
-                                class="w-full h-24 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity border border-slate-100"
+                                class="w-full h-24 object-cover rounded-none cursor-pointer hover:opacity-90 transition-opacity border border-slate-100"
                                 @click="openImage(img)"
                             />
                         </div>
                     </div>
 
                     <!-- AI Clinical Insights -->
-                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <div class="bg-slate-50 rounded-none p-6 border border-slate-100">
                         <div class="flex items-center gap-2 mb-4">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                            <div class="w-8 h-8 rounded-none bg-[#02939E] flex items-center justify-center text-white">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <h3 class="font-bold text-slate-900">AI Clinical Insights</h3>
@@ -255,7 +255,7 @@
                             <p class="text-slate-500 text-sm mb-4">No hay análisis disponible para esta solicitud.</p>
                             <button 
                                 @click="analyzeRequest(selectedRequest)"
-                                class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg text-sm font-bold hover:bg-indigo-200 transition-colors flex items-center gap-2 mx-auto"
+                                class="px-4 py-2 bg-[#02939E]/15 text-[#027a83] rounded-none text-sm font-bold hover:bg-[#02939E]/25 transition-colors flex items-center gap-2 mx-auto"
                                 :disabled="analyzing"
                             >
                                 <svg v-if="analyzing" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -272,16 +272,16 @@
         </div>
 
         <!-- Footer Actions -->
-        <div class="p-8 sm:p-12 bg-slate-50 mt-auto flex justify-end gap-4 rounded-b-3xl">
+        <div class="p-8 sm:p-12 bg-slate-50 mt-auto flex justify-end gap-4 rounded-none border-t border-slate-200">
             <button 
                 @click="updateStatus(selectedRequest, 'cancelled'); closeModal()"
-                class="px-8 py-4 rounded-xl font-bold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
+                class="px-5 py-2.5 rounded-none text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
             >
                 Rechazar Solicitud
             </button>
             <button 
                 @click="updateStatus(selectedRequest, 'reviewed'); closeModal()"
-                class="px-8 py-4 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200 transition-all transform hover:-translate-y-1"
+                class="px-5 py-2.5 rounded-none text-sm font-semibold text-white bg-[#02939E] hover:bg-[#027a83] shadow-md hover:shadow-[#02939E]/25 transition-all"
             >
                 Aprobar y Agendar
             </button>
@@ -291,10 +291,10 @@
 
     <!-- SCHEDULE MODAL -->
     <div v-if="showScheduleModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showScheduleModal = false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+      <div class="bg-white rounded-none shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <CalendarDaysIcon class="h-6 w-6 text-indigo-600" />
+            <CalendarDaysIcon class="h-6 w-6 text-[#02939E]" />
             Agendar Cita
           </h3>
           <button @click="showScheduleModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
@@ -310,19 +310,19 @@
             <textarea 
               v-model="scheduleNotes"
               rows="3"
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+              class="w-full px-4 py-3 rounded-none border border-slate-200 focus:ring-2 focus:ring-[#02939E] focus:border-[#02939E] transition-all text-sm"
               placeholder="Instrucciones adicionales..."
             ></textarea>
           </div>
         </div>
 
         <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-          <button @click="showScheduleModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">
+          <button @click="showScheduleModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-none transition-colors">
             Cancelar
           </button>
           <button 
             @click="confirmAppointment" 
-            class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
+            class="px-6 py-2 bg-[#02939E] text-white font-bold rounded-none hover:bg-[#027a83] transition-colors shadow-lg shadow-[#02939E]/20 flex items-center gap-2"
             :disabled="scheduling"
           >
             <span v-if="scheduling" class="animate-spin">⌛</span>
@@ -569,7 +569,7 @@ const getServiceTypeClass = (type) => {
   const classes = {
     consultation: 'bg-sky-50 text-sky-700 border border-sky-100',
     general: 'bg-orange-50 text-orange-700 border border-orange-100',
-    clinical: 'bg-purple-50 text-purple-700 border border-purple-100',
+    clinical: 'bg-[#02939E]/12 text-[#027a83] border border-[#02939E]/25',
     aesthetic: 'bg-pink-50 text-pink-700 border border-pink-100'
   };
   return classes[type] || 'bg-gray-50 text-gray-700 border border-gray-100';
@@ -578,8 +578,8 @@ const getServiceTypeClass = (type) => {
 const getStatusClass = (status) => {
   const classes = {
     pending: 'text-amber-600',
-    reviewed: 'text-blue-600',
-    in_progress: 'text-indigo-600',
+    reviewed: 'text-[#02939E]',
+    in_progress: 'text-[#02939E]',
     completed: 'text-emerald-600',
     cancelled: 'text-red-600'
   };

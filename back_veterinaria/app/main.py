@@ -1,12 +1,26 @@
 """
 Punto de entrada principal de la aplicación con arquitectura limpia
 """
+from pathlib import Path
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
-from app.presentation.api.routers import auth, users, services, appointments, products, orders, adoptions, ai_chat, service_requests, pets
+from app.presentation.api.routers import (
+    auth,
+    users,
+    services,
+    appointments,
+    products,
+    orders,
+    adoptions,
+    ai_chat,
+    service_requests,
+    pets,
+    vet,
+)
 from app.core.exceptions import (
     DomainException,
     NotFoundException,
@@ -25,9 +39,7 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-origins = [settings.FRONTEND_URL, "http://localhost:5173"]
-if settings.BACKEND_CORS_ORIGINS:
-    origins.extend(settings.BACKEND_CORS_ORIGINS)
+origins = list({settings.FRONTEND_URL, "http://localhost:5173", "http://127.0.0.1:5173"} | set(settings.BACKEND_CORS_ORIGINS))
 
 app.add_middleware(
     CORSMiddleware,
@@ -105,9 +117,17 @@ app.include_router(adoptions.router, prefix="/api/v1/adoptions", tags=["Adoption
 app.include_router(ai_chat.router, prefix="/api/v1/ai", tags=["AI Chat"])
 app.include_router(service_requests.router, prefix="/api/v1/service-requests", tags=["Service Requests"])
 app.include_router(pets.router, prefix="/api/v1/pets", tags=["Pets"])
+app.include_router(vet.router, prefix="/api/v1/vet", tags=["Veterinario"])
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Raíz del proyecto (back_veterinaria): StaticFiles exige que el directorio exista (p. ej. en Docker).
+_project_root = Path(__file__).resolve().parent.parent
+_uploads_dir = _project_root / "uploads"
+_static_dir = _project_root / "static"
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+_static_dir.mkdir(parents=True, exist_ok=True)
+
+app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
+app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
 
 @app.get("/")

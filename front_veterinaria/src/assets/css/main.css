@@ -96,22 +96,95 @@
   scrollbar-width: none;
 }
 
+@layer components {
+  /* CTA y navegación: mismo tamaño en toda la web pública */
+  .app-btn-cta-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 bg-[#02939E] text-white shadow-md hover:bg-[#027a83] hover:shadow-lg;
+  }
+  .app-btn-cta-outline-light {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg border-2 border-white text-white transition-colors hover:bg-white hover:text-gray-900;
+  }
+  .app-btn-nav {
+    @apply inline-flex items-center justify-center min-w-[6.5rem] px-3 py-2 rounded-md text-sm font-medium text-white bg-[#1BB0B9] shadow-none border-0 outline-none ring-0 hover:bg-[#169aa0] transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white;
+  }
+  .app-btn-auth-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white border border-white/25 shadow-none hover:bg-white/10 transition-colors;
+  }
+  .app-btn-auth-solid {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1BB0B9] shadow-none hover:bg-[#169aa0] transition-colors;
+  }
+  /* --- Tipografía unificada (un tamaño por rol en toda la app) --- */
+  .app-type-hero {
+    @apply font-serif font-bold leading-tight tracking-tight text-white text-3xl sm:text-4xl md:text-5xl;
+  }
+  /* Título principal de página / sección (antes app-type-section) */
+  .app-type-title {
+    @apply font-serif font-bold leading-tight tracking-tight text-2xl md:text-3xl text-gray-900;
+  }
+  /* Título principal sobre fondo oscuro o color */
+  .app-type-title-inverse {
+    @apply font-serif font-bold leading-tight tracking-tight text-2xl md:text-3xl text-white;
+  }
+  /* Subtítulo de bloque o paso dentro de una vista */
+  .app-type-panel-heading {
+    @apply font-serif font-bold text-xl text-gray-900 leading-snug;
+  }
+  /* Título de tarjeta / bloque compacto */
+  .app-type-card-title {
+    @apply text-base font-semibold text-gray-900 leading-snug;
+  }
+  .app-type-card-title-serif {
+    @apply font-serif font-semibold text-base text-gray-800 leading-snug;
+  }
+  /* Pie de sección / columnas */
+  .app-type-footer-title {
+    @apply text-base font-serif font-bold text-gray-800 tracking-wide;
+  }
+  /* Barra lateral / panel vet: título de página */
+  .app-type-toolbar-title {
+    @apply text-xl font-bold tracking-tight text-slate-900 leading-tight;
+  }
+  /* Cifras destacadas (métricas, día en calendario) */
+  .app-type-stat {
+    @apply text-xl font-bold tabular-nums text-gray-900;
+  }
+  .app-type-stat-slate {
+    @apply text-xl font-bold tabular-nums text-slate-800;
+  }
+  /* Precios */
+  .app-type-price {
+    @apply font-serif font-bold text-2xl tabular-nums text-gray-900 tracking-tight;
+  }
+  .app-type-price-currency {
+    @apply text-sm font-bold text-[#1BB0B9];
+  }
+  .app-type-price-accent {
+    @apply font-serif font-bold text-2xl tabular-nums text-[#1BB0B9] tracking-tight;
+  }
+  .app-type-lead {
+    @apply text-base md:text-lg font-light italic text-gray-600 max-w-xl;
+  }
+  .app-type-lead-on-dark {
+    @apply text-base md:text-lg font-light italic text-gray-100 max-w-lg;
+  }
+}
+
 @layer utilities {
   .min-w-72 {
     min-width: 18rem; /* 288px */
   }
 
-  /* Utility classes para tipografía consistente */
+  /* Preferir componentes app-type-* arriba; utilidades legacy = alias */
   .text-display {
-    @apply text-2xl md:text-3xl font-bold;
+    @apply text-2xl md:text-3xl font-serif font-bold;
   }
 
   .text-heading {
-    @apply text-xl md:text-2xl font-bold;
+    @apply text-xl font-serif font-bold;
   }
 
   .text-subheading {
-    @apply text-lg md:text-xl font-semibold;
+    @apply text-base font-semibold;
   }
 
   .text-body {

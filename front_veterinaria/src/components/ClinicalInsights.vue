@@ -44,11 +44,11 @@
           <BeakerIcon class="h-3 w-3" /> Pruebas Sugeridas
         </label>
         
-        <div class="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100 space-y-3">
+        <div class="bg-[#02939E]/10 rounded-none p-3 border border-[#02939E]/20 space-y-3">
           <div v-for="(test, idx) in insights.recommended_tests" :key="idx" class="flex items-start gap-2">
             <div class="mt-0.5 min-w-[14px]">
-              <div class="w-3.5 h-3.5 rounded border border-indigo-300 bg-white flex items-center justify-center">
-                <CheckIcon class="h-2.5 w-2.5 text-indigo-600 opacity-0 hover:opacity-100 cursor-pointer transition-opacity" />
+              <div class="w-3.5 h-3.5 rounded border border-[#02939E]/40 bg-white flex items-center justify-center">
+                <CheckIcon class="h-2.5 w-2.5 text-[#02939E] opacity-0 hover:opacity-100 cursor-pointer transition-opacity" />
               </div>
             </div>
             <div>
@@ -83,7 +83,7 @@
         </label>
         
         <div class="space-y-2">
-          <div v-for="(dose, idx) in insights.calculated_dosages" :key="idx" class="bg-blue-50 rounded-xl p-3 border border-blue-100 relative overflow-hidden">
+          <div v-for="(dose, idx) in insights.calculated_dosages" :key="idx" class="bg-blue-50 rounded-none p-3 border border-blue-100 relative overflow-hidden">
             <div class="absolute top-0 right-0 p-1 opacity-10">
               <BeakerIcon class="w-8 h-8 text-blue-600" />
             </div>
@@ -107,7 +107,7 @@
         
         <div class="space-y-2">
           <div v-for="(alert, idx) in insights.safety_alerts" :key="idx" 
-            class="rounded-xl p-3 border flex gap-2 items-start"
+            class="rounded-none p-3 border flex gap-2 items-start"
             :class="{
               'bg-rose-50 border-rose-100 text-rose-700': alert.level.includes('High') || alert.level.includes('Alta'),
               'bg-amber-50 border-amber-100 text-amber-700': alert.level.includes('Medium') || alert.level.includes('Media'),
@@ -122,19 +122,19 @@
 
       <!-- Smart Follow-up -->
       <div v-if="insights?.follow_up" class="space-y-3 animate-fade-in delay-300">
-        <label class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1">
+        <label class="text-xs font-bold text-[#02939E] uppercase tracking-wider flex items-center gap-1">
           <CalendarDaysIcon class="h-3 w-3" /> Seguimiento Inteligente
         </label>
         
-        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3">
+        <div class="bg-[#02939E]/10 border border-[#02939E]/20 rounded-none p-3">
           <div class="flex justify-between items-start mb-2">
             <div>
-              <div class="text-sm font-bold text-indigo-900">{{ insights.follow_up.duration }}</div>
-              <div class="text-[10px] text-indigo-600 leading-tight mt-0.5">{{ insights.follow_up.reason }}</div>
+              <div class="text-sm font-bold text-slate-900">{{ insights.follow_up.duration }}</div>
+              <div class="text-[10px] text-[#02939E] leading-tight mt-0.5">{{ insights.follow_up.reason }}</div>
             </div>
             <button 
               @click="$emit('schedule', insights.follow_up)"
-              class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
+              class="bg-[#02939E] text-white text-[10px] font-bold px-2 py-1 rounded-none shadow-sm hover:bg-[#027a83] transition-colors"
             >
               Agendar
             </button>

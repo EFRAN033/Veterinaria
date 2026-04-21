@@ -29,12 +29,12 @@
             <div class="p-6 md:p-8 lg:p-10 flex flex-col justify-center lg:border-r border-gray-100 bg-white">
               
               <div class="mb-8 text-center lg:text-left"> 
-                <div class="inline-block bg-gradient-to-br from-brand-accentPink to-brand-primary p-3 rounded-2xl shadow-lg shadow-brand-primary/30 mb-4"> 
+                <div class="inline-block bg-gradient-to-br from-brand-accentPink to-brand-primary p-3 rounded-none shadow-lg shadow-brand-primary/30 mb-4"> 
                   <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </div>
-                <h2 class="text-3xl lg:text-4xl font-serif font-bold text-gray-900 mb-2">Crear Cuenta</h2>
+                <h2 class="app-type-title mb-2">Crear Cuenta</h2>
                 <p class="text-gray-500 text-lg">Únete a nuestra comunidad de amantes de las mascotas.</p>
               </div>
 
@@ -155,19 +155,19 @@
 
               <div class="space-y-8 relative z-10 max-w-lg mx-auto lg:mx-0">
                 <div>
-                  <h3 class="text-2xl font-bold text-gray-900 mb-3">Otras opciones de acceso</h3>
+                  <h3 class="app-type-panel-heading mb-3">Otras opciones de acceso</h3>
                   <p class="text-gray-600 leading-relaxed">
                     Si prefieres no crear una contraseña nueva, utiliza tus redes sociales para un acceso rápido y seguro.
                   </p>
                 </div>
 
                 <div class="space-y-4">
-                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-white border-2 border-gray-200 rounded-xl hover:border-brand-accentPink hover:bg-gray-50 transition-all group duration-300">
+                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-white border-2 border-gray-200 rounded-none hover:border-brand-accentPink hover:bg-gray-50 transition-all group duration-300">
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
                     <span class="text-gray-700 font-bold group-hover:text-gray-900">Registrarse con Google</span>
                   </button>
                   
-                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-[#1877F2] border-2 border-[#1877F2] rounded-xl hover:bg-[#166fe5] transition-all text-white shadow-md shadow-blue-500/20">
+                  <button class="w-full flex items-center justify-center gap-4 py-3.5 px-4 bg-[#1877F2] border-2 border-[#1877F2] rounded-none hover:bg-[#166fe5] transition-all text-white shadow-md shadow-blue-500/20">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
@@ -178,7 +178,7 @@
                 <div class="pt-8 border-t border-gray-200">
                   <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Beneficios de tu cuenta</h4>
                   <div class="grid gap-4">
-                    <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-4 bg-white p-4 rounded-none border border-gray-100 shadow-sm">
                       <div class="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </div>
@@ -188,7 +188,7 @@
                       </div>
                     </div>
                     
-                    <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-4 bg-white p-4 rounded-none border border-gray-100 shadow-sm">
                       <div class="w-10 h-10 bg-brand-medium/20 rounded-full flex items-center justify-center text-brand-dark">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       </div>

@@ -26,9 +26,41 @@ export const usePets = () => {
         }
     };
 
+    const createPet = async (payload) => {
+        try {
+            loading.value = true;
+            error.value = '';
+            const response = await apiClient.post('/v1/pets/', payload);
+            return response.data;
+        } catch (err) {
+            console.error('Error creating pet:', err);
+            error.value = err.response?.data?.detail || 'Error al registrar mascota';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const updatePet = async (petId, payload) => {
+        try {
+            loading.value = true;
+            error.value = '';
+            const response = await apiClient.patch(`/v1/pets/${petId}`, payload);
+            return response.data;
+        } catch (err) {
+            console.error('Error updating pet:', err);
+            error.value = err.response?.data?.detail || 'Error al actualizar mascota';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     return {
         loading,
         error,
-        getPetsByUserId
+        getPetsByUserId,
+        createPet,
+        updatePet,
     };
 };

@@ -4,10 +4,10 @@
       
       <!-- Sidebar Filters -->
       <aside class="lg:w-72 flex-shrink-0">
-        <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-xl p-6 sticky top-24 border border-gray-100">
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-none shadow-xl p-6 sticky top-24 border border-gray-100">
           <!-- Header -->
           <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-200">
-            <h3 class="text-2xl font-serif font-bold text-gray-800 flex items-center gap-2">
+            <h3 class="app-type-panel-heading flex items-center gap-2">
               <svg class="w-6 h-6 text-[#1BB0B9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
@@ -100,7 +100,7 @@
                 :class="filters.sizes.includes(size) 
                   ? 'bg-gradient-to-br from-[#1BB0B9] to-[#16a0a8] text-white border-[#1BB0B9] shadow-lg scale-105' 
                   : 'bg-white text-gray-700 border-gray-300 hover:border-[#1BB0B9] hover:text-[#1BB0B9]'"
-                class="px-5 py-2.5 rounded-xl border-2 text-sm font-bold transition-all"
+                class="px-5 py-2.5 rounded-none border-2 text-sm font-bold transition-all"
               >
                 {{ size }}
               </button>
@@ -134,7 +134,7 @@
           <!-- Clear Filters Button -->
           <button 
             @click="clearFilters"
-            class="w-full py-3 px-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-bold rounded-xl hover:from-red-50 hover:to-red-100 hover:text-red-600 transition-all duration-300 flex items-center justify-center gap-2 border border-gray-300 hover:border-red-300"
+            class="w-full py-3 px-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-bold rounded-none hover:from-red-50 hover:to-red-100 hover:text-red-600 transition-all duration-300 flex items-center justify-center gap-2 border border-gray-300 hover:border-red-300"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -153,13 +153,13 @@
               v-model="searchQuery"
               type="text" 
               placeholder="Buscar productos..." 
-              class="w-full px-4 py-3 pl-12 rounded-xl border-2 border-gray-200 focus:border-[#1BB0B9] focus:outline-none transition-colors"
+              class="w-full px-4 py-3 pl-12 rounded-none border-2 border-gray-200 focus:border-[#1BB0B9] focus:outline-none transition-colors"
             >
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <button class="relative p-3 bg-[#1BB0B9] text-white rounded-xl hover:bg-[#16a0a8] transition-colors">
+          <button class="relative p-3 bg-[#1BB0B9] text-white rounded-none hover:bg-[#16a0a8] transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
@@ -172,7 +172,7 @@
           <div 
             v-for="product in filteredProducts" 
             :key="product.id"
-            class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
+            class="bg-white rounded-none overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
           >
             <!-- Product Image -->
             <div class="relative h-56 overflow-hidden bg-gray-100 flex-shrink-0">
@@ -197,18 +197,18 @@
               </div>
 
               <!-- Name -->
-              <h3 class="font-serif font-bold text-gray-800 mb-2 line-clamp-2">{{ product.name }}</h3>
+              <h3 class="app-type-card-title-serif mb-2 line-clamp-2">{{ product.name }}</h3>
 
               <!-- Price -->
               <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-2xl font-bold text-[#1BB0B9]">S/. {{ product.price.toFixed(2) }}</span>
+                <span class="app-type-price-accent">S/. {{ product.price.toFixed(2) }}</span>
                 <span v-if="product.discount" class="text-sm text-gray-400 line-through">S/. {{ product.originalPrice.toFixed(2) }}</span>
               </div>
 
               <!-- Add to Cart Button -->
               <button 
                 @click="addToCart(product)"
-                class="w-full py-3 bg-[#1BB0B9] text-white font-bold rounded-xl hover:bg-[#16a0a8] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg mt-auto"
+                class="w-full py-3 bg-[#1BB0B9] text-white font-bold rounded-none hover:bg-[#16a0a8] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg mt-auto"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />

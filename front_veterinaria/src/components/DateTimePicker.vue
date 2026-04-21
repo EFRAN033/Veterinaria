@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <!-- Header -->
     <div class="text-center">
-      <h3 class="text-2xl font-serif font-bold text-gray-900">
+      <h3 class="app-type-panel-heading">
         {{ mode === 'vet' ? 'Agendar Cita' : '¿Cuándo prefieres la atención?' }}
       </h3>
       <p class="text-gray-500 mt-2">
@@ -12,13 +12,13 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
       <!-- Calendar Section -->
-      <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+      <div class="bg-white rounded-none p-6 border border-gray-100 shadow-sm">
         <div class="flex items-center justify-between mb-6">
-          <button @click="prevMonth" class="p-2 hover:bg-gray-50 rounded-full text-gray-400 hover:text-[#1BB0B9] transition-colors">
+          <button @click="prevMonth" class="p-2 hover:bg-gray-50 rounded-full text-gray-400 hover:text-[#02939E] transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
           </button>
           <h4 class="font-bold text-gray-800 capitalize">{{ currentMonthName }} {{ currentYear }}</h4>
-          <button @click="nextMonth" class="p-2 hover:bg-gray-50 rounded-full text-gray-400 hover:text-[#1BB0B9] transition-colors">
+          <button @click="nextMonth" class="p-2 hover:bg-gray-50 rounded-full text-gray-400 hover:text-[#02939E] transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
           </button>
         </div>
@@ -36,15 +36,15 @@
             <button 
               @click="selectDate(date)"
               :disabled="isPast"
-              class="w-full h-full rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200 relative group"
+              class="w-full h-full rounded-none flex items-center justify-center text-sm font-medium transition-all duration-200 relative group"
               :class="[
-                isSelected ? 'bg-[#1BB0B9] text-white shadow-lg shadow-[#1BB0B9]/30' : 
+                isSelected ? 'bg-[#02939E] text-white shadow-lg shadow-[#02939E]/30' : 
                 isPast ? 'text-gray-300 cursor-not-allowed' : 
-                isCurrentMonth ? 'text-gray-700 hover:bg-[#1BB0B9]/10 hover:text-[#1BB0B9]' : 'text-gray-300'
+                isCurrentMonth ? 'text-gray-700 hover:bg-[#02939E]/10 hover:text-[#02939E]' : 'text-gray-300'
               ]"
             >
               {{ date.getDate() }}
-              <span v-if="isToday && !isSelected" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1BB0B9]"></span>
+              <span v-if="isToday && !isSelected" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#02939E]"></span>
             </button>
           </div>
         </div>
@@ -53,8 +53,8 @@
       <!-- Time Selection & Urgency -->
       <div class="space-y-8">
         <!-- Urgency Toggle -->
-        <div class="bg-[#FFF8F6] border border-[#FFDDD6] rounded-2xl p-4 flex items-start gap-4 cursor-pointer hover:bg-[#FFF0EB] transition-colors" @click="toggleUrgency">
-          <div class="bg-white p-2 rounded-xl text-[#FF6B6B] shadow-sm shrink-0">
+        <div class="bg-[#FFF8F6] border border-[#FFDDD6] rounded-none p-4 flex items-start gap-4 cursor-pointer hover:bg-[#FFF0EB] transition-colors" @click="toggleUrgency">
+          <div class="bg-white p-2 rounded-none text-[#FF6B6B] shadow-sm shrink-0">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div class="flex-1">
@@ -74,7 +74,7 @@
         <!-- Time Slots -->
         <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': modelValue.isUrgent }">
           <h4 class="font-bold text-gray-900 flex items-center gap-2">
-            <svg class="w-5 h-5 text-[#1BB0B9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <svg class="w-5 h-5 text-[#02939E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Horarios Disponibles
           </h4>
           
@@ -83,26 +83,26 @@
               v-for="slot in timeSlots" 
               :key="slot.id"
               @click="selectTime(slot.id)"
-              class="flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 group"
+              class="flex items-center justify-between p-4 rounded-none border-2 transition-all duration-200 group"
               :class="[
-                modelValue.timeSlot === slot.id ? 'border-[#1BB0B9] bg-[#1BB0B9]/5' : 'border-gray-100 bg-white hover:border-[#1BB0B9]/30',
+                modelValue.timeSlot === slot.id ? 'border-[#02939E] bg-[#02939E]/5' : 'border-gray-100 bg-white hover:border-[#02939E]/30',
                 takenSlots.includes(slot.id) ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
               ]"
               :disabled="takenSlots.includes(slot.id)"
             >
               <div class="flex items-center gap-3">
-                <div class="p-2 rounded-lg" :class="modelValue.timeSlot === slot.id ? 'bg-[#1BB0B9] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-[#1BB0B9]/10 group-hover:text-[#1BB0B9]'">
+                <div class="p-2 rounded-none" :class="modelValue.timeSlot === slot.id ? 'bg-[#02939E] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-[#02939E]/10 group-hover:text-[#02939E]'">
                   <component :is="slot.icon" class="w-5 h-5" />
                 </div>
                 <div class="text-left">
-                  <span class="block font-bold text-sm" :class="modelValue.timeSlot === slot.id ? 'text-[#1BB0B9]' : 'text-gray-700'">{{ slot.label }}</span>
+                  <span class="block font-bold text-sm" :class="modelValue.timeSlot === slot.id ? 'text-[#02939E]' : 'text-gray-700'">{{ slot.label }}</span>
                   <span class="text-xs text-gray-400">
                     {{ takenSlots.includes(slot.id) ? 'No disponible' : slot.hours }}
                   </span>
                 </div>
               </div>
               <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                :class="modelValue.timeSlot === slot.id ? 'border-[#1BB0B9] bg-[#1BB0B9]' : 'border-gray-200'">
+                :class="modelValue.timeSlot === slot.id ? 'border-[#02939E] bg-[#02939E]' : 'border-gray-200'">
                 <svg v-if="modelValue.timeSlot === slot.id" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
               </div>
             </button>

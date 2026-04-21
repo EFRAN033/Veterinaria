@@ -1,6 +1,7 @@
 SETUP_GUIDE.md
 .env
 .env.*
+!.env.prod.example        # Plantilla de producción — SÍ va al repo
 .DS_Store
 node_modules/
 __pycache__/
@@ -10,3 +11,5 @@ dist/
 coverage/
 .idea/
 .vscode/
+*.tar.gz                  # Paquetes de despliegue temporales
+*.db                      # Bases de datos SQLite locales

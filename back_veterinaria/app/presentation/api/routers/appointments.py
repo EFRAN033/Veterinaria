@@ -1,15 +1,20 @@
 """
 Router de citas refactorizado con arquitectura limpia
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
 from app.application.services.appointment_service import AppointmentService
-from app.application.dtos.appointment_dto import AppointmentCreateDTO, AppointmentUpdateDTO, AppointmentDTO
-from app.presentation.dependencies.auth import get_current_user
+from app.application.dtos.appointment_dto import (
+    AppointmentCreateDTO,
+    AppointmentUpdateDTO,
+    AppointmentDTO,
+    AppointmentClinicalUpdateDTO,
+)
+from app.presentation.dependencies.auth import get_current_user, get_current_veterinario_user
 from app.infrastructure.database.models.user import User
-from app.core.exceptions import NotFoundException, ValidationException, BusinessRuleException
+from app.core.exceptions import NotFoundException, BusinessRuleException
 
 router = APIRouter()
 
@@ -54,6 +59,22 @@ async def get_appointments(
     """
     appointment_service = AppointmentService(db)
     return appointment_service.get_by_user(current_user.id, skip=skip, limit=limit)
+
+
+@router.get("/vet/history", response_model=List[AppointmentDTO])
+async def get_vet_appointment_history(
+    skip: int = 0,
+    limit: int = 100,
+    species: str | None = Query(None),
+    sex: str | None = Query(None),
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(get_current_veterinario_user),
+):
+    """Historial de citas para el panel veterinario (todas las mascotas)."""
+    appointment_service = AppointmentService(db)
+    return appointment_service.get_vet_history(
+        skip=skip, limit=limit, species=species, sex=sex
+    )
 
 
 @router.get("/all", response_model=List[AppointmentDTO])
@@ -144,6 +165,25 @@ async def update_appointment_status(
     try:
         appointment_service = AppointmentService(db)
         return appointment_service.update(appointment_id, current_user.id, status_data)
+    except NotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
+    except BusinessRuleException as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=e.message)
+
+
+@router.patch("/{appointment_id}/clinical", response_model=AppointmentDTO)
+async def update_appointment_clinical(
+    appointment_id: int,
+    clinical_data: AppointmentClinicalUpdateDTO,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_veterinario_user),
+):
+    """Diagnóstico final y tratamiento (solo veterinario)."""
+    try:
+        appointment_service = AppointmentService(db)
+        return appointment_service.update_clinical(
+            appointment_id, current_user.id, clinical_data
+        )
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
     except BusinessRuleException as e:

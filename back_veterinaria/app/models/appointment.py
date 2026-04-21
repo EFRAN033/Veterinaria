@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, DECIMAL, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, DECIMAL, DateTime, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -15,6 +15,8 @@ class Appointment(Base):
     appointment_time = Column(Time, nullable=False)
     status = Column(String(20), default="pending") 
     notes = Column(String)
+    final_diagnosis = Column(Text, nullable=True)
+    treatment = Column(Text, nullable=True)
     estimated_cost = Column(DECIMAL(10, 2))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     

@@ -13,7 +13,7 @@
         
         <!-- Header Section (No Card) -->
         <div class="mb-16 mt-8">
-          <h1 class="text-5xl font-serif font-bold text-gray-900 mb-4 tracking-tight">
+          <h1 class="app-type-title mb-4 tracking-tight">
             Hola, <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#16aeb1] to-[#1BB0B9]">{{ userProfile?.name?.split(' ')[0] || 'Usuario' }}</span>
           </h1>
           <p class="text-xl text-gray-500 font-light max-w-2xl">
@@ -46,7 +46,7 @@
                 <div class="group">
                   <label class="block text-sm text-gray-400 mb-1">Correo Electrónico</label>
                   <div class="flex items-center gap-4">
-                    <span class="text-2xl text-gray-800 font-medium group-hover:text-[#1BB0B9] transition-colors">
+                    <span class="app-type-stat text-gray-800 font-medium group-hover:text-[#1BB0B9] transition-colors">
                       {{ userProfile?.email || 'No disponible' }}
                     </span>
                   </div>
@@ -56,7 +56,7 @@
                 <div class="group">
                   <label class="block text-sm text-gray-400 mb-1">Teléfono</label>
                   <div class="flex items-center gap-4">
-                    <span class="text-2xl text-gray-800 font-medium group-hover:text-[#1BB0B9] transition-colors">
+                    <span class="app-type-stat text-gray-800 font-medium group-hover:text-[#1BB0B9] transition-colors">
                       {{ userProfile?.phone || 'No registrado' }}
                     </span>
                   </div>
@@ -69,6 +69,85 @@
                     <span class="text-xl text-gray-800 font-medium group-hover:text-[#1BB0B9] transition-colors leading-relaxed">
                       {{ userProfile?.address || 'No registrada' }}
                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mascotas -->
+            <div v-if="userProfile?.id" class="mt-16">
+              <h3 class="text-sm font-bold text-[#1BB0B9] uppercase tracking-widest mb-8 flex items-center gap-3">
+                <span class="w-8 h-[2px] bg-[#1BB0B9]"></span>
+                Mis mascotas
+              </h3>
+              <p class="text-sm text-gray-500 mb-6 pl-4 border-l-2 border-gray-100">
+                Registra o actualiza el sexo de tus mascotas para un mejor seguimiento clínico.
+              </p>
+
+              <div v-if="petsLoading" class="pl-4 text-sm text-gray-400">Cargando mascotas…</div>
+              <div v-else class="space-y-6 pl-4 border-l-2 border-gray-100">
+                <div
+                  v-for="pet in pets"
+                  :key="pet.id"
+                  class="flex flex-col sm:flex-row sm:items-end gap-4 pb-6 border-b border-gray-100 last:border-0"
+                >
+                  <div class="flex-1">
+                    <p class="font-bold text-gray-800">{{ pet.name }}</p>
+                    <p class="text-xs text-gray-500">{{ pet.species || 'Especie no indicada' }}</p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <select
+                      v-model="petGenderEdits[pet.id]"
+                      class="text-sm border border-gray-200 px-3 py-2 rounded-none min-w-[140px] focus:border-[#1BB0B9] focus:outline-none"
+                    >
+                      <option value="">Sin indicar</option>
+                      <option value="Macho">Macho</option>
+                      <option value="Hembra">Hembra</option>
+                    </select>
+                    <button
+                      type="button"
+                      class="text-sm font-bold text-[#1BB0B9] px-3 py-2 border border-[#1BB0B9] rounded-none hover:bg-[#1BB0B9] hover:text-white transition-colors disabled:opacity-50"
+                      :disabled="petSaving === pet.id"
+                      @click="savePetGender(pet)"
+                    >
+                      {{ petSaving === pet.id ? 'Guardando…' : 'Guardar' }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100">
+                  <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Añadir mascota</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input
+                      v-model="newPet.name"
+                      type="text"
+                      placeholder="Nombre"
+                      class="text-sm border border-gray-200 px-3 py-2 rounded-none focus:border-[#1BB0B9] focus:outline-none"
+                    />
+                    <select
+                      v-model="newPet.species"
+                      class="text-sm border border-gray-200 px-3 py-2 rounded-none focus:border-[#1BB0B9] focus:outline-none"
+                    >
+                      <option value="">Especie</option>
+                      <option value="Perro">Perro</option>
+                      <option value="Gato">Gato</option>
+                    </select>
+                    <select
+                      v-model="newPet.gender"
+                      class="text-sm border border-gray-200 px-3 py-2 rounded-none focus:border-[#1BB0B9] focus:outline-none"
+                    >
+                      <option value="">Sexo</option>
+                      <option value="Macho">Macho</option>
+                      <option value="Hembra">Hembra</option>
+                    </select>
+                    <button
+                      type="button"
+                      class="text-sm font-bold bg-[#1BB0B9] text-white px-4 py-2 rounded-none hover:opacity-90 disabled:opacity-50"
+                      :disabled="petSaving === 'new'"
+                      @click="createNewPet"
+                    >
+                      {{ petSaving === 'new' ? 'Guardando…' : 'Registrar' }}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -90,7 +169,7 @@
                 <!-- Status Badge (No Card, just clean design) -->
                 <div class="flex items-center gap-6">
                   <div class="relative">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center transition-colors"
+                    <div class="w-16 h-16 rounded-none flex items-center justify-center transition-colors"
                          :class="userProfile?.is_active ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'">
                       <svg v-if="userProfile?.is_active" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -157,15 +236,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { usePets } from '@/composables/usePets';
 import BackButton from '@/components/BackButton.vue';
 import Footer from './Footer.vue';
 
 const userStore = useUserStore();
+const { getPetsByUserId, updatePet, createPet } = usePets();
 const userProfile = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const pets = ref([]);
+const petsLoading = ref(false);
+const petGenderEdits = reactive({});
+const petSaving = ref(null);
+const newPet = reactive({ name: '', species: '', gender: '' });
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Fecha no disponible';
@@ -177,11 +263,65 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
+async function loadPets() {
+  if (!userProfile.value?.id) return;
+  petsLoading.value = true;
+  try {
+    const list = await getPetsByUserId(userProfile.value.id);
+    pets.value = list;
+    list.forEach((p) => {
+      petGenderEdits[p.id] = p.gender || '';
+    });
+  } catch {
+    pets.value = [];
+  } finally {
+    petsLoading.value = false;
+  }
+}
+
+async function savePetGender(pet) {
+  petSaving.value = pet.id;
+  try {
+    await updatePet(pet.id, { gender: petGenderEdits[pet.id] || null });
+    pet.gender = petGenderEdits[pet.id] || null;
+  } catch (e) {
+    console.error(e);
+    alert('No se pudo actualizar la mascota.');
+  } finally {
+    petSaving.value = null;
+  }
+}
+
+async function createNewPet() {
+  if (!newPet.name.trim()) {
+    alert('Indica el nombre de la mascota.');
+    return;
+  }
+  petSaving.value = 'new';
+  try {
+    await createPet({
+      name: newPet.name.trim(),
+      species: newPet.species || null,
+      gender: newPet.gender || null,
+    });
+    newPet.name = '';
+    newPet.species = '';
+    newPet.gender = '';
+    await loadPets();
+  } catch (e) {
+    console.error(e);
+    alert('No se pudo registrar la mascota. ¿Iniciaste sesión?');
+  } finally {
+    petSaving.value = null;
+  }
+}
+
 onMounted(async () => {
   try {
     loading.value = true;
     await userStore.fetchProfile();
     userProfile.value = userStore.user;
+    await loadPets();
   } catch (e) {
     error.value = 'No se pudo cargar la información del perfil.';
     console.error(e);

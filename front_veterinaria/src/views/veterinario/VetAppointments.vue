@@ -5,8 +5,8 @@
     <div class="bg-white border-b border-slate-200 sticky top-0 z-30">
       <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <CalendarDaysIcon class="h-7 w-7 text-indigo-600" />
+          <h1 class="app-type-toolbar-title flex items-center gap-2">
+            <CalendarDaysIcon class="h-7 w-7 text-[#02939E]" />
             Gestión de Citas
           </h1>
           <p class="text-sm text-slate-500">Administración completa de la agenda veterinaria</p>
@@ -15,7 +15,7 @@
         <div class="flex items-center gap-3">
           <button 
             @click="fetchAppointments" 
-            class="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors"
+            class="flex items-center gap-2 text-xs font-bold text-[#02939E] hover:text-[#027a83] bg-[#02939E]/10 hover:bg-[#02939E]/15 px-4 py-2 rounded-lg transition-colors"
             :disabled="loading"
           >
             <ArrowPathIcon class="h-4 w-4" :class="{ 'animate-spin': loading }" />
@@ -28,7 +28,7 @@
     <div class="p-6 max-w-[1600px] mx-auto">
       
       <!-- Filters & Controls -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
+      <div class="bg-white p-4 rounded-none shadow-sm border border-slate-200 mb-6">
         <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
           
           <!-- Status Filters -->
@@ -39,7 +39,7 @@
               @click="activeFilter = filter.id"
               class="px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2"
               :class="activeFilter === filter.id 
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+                ? 'bg-[#02939E] text-white shadow-md shadow-[#02939E]/25' 
                 : 'bg-slate-50 text-slate-600 hover:bg-slate-100'"
             >
               <component :is="filter.icon" class="h-4 w-4" />
@@ -55,7 +55,7 @@
                 v-model="searchQuery"
                 type="text" 
                 placeholder="Buscar paciente, cliente..." 
-                class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none transition-all"
+                class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-[#02939E] focus:ring-2 focus:ring-[#02939E]/20 focus:outline-none transition-all"
               />
               <MagnifyingGlassIcon class="h-5 w-5 text-slate-400 absolute left-3 top-2" />
             </div>
@@ -63,14 +63,14 @@
             <input 
               v-model="dateFilter"
               type="date"
-              class="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-slate-600"
+              class="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-[#02939E] focus:ring-2 focus:ring-[#02939E]/20 focus:outline-none text-slate-600"
             />
           </div>
         </div>
       </div>
 
       <!-- Appointments Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="bg-white rounded-none shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -87,7 +87,7 @@
               <tr v-if="loading" class="animate-pulse">
                 <td colspan="6" class="py-12 text-center text-slate-400">
                   <div class="flex flex-col items-center gap-2">
-                    <ArrowPathIcon class="h-8 w-8 animate-spin text-indigo-300" />
+                    <ArrowPathIcon class="h-8 w-8 animate-spin text-[#02939E]/40" />
                     <span>Cargando agenda...</span>
                   </div>
                 </td>
@@ -98,7 +98,7 @@
                   <div class="flex flex-col items-center gap-3 opacity-60">
                     <InboxIcon class="h-12 w-12" />
                     <p class="font-medium">No se encontraron citas con los filtros actuales</p>
-                    <button @click="clearFilters" class="text-indigo-600 hover:underline text-xs">Limpiar filtros</button>
+                    <button @click="clearFilters" class="text-[#02939E] hover:underline text-xs">Limpiar filtros</button>
                   </div>
                 </td>
               </tr>
@@ -135,7 +135,7 @@
                 </td>
 
                 <td class="py-4 px-6">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-[#02939E]/10 text-[#027a83] border border-[#02939E]/20">
                     {{ app.service_id || 'Consulta General' }}
                   </span>
                 </td>

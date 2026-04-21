@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https://api.qrserver.com blob:; style-src 'self' 'unsafe-inline';">
+    
+    <title>Veterinaria Pro - Nueva Consulta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#02939E', 
+                        secondary: '#CDE262', 
+                        darkPrimary: '#01737a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .stepper-dot { background-color: #d1d5db; transition: all 0.3s ease; }
+        .stepper-dot.active { background-color: #ffffff; transform: scale(1.2); }
+        .stepper-dot.completed { background-color: #ffffff; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen font-sans">
+
+    <button onclick="toggleModalConsul(true)" class="bg-primary hover:bg-darkPrimary text-white font-bold py-4 px-10 rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95">
+        Consulta
+    </button>
+
+    <div id="modalConsult" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 py-6 md:p-6">
+        
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-full flex flex-col animate-in fade-in zoom-in duration-300"> 
+            
+            <div class="bg-primary p-5 text-white text-center rounded-t-3xl">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <h3 class="text-xl font-bold">Nueva Consulta</h3>
+                    </div>
+                    <button onclick="toggleModalConsul(false)" class="text-white text-3xl font-light hover:text-gray-200">&times;</button>
+                </div>
+                
+                <div class="flex justify-between max-w-md mx-auto relative">
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/30 -translate-y-1/2"></div>
+                    <div id="dot1" class="stepper-dot active relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs shadow-lg"></div>
+                    <div id="dot2" class="stepper-dot relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs text-gray-500 shadow-lg"></div>
+                    <div id="dot3" class="stepper-dot relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs text-gray-500 shadow-lg"></div>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[75vh]">
+                
+                <!-- Paso 1 -->
+                <div id="step1" class="step-content active">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg>
+                                    Datos de la Mascota
+                                </h4>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <input type="text" id="petCode" maxlength="50" autocomplete="off" spellcheck="false" placeholder="Código de la Mascota" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2">
+                                        <input type="text" id="petName" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" maxlength="50" autocomplete="off" spellcheck="false" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2" placeholder="Nombre de la Mascota">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>Pregunta de Consulta
+                                </h4>
+                                <textarea id="consultaQuestion" maxlength="500" placeholder="¿Cuál es tu pregunta o consulta veterinaria?" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2 resize-none h-20"></textarea>
+                            </div>
+                             <a href="https://wa.me/51900000000" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-3 w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold transition-all shadow-lg hover:-translate-y-1">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                Agendar vía WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div id="step2" class="step-content space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="space-y-2">
+                                <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 w-full shadow-sm">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <button id="prevMonthBtn" type="button" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                        </button>
+                                        <h5 id="monthYearDisplay" class="font-bold text-primary capitalize text-sm uppercase"></h5>
+                                        <button id="nextMonthBtn" type="button" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-primary transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-wider">
+                                        <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sa</div>
+                                    </div>
+                                    <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+                                    <input type="hidden" id="selectedDate" name="selectedDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-bold text-primary uppercase">Detalles</label>
+                                <div class="flex items-center gap-2 justified-between mb-2">
+                                    <label class="text-sm text-gray-600 w-full">Turno :</label>
+                                    <select id="timeHour" class="w-full border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                        <option selected disabled value="">Hora</option>
+                                        <option value="09:00">09:00</option><option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option><option value="12:00">12:00</option>
+                                        <option value="01:00">01:00</option><option value="02:00">02:00</option>
+                                    </select>
+                                    <!-- [MODIFICADO] ID agregado para actualizar dinámicamente -->
+                                    <span id="timeAmPm" class="w-full border-b-2 border-primary py-2 px-1">--</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <p class="w-1/3 text-sm text-gray-600">Dr(a).</p>
+                                    <!-- [MODIFICADO] Se liberó el hardcode para lógica dinámica -->
+                                    <span id="doctorName" class="w-2/3"></span>
+                                </div>
+                            </div>
+                            <div class="my-6">
+                                <label class="block text-sm font-bold text-primary uppercase mb-6">Modalidad</label>
+                                <div class="flex p-1 bg-gray-100 rounded-2xl">
+                                    <button onclick="setMode('presencial')" id="btnPres" class="flex-1 py-3 rounded-xl text-sm font-bold bg-white shadow text-primary transition-all">Presencial</button>
+                                    <button onclick="setMode('virtual')" id="btnVirt" class="flex-1 py-3 rounded-xl text-sm font-bold text-gray-500 transition-all">Virtual</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div id="step3" class="step-content text-center space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="max-w-xs mx-auto relative flex flex-col justify-center">
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] text-primary animate-pulse font-bold uppercase tracking-tighter">Monto Total a Pagar</p>
+                                    <span id="precioFinalPagar" class="text-3xl font-black">S/ 50.00</span>
+                                </div>
+                                <div class="text-gray-800">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=VET_PAY_50" alt="QR de Pago" class="mx-auto w-40 h-40 mb-2 shadow-sm rounded-xl">
+                                    <p class="text-xs font-bold text-gray-500">YAPE / PLIN</p>
+                                    <p class="text-sm font-black text-primary">900 000 000</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="max-w-sm mx-auto space-y-4 flex flex-col justify-center">
+                            <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Sube tu comprobante</label>
+                            <div id="dropZone" class="relative group border-2 border-dashed border-gray-300 rounded-2xl p-4 transition-all hover:border-primary bg-gray-50 cursor-pointer">
+                                <!-- [MODIFICADO] Extensiones simplificadas para coincidir con la validación segura -->
+                                <input type="file" id="paymentScreenshot" accept=".png, .jpg, .jpeg, .webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
+                                
+                                <div id="uploadPlaceholder" class="flex flex-col items-center gap-2">
+                                    <svg class="w-8 h-8 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    <span class="text-xs text-gray-500 font-medium">Click o arrastra tu captura aquí</span>
+                                </div>
+                                <div id="imagePreviewContainer" class="hidden flex flex-col items-center">
+                                    <img id="imgPreview" src="#" alt="Vista previa" class="h-32 rounded-lg mb-2 shadow-sm object-cover">
+                                    <span class="text-[10px] text-primary font-bold">✓ Archivo cargado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-t flex justify-between items-center gap-6 rounded-b-3xl">
+                <button id="prevBtn" onclick="moveStep(-1)" class="invisible text-gray-400 font-bold hover:text-primary transition-all flex items-center gap-2 px-4 py-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Anterior
+                </button>
+                <button id="nextBtn" onclick="moveStep(1)" class="flex-1 max-w-xs py-4 bg-primary text-white rounded-2xl font-bold shadow-xl hover:bg-darkPrimary transition-all transform hover:-translate-y-1 active:scale-95">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CIBERSEGURIDAD: SANITIZADOR DE ENTRADAS ---
+        function sanitize(input) {
+            if (!input) return "";
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;' };
+            return input.toString().replace(/[&<>"'`=\/]/g, function (m) { return map[m]; });
+        }
+
+        // [MODIFICADO][SEGURIDAD] Validación estricta que incluye MIME Type
+        function validateSecureFile(input, maxMb) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileSizeMb = file.size / (1024 * 1024);
+                
+                const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!allowedMimeTypes.includes(file.type)) {
+                    alert('⚠️ Tipo de archivo no permitido. Sube un formato de imagen válido (JPG, PNG, WEBP).');
+                    input.value = ''; 
+                    return false;
+                }
+
+                if (fileSizeMb > maxMb) {
+                    alert(`⚠️ El archivo excede el límite de ${maxMb}MB para evitar ataques DoS.`);
+                    input.value = ''; 
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        const modal = document.getElementById('modalConsult');
+        let currentStep = 1;
+        let modalidadSeleccionada = 'presencial';
+
+        function toggleModalConsul(show) {
+            modal.classList.toggle('hidden', !show);
+            modal.classList.toggle('flex', show);
+            if (show) { 
+                currentStep = 1;
+                updateStepUI(); 
+                renderCalendar(); 
+            } else {
+                resetForm();
+            }
+        }
+
+        function moveStep(n) {
+            if (currentStep === 1 && n === 1 && !validateStep1()) return;
+            if (currentStep === 2 && n === 1 && !validateStep2()) return;
+            if (currentStep === 3 && n === 1 && !validateStep3()) return;
+            
+            currentStep += n;
+            if (currentStep > 3) {
+                const oName = sanitize(document.getElementById('ownerName').value);
+                alert(`✅ Tu cita de Consulta ${modalidadSeleccionada} está registrada, ${oName}. Nos comunicaremos para confirmar.`);
+                toggleModalConsul(false);
+                return;
+            }
+            updateStepUI();
+        }
+
+        function resetForm() {
+            document.querySelectorAll('#modalConsult input:not([type="hidden"]), #modalConsult textarea').forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+                else el.value = '';
+            });
+            document.querySelectorAll('#modalConsult select').forEach(el => el.selectedIndex = 0);
+            
+            activeSelectedDate = null;
+            document.getElementById('selectedDate').value = '';
+            renderCalendar();
+
+            const fileInput = document.getElementById('paymentScreenshot');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imgPreview');
+            
+            if(fileInput) fileInput.value = '';
+            if(previewImg) previewImg.src = '#';
+            if(placeholder) placeholder.classList.remove('hidden');
+            if(previewContainer) previewContainer.classList.add('hidden');
+
+            const dynamicElements = ['doctorName', 'timeAmPm'];
+            dynamicElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = id === 'timeAmPm' ? '--' : '';
+            });
+
+            currentStep = 1;
+            setMode('presencial');
+            updateStepUI();
+        }
+
+        function updateStepUI() {
+            document.querySelectorAll('.step-content').forEach((s, i) => {
+                s.classList.toggle('active', i + 1 === currentStep);
+            });
+            
+            document.querySelectorAll('.stepper-dot').forEach((dot, idx) => {
+                const step = idx + 1;
+                dot.classList.remove('active', 'completed', 'text-primary', 'text-white');
+                if (step === currentStep) dot.classList.add('active', 'text-primary');
+                else if (step < currentStep) dot.classList.add('completed', 'text-primary');
+                else dot.classList.add('text-gray-500');
+            });
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            nextBtn.textContent = currentStep === 3 ? "Finalizar Cita" : "Siguiente";
+        }
+
+        // --- LÓGICA DEL CALENDARIO ---
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        let activeSelectedDate = null;
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const hiddenDateInput = document.getElementById('selectedDate');
+
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+            monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            prevMonthBtn.disabled = (currentYear === today.getFullYear() && currentMonth === today.getMonth());
+
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                calendarGrid.appendChild(document.createElement('div'));
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                const loopDate = new Date(currentYear, currentMonth, i);
+                loopDate.setHours(0, 0, 0, 0);
+
+                dayDiv.textContent = i;
+                let baseClasses = "py-2 rounded-xl transition-all duration-200 flex items-center justify-center font-medium ";
+                
+                // [MODIFICADO][QA] Se corrige el bug del día actual. Si es igual a hoy, se desactiva igual que el baño
+                if (loopDate.getTime() === today.getTime()) {
+                    dayDiv.className = baseClasses + "text-primary font-bold border-2 border-primary cursor-not-allowed shadow-sm";
+                } else if (loopDate < today) {
+                    dayDiv.className = baseClasses + "text-gray-300 bg-gray-50 cursor-not-allowed";
+                } else {
+                    dayDiv.className = baseClasses + "text-gray-600 cursor-pointer hover:bg-secondary/30 hover:text-primary";
+                    if (activeSelectedDate && loopDate.getTime() === activeSelectedDate.getTime()) dayDiv.className = baseClasses + "bg-primary text-white font-bold shadow-md transform scale-105";
+                    
+                    dayDiv.onclick = () => {
+                        activeSelectedDate = loopDate;
+                        hiddenDateInput.value = `${loopDate.getFullYear()}-${String(loopDate.getMonth() + 1).padStart(2, '0')}-${String(loopDate.getDate()).padStart(2, '0')}`;
+                        renderCalendar(); 
+                        handleAppointmentLogic();
+                    };
+                }
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) return;
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        });
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        });
+
+        // --- LÓGICA DE TURNOS Y DOCTORES ---
+        function handleAppointmentLogic() {
+            const hourSelect = document.getElementById('timeHour');
+            const amPmSpan = document.getElementById('timeAmPm');
+            const dateInput = document.getElementById('selectedDate');
+            const doctorNameDisplay = document.getElementById('doctorName');
+
+            if (!hourSelect.value) return;
+
+            const hourInt = parseInt(hourSelect.value.split(':')[0]);
+
+            if (hourInt >= 8 && hourInt <= 12) {
+                amPmSpan.textContent = "AM";
+            } else if (hourInt >= 1 && hourInt <= 6) {
+                amPmSpan.textContent = "PM";
+            }
+
+            if (dateInput.value) {
+                const selectedDate = new Date(dateInput.value);
+                const dayOfWeek = selectedDate.getDay(); // 0=Dom, 6=Sab
+                
+                let doctorAsignado = "";
+
+                if (dayOfWeek === 5 || dayOfWeek === 6) { 
+                    doctorAsignado = "Ricardo Tello";
+                } else {
+                    if (hourInt >= 8 && hourInt <= 12) doctorAsignado = "Ana Martínez";
+                    else if (hourInt >= 1 && hourInt <= 6) doctorAsignado = "Carlos Mendoza";
+                }
+
+                if (doctorNameDisplay) doctorNameDisplay.textContent = doctorAsignado;
+            }
+        }
+
+        const timeHourSelect = document.getElementById('timeHour');
+        if (timeHourSelect) timeHourSelect.addEventListener('change', handleAppointmentLogic);
+
+        // --- CARGA DE IMAGEN ---
+        function previewImage(input) {
+            // [MODIFICADO] Se llama a la validación robusta
+            if(!validateSecureFile(input, 2)) return;
+
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imgPreview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const result = e.target.result;
+                    // [SEGURIDAD] Validación de prefijo base64 en lugar de sanitización destructiva
+                    if(result.startsWith('data:image/')) {
+                        previewImg.src = result; 
+                        placeholder.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                    } else {
+                        alert("Intento de inyección detectado.");
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function setMode(mode) {
+            modalidadSeleccionada = mode;
+            const isP = mode === 'presencial';
+            document.getElementById('btnPres').className = `flex-1 py-3 rounded-xl text-sm font-bold transition-all ${isP ? 'bg-white shadow text-primary' : 'text-gray-500'}`;
+            document.getElementById('btnVirt').className = `flex-1 py-3 rounded-xl text-sm font-bold transition-all ${!isP ? 'bg-white shadow text-primary' : 'text-gray-500'}`;
+        }
+
+        const phoneInput = document.getElementById('ownerCell');
+        phoneInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = value.match(/(\d{0,3})(\d{0,3})(\d{0,3})/);
+            e.target.value = !formatted[2] ? formatted[1] : formatted[1] + ' ' + formatted[2] + (formatted[3] ? ' ' + formatted[3] : '');
+        });
+
+        // --- QA: VALIDACIONES ---
+        function validateStep1() {
+            const petCode = document.getElementById('petCode').value.trim();
+            const pName = document.getElementById('petName').value.trim();
+            const consultaQuestion = document.getElementById('consultaQuestion').value.trim();
+
+            if (!petCode || !pName || !consultaQuestion) {
+                alert("⚠️ Por favor, completa todos los campos obligatorios antes de continuar.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep2() {
+            const sDate = document.getElementById('selectedDate').value;
+            const tHour = document.getElementById('timeHour').value;
+
+            if (!sDate || tHour === "" || tHour === "Hora") {
+                alert("⚠️ Por favor, selecciona una fecha en el calendario y la hora de tu cita.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep3() {
+            const paymentScreenshot = document.getElementById('paymentScreenshot');
+            if (!paymentScreenshot || !paymentScreenshot.files || paymentScreenshot.files.length === 0) {
+                alert("⚠️ Por favor, sube la captura de pantalla del comprobante de pago para finalizar la cita.");
+                return false;
+            }
+            return true;
+        }
+
+        function allowOnlyLetters(input) { input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }
+        function capitalizeWords(input) { input.value = input.value.replace(/\b\w/g, char => char.toUpperCase()); }
+
+        // [MODIFICADO][QA] Función amigable para emails
+        function sanitizeEmail(e) {
+            let value = e.target.value.replace(/[^a-zA-Z0-9.@_-]/g, '');
+            const parts = value.split('@');
+            if (parts.length > 2) value = parts[0] + '@' + parts.slice(1).join('');
+            e.target.value = value;
+        }
+
+        document.getElementById('petName').addEventListener('input', function() { allowOnlyLetters(this); capitalizeWords(this); });
+        // ELIMINADO: Restricción de solo letras en síntomas para permitir números y comas.
+        document.getElementById('ownerName').addEventListener('input', function() { allowOnlyLetters(this); capitalizeWords(this); });
+        document.getElementById('ownerEmail').addEventListener('input', sanitizeEmail);
+
+        window.onclick = (e) => { 
+            if (e.target == modal) toggleModalConsul(false); 
+        }
+    </script>
+</body>
+</html>

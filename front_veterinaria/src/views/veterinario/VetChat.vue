@@ -5,10 +5,10 @@
     <div class="mb-4 shrink-0 px-1">
       <div class="flex items-end justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <SparklesIcon class="h-6 w-6 text-indigo-600" />
+          <h2 class="app-type-toolbar-title flex items-center gap-2">
+            <SparklesIcon class="h-6 w-6 text-[#02939E]" />
             Asistente IA
-            <span v-if="currentCategory !== 'GENERAL'" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200">{{ currentCategory }}</span>
+            <span v-if="currentCategory !== 'GENERAL'" class="text-[10px] bg-[#02939E]/15 text-[#027a83] px-2 py-0.5 rounded-full uppercase tracking-wider border border-[#02939E]/30">{{ currentCategory }}</span>
           </h2>
           <p class="text-sm text-slate-500 mt-1">Consultas clínicas y apoyo diagnóstico.</p>
         </div>
@@ -17,16 +17,16 @@
           <button 
             @click="generateReport"
             :disabled="messages.length < 2 || generatingReport"
-            class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-none hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <DocumentTextIcon class="h-5 w-5 text-indigo-600" />
+            <DocumentTextIcon class="h-5 w-5 text-[#02939E]" />
             <span v-if="generatingReport">Generando...</span>
             <span v-else>Generar Reporte</span>
           </button>
 
           <button 
             @click="loadClinicalCase"
-            class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 text-sm font-medium"
+            class="flex items-center gap-2 px-4 py-2 bg-[#02939E] text-white rounded-none hover:bg-[#027a83] transition-colors shadow-lg shadow-[#02939E]/20 text-sm font-medium"
           >
             <FolderPlusIcon class="h-5 w-5" />
             Cargar Caso
@@ -38,14 +38,14 @@
     <div class="flex-1 flex gap-4 overflow-hidden min-h-0">
       
       <!-- Chat Area -->
-      <div class="flex-1 bg-white rounded-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.02)] border border-slate-200 overflow-hidden flex flex-col relative">
+      <div class="flex-1 bg-white rounded-none shadow-[0_-4px_20px_rgba(0,0,0,0.02)] border border-slate-200 overflow-hidden flex flex-col relative">
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
 
         <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar relative z-10">
           
           <div v-if="messages.length === 0" class="flex flex-col items-center justify-center h-full text-center opacity-60 space-y-4">
-            <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center">
-              <CpuChipIcon class="h-8 w-8 text-indigo-500" />
+            <div class="w-16 h-16 bg-[#02939E]/10 rounded-full flex items-center justify-center">
+              <CpuChipIcon class="h-8 w-8 text-[#02939E]" />
             </div>
             <div>
               <p class="text-slate-800 font-bold">¿En qué puedo ayudarte?</p>
@@ -71,11 +71,11 @@
                 class="px-5 py-3.5 shadow-sm text-sm leading-relaxed relative group"
                 :class="[
                   msg.role === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none' 
-                    : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-2xl rounded-tl-none'
+                    ? 'bg-[#02939E] text-white rounded-none' 
+                    : 'bg-slate-50 text-slate-700 border border-slate-100 rounded-none'
                 ]"
               >
-                <div v-html="formatMessage(msg.content)" class="prose prose-sm max-w-none prose-indigo"></div>
+                <div v-html="formatMessage(msg.content)" class="prose prose-sm max-w-none prose-slate prose-a:text-[#02939E]"></div>
                 <span class="text-[9px] absolute -bottom-5 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 w-20"
                   :class="msg.role === 'user' ? 'right-0 text-right' : 'left-0 text-left'"
                 >
@@ -88,7 +88,7 @@
           <div v-if="loading" class="flex justify-start w-full">
             <div class="flex gap-3 max-w-[75%]">
               <ChatAvatar role="assistant" :isAnimated="true" :isLatest="true" />
-              <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
+              <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-none flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
                 <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-100"></span>
                 <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-200"></span>
@@ -101,7 +101,7 @@
         <div class="p-4 bg-white border-t border-slate-100 z-20">
           <form @submit.prevent="sendMessage" class="flex gap-3 items-end">
             <!-- Image Preview -->
-            <div v-if="selectedImagePreview" class="absolute bottom-full mb-2 left-0 bg-white p-2 rounded-xl shadow-lg border border-slate-200 animate-fade-in-up">
+            <div v-if="selectedImagePreview" class="absolute bottom-full mb-2 left-0 bg-white p-2 rounded-none shadow-lg border border-slate-200 animate-fade-in-up">
               <div class="relative">
                 <img :src="selectedImagePreview" class="h-20 w-20 object-cover rounded-lg" />
                 <button @click="clearImage" type="button" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600">
@@ -117,7 +117,7 @@
                 :key="action"
                 type="button"
                 @click="useQuickAction(action)"
-                class="whitespace-nowrap px-3 py-1.5 bg-white border border-indigo-100 text-indigo-600 text-xs font-bold rounded-lg shadow-sm hover:bg-indigo-50 hover:border-indigo-200 transition-all active:scale-95"
+                class="whitespace-nowrap px-3 py-1.5 bg-white border border-[#02939E]/20 text-[#02939E] text-xs font-bold rounded-lg shadow-sm hover:bg-[#02939E]/10 hover:border-[#02939E]/30 transition-all active:scale-95"
               >
                 {{ action }}
               </button>
@@ -135,7 +135,7 @@
                 @keydown="handleKeydown"
                 type="text" 
                 placeholder="Escribe tu consulta veterinaria..." 
-                class="w-full pl-12 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner relative z-10 bg-transparent"
+                class="w-full pl-12 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#02939E] focus:ring-4 focus:ring-[#02939E]/10 transition-all shadow-inner relative z-10 bg-transparent"
                 :disabled="loading"
               >
               <!-- Image Upload Button -->
@@ -143,7 +143,7 @@
                 <button 
                   type="button"
                   @click="$refs.fileInput.click()"
-                  class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-slate-100"
+                  class="p-2 text-slate-400 hover:text-[#02939E] transition-colors rounded-full hover:bg-slate-100"
                   title="Adjuntar imagen clínica"
                 >
                   <PaperClipIcon class="h-5 w-5" />
@@ -163,7 +163,7 @@
                   type="button"
                   @click="toggleVoiceRecording"
                   class="p-1.5 rounded-full transition-all duration-300"
-                  :class="isRecording ? 'bg-rose-100 text-rose-600 animate-pulse' : 'text-slate-300 hover:text-indigo-600 hover:bg-slate-100'"
+                  :class="isRecording ? 'bg-rose-100 text-rose-600 animate-pulse' : 'text-slate-300 hover:text-[#02939E] hover:bg-slate-100'"
                   title="Dictado por voz"
                 >
                   <MicrophoneIcon class="h-5 w-5" />
@@ -174,7 +174,7 @@
 
             <button 
               type="submit" 
-              class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
+              class="h-[46px] w-[46px] flex items-center justify-center rounded-full bg-[#02939E] text-white shadow-md hover:bg-[#027a83] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200"
               :disabled="loading || !userInput.trim()"
             >
               <PaperAirplaneIcon class="h-5 w-5 transform -rotate-45 translate-x-0.5 -translate-y-0.5" />
@@ -197,17 +197,17 @@
   </div>
     <!-- Case Selection Modal -->
     <div v-if="isCaseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="closeCaseModal">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
+      <div class="bg-white rounded-none shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[80vh]">
         
-        <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center shrink-0">
+        <div class="bg-[#02939E] px-6 py-4 flex justify-between items-center shrink-0">
           <div>
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
               <FolderPlusIcon class="h-5 w-5" />
               Solicitudes Pendientes
             </h3>
-            <p class="text-indigo-100 text-xs mt-0.5">Selecciona una solicitud para analizar</p>
+            <p class="text-white/80 text-xs mt-0.5">Selecciona una solicitud para analizar</p>
           </div>
-          <button @click="closeCaseModal" class="text-indigo-200 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg">
+          <button @click="closeCaseModal" class="text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-1.5 rounded-lg">
             <XMarkIcon class="h-5 w-5"/>
           </button>
         </div>
@@ -218,7 +218,7 @@
               v-model="caseSearch"
               type="text" 
               placeholder="Buscar por paciente o síntomas..." 
-              class="w-full pl-9 pr-4 py-2.5 text-sm bg-white border-0 ring-1 ring-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm text-slate-700 placeholder:text-slate-400"
+              class="w-full pl-9 pr-4 py-2.5 text-sm bg-white border-0 ring-1 ring-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#02939E] shadow-sm text-slate-700 placeholder:text-slate-400"
             />
             <MagnifyingGlassIcon class="h-5 w-5 text-slate-400 absolute left-2.5 top-2.5" />
           </div>
@@ -234,7 +234,7 @@
             v-for="item in filteredCases" 
             :key="item.id"
             @click="selectCase(item)"
-            class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md hover:ring-1 hover:ring-indigo-500 transition-all cursor-pointer group relative overflow-hidden border border-transparent"
+            class="bg-white p-4 rounded-none shadow-sm hover:shadow-md hover:ring-1 hover:ring-[#02939E] transition-all cursor-pointer group relative overflow-hidden border border-transparent"
           >
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
             
@@ -270,10 +270,10 @@
 
     <!-- Report Modal -->
     <div v-if="showReportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showReportModal = false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden animate-fade-in-up">
+      <div class="bg-white rounded-none shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden animate-fade-in-up">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <DocumentTextIcon class="h-6 w-6 text-indigo-600" />
+            <DocumentTextIcon class="h-6 w-6 text-[#02939E]" />
             Reporte Clínico Generado
           </h3>
           <button @click="showReportModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
@@ -282,7 +282,7 @@
         </div>
         
         <div class="p-8 overflow-y-auto custom-scrollbar bg-white">
-          <div class="prose prose-slate max-w-none prose-headings:text-indigo-900 prose-a:text-indigo-600">
+          <div class="prose prose-slate max-w-none prose-headings:text-slate-900 prose-a:text-[#02939E]">
             <div v-html="formatMessage(reportContent)"></div>
           </div>
         </div>
@@ -291,7 +291,7 @@
           <button @click="showReportModal = false" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors">
             Cerrar
           </button>
-          <button @click="downloadReport" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+          <button @click="downloadReport" class="px-4 py-2 bg-[#02939E] text-white font-medium rounded-lg hover:bg-[#027a83] transition-colors flex items-center gap-2">
             <ArrowDownTrayIcon class="h-5 w-5" />
             Descargar Markdown
           </button>
@@ -301,10 +301,10 @@
 
     <!-- Schedule Modal -->
     <div v-if="showScheduleModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @click.self="showScheduleModal = false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+      <div class="bg-white rounded-none shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <CalendarDaysIcon class="h-6 w-6 text-indigo-600" />
+            <CalendarDaysIcon class="h-6 w-6 text-[#02939E]" />
             Agendar Seguimiento
           </h3>
           <button @click="showScheduleModal = false" class="text-slate-400 hover:text-slate-600 transition-colors">
@@ -320,7 +320,7 @@
             <textarea 
               v-model="scheduleNotes"
               rows="3"
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+              class="w-full px-4 py-3 rounded-none border border-slate-200 focus:ring-2 focus:ring-[#02939E] focus:border-[#02939E] transition-all text-sm"
               placeholder="Detalles adicionales para la cita..."
             ></textarea>
           </div>
@@ -332,7 +332,7 @@
           </button>
           <button 
             @click="confirmAppointment" 
-            class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2"
+            class="px-6 py-2 bg-[#02939E] text-white font-bold rounded-lg hover:bg-[#027a83] transition-colors shadow-lg shadow-[#02939E]/20 flex items-center gap-2"
             :disabled="loading"
           >
             <span v-if="loading" class="animate-spin">⌛</span>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetClinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="js/config.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-slate-50 font-sans text-slate-800 relative">
+
+    <header class="fixed w-full z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-shadow-lg">
+                <i data-lucide="heart-pulse" class="text-primary"></i>
+                <span class="font-bold text-xl tracking-tight" style="color: #02939E">Vet<span
+                        style="color: #CDE262">App</span></span>
+            </div>
+            <div class="md:flex gap-6 font-medium text-neutral">
+                <button onclick="ui.toggleAdmin()"
+                    class="bg-primary text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-md shadow-primary/20">Staff
+                    Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <section
+        class="relative h-[90vh] flex items-center justify-center bg-hero-section bg-cover bg-center pt-20 overflow-hidden">
+        <div class="container mx-auto px-6 md:px-20 grid grid-cols-1 md:grid-cols-2 items-center gap-12 relative z-10">
+            <div class="space-y-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold leading-tight text-white">
+                    Comprometidos con <br>la<span class="text-primary font-black italic text-shadow-lg"> Salud</span> y
+                    el<span class="text-primary font-black italic text-shadow-lg"> Bienestar Animal</span>
+                </h1>
+                <p class="text-lg text-white max-w-lg leading-relaxed italic">
+                    Más que veterinaria, un hogar para brindar salud y felicidad a tus compañeros de vida.
+                </p>
+                <div class="flex gap-4">
+                    <button onclick="ui.openModal('modal-consulta')"
+                        class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all transform hover:-translate-y-1 shadow-xl">
+                        <i data-lucide="calendar"></i> Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="absolute bottom-7 right-0 flex flex-row-reverse items-end pointer-events-none z-0 opacity-60 md:opacity-100">
+            <div class="flex flex-col gap-4">
+                <img src="assets/paw-print.png" class="w-8 h-8 rotate-[-10deg] drop-shadow-md" alt="paw">
+                <img src="assets/paw-print.png" class="w-11 h-11 rotate-[-30deg] -translate-x-4 drop-shadow-md"
+                    alt="paw">
+                <img src="assets/paw-print.png" class="w-9 h-9 rotate-[-25deg] mt-6 drop-shadow-md" alt="paw">
+            </div>
+            <div class="flex flex-col gap-4 mb-8">
+                <img src="assets/paw-print.png" class="w-8 h-8 rotate-[-30deg] -translate-x-1 drop-shadow-md" alt="paw">
+                <img src="assets/paw-print.png" class="w-10 h-10 rotate-[-40deg] -translate-x-10 drop-shadow-md"
+                    alt="paw">
+                <img src="assets/paw-print.png" class="w-9 h-9 rotate-[-45deg] mt-6 -translate-x-3 drop-shadow-md"
+                    alt="paw">
+            </div>
+            <div class="flex flex-col gap-4 mb-12">
+                <img src="assets/paw-print.png" class="w-10 h-10 rotate-[-56deg] -translate-x-9 drop-shadow-md"
+                    alt="paw">
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20">
+            <svg class="relative block w-full h-[80px] md:h-[100px]" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path
+                    d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+                    fill="#ffffff"></path>
+            </svg>
+        </div>
+    </section>
+
+    <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-white">
+        <div class="container mx-auto px-20 grid grid-cols-1 md:grid-cols-2 items-center gap-12 relative z-10">
+            <div class="relative group">
+                <div
+                    class="absolute -inset-4 bg-secondary/30 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors">
+                </div>
+                <img src="assets/Imagen-bienvenido.png"
+                    class="relative object-cover w-full max-w-[380px] md:max-w-[480px] mx-auto drop-shadow-2xl"
+                    alt="Mascota feliz">
+            </div>
+            <div class="space-y-6 pl-20">
+                <h1 class="text-3xl md:text-5xl font-extrabold leading-tight text-slate-900">
+                    Bienvenid@ a <span class="text-primary font-black italic">VetApp</span>
+                </h1>
+                <p class="text-lg text-neutral max-w-lg leading-relaxed">
+                    Somos un equipo apasionado por el cuidado animal, comprometido con brindar atención veterinaria de
+                    calidad, personalizada y con el cariño que tu mejor amigo necesita.
+                </p>
+                <div class="flex gap-4">
+                    <button onclick="ui.openModal('modal-consulta')"
+                        class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all transform hover:-translate-y-1 shadow-xl">
+                        <i data-lucide="calendar"></i> Consulta Aquí
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-fixed-section relative py-32 flex items-center justify-center text-center">
+        <div class="absolute inset-0 bg-primary/40 backdrop-blur-[2px]"></div>
+        <div class="relative z-10 text-white px-4 max-w-3xl">
+            <h2 class="text-3xl md:text-5xl font-black mb-4">Atención Integral 24/7</h2>
+            <p class="text-xl font-medium opacity-90">Porque las emergencias no tienen horario, nosotros tampoco.</p>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-20 py-20 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <button onclick="ui.openModal('modal-consulta')"
+                class="bg-white p-10 rounded-3xl shadow-xl hover:shadow-primary/10 transition-all text-left border-b-8 border-primary group">
+                <div
+                    class="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                    <i data-lucide="stethoscope" size="32"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3" style="color: #02939E">Consulta</h3>
+                <p class="text-neutral leading-relaxed">Chequeos preventivos y diagnóstico clínico especializado.</p>
+            </button>
+
+            <button onclick="ui.openModal('modal-grooming')"
+                class="bg-white p-10 rounded-3xl shadow-xl hover:shadow-secondary/10 transition-all text-left border-b-8 border-secondary group">
+                <div
+                    class="bg-secondary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:bg-secondary group-hover:text-primary transition-all">
+                    <i data-lucide="scissors" size="32"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3" style="color: #02939E">Estética</h3>
+                <p class="text-neutral leading-relaxed">Baños, cortes de raza y tratamientos para tu mascota.</p>
+            </button>
+
+            <button onclick="ui.openModal('modal-seguimiento')"
+                class="bg-white p-10 rounded-3xl shadow-xl hover:shadow-slate-200 transition-all text-left border-b-8 border-slate-300 group">
+                <div
+                    class="bg-slate-100 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-neutral group-hover:bg-slate-800 group-hover:text-white transition-all">
+                    <i data-lucide="activity" size="32"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3" style="color: #02939E">Seguimiento</h3>
+                <p class="text-neutral leading-relaxed">Monitoreo post-operatorio y control virtual en tiempo real.</p>
+            </button>
+        </div>
+    </section>
+
+    <section class="py-16 overflow-hidden">
+        <div class="flex brand-carousel gap-16 whitespace-nowrap items-center">
+            <span class="text-2xl font-black text-slate-200 hover:text-primary transition-colors">ROYAL CANIN</span>
+            <span class="text-2xl font-black text-slate-200 hover:text-primary transition-colors">PRO PLAN</span>
+            <span class="text-2xl font-black text-slate-200 hover:text-primary transition-colors">HILLS</span>
+            <span class="text-2xl font-black text-slate-200 hover:text-primary transition-colors">BRAVECTO</span>
+            <span class="text-2xl font-black text-slate-200 hover:text-primary transition-colors">BAYER</span>
+            <span class="text-2xl font-black text-slate-200">ROYAL CANIN</span>
+            <span class="text-2xl font-black text-slate-200">PRO PLAN</span>
+            <span class="text-2xl font-black text-slate-200">HILLS</span>
+            <span class="text-2xl font-black text-slate-200">BRAVECTO</span>
+            <span class="text-2xl font-black text-slate-200">BAYER</span>
+        </div>
+    </section>
+
+    <footer class="bg-[#E9F2BA] text-slate-400 py-10 relative mt-24">
+        <div class="absolute bottom-6 md:top-2 flex flex-col gap-6 pointer-events-none z-0">
+            <img src="assets/paw-print-p.png" class="w-10 h-10 rotate-[143deg] drop-shadow-md">
+            <img src="assets/paw-print-s.png" class="w-10 h-10 rotate-[130deg] translate-x-3 drop-shadow-md">
+            <img src="assets/paw-print-s.png" class="w-10 h-10 rotate-[120deg] translate-x-4 drop-shadow-md">
+        </div>
+        <div class="absolute bottom-8 left-16 flex flex-col gap-4 pointer-events-none z-0">
+            <img src="assets/paw-print-p.png" class="w-10 h-10 rotate-[130deg] translate-x-2 drop-shadow-md">
+            <img src="assets/paw-print-p.png" class="w-10 h-10 rotate-[143deg] translate-x-2 drop-shadow-md">
+            <img src="assets/paw-print-p.png" class="w-10 h-10 rotate-[133deg] translate-x-8 drop-shadow-md">
+        </div>
+        <div class="absolute bottom-20 md:top-16 left-28 flex flex-col gap-4 pointer-events-none z-0">
+            <img src="assets/paw-print-s.png" class="w-10 h-10 rotate-[105deg] translate-x-6 drop-shadow-md">
+        </div>
+        <div class="absolute -top-[70px] left-0 w-full overflow-hidden leading-[0]">
+            <svg class="relative block w-full h-[72px]" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path
+                    d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+                    fill="#E9F2BA" class="shape-fill"></path>
+            </svg>
+        </div>
+        <div class="container mx-auto px-20 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl relative z-10">
+            <div class="text-black">
+                <h4 class="font-bold mb-2 text-lg">Contáctanos</h4>
+                <div class="space-y-4">
+                    <p class="flex items-center gap-3"><i data-lucide="map-pin" class="text-primary w-5"></i> Av. Las
+                        Patas 456, Lima</p>
+                    <p class="flex items-center gap-3"><i data-lucide="phone" class="text-primary w-5"></i> +51 987
+                        654 321</p>
+                    <p class="flex items-center gap-3"><i data-lucide="mail" class="text-primary w-5"></i>
+                        contacto@vetapp.com</p>
+                </div>
+            </div>
+            <div class="text-black md:text-center">
+                <h4 class="font-bold mb-4 text-lg">Síguenos</h4>
+                <div class="flex gap-4 md:justify-center">
+                    <a href="#"
+                        class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary text-white transition-all hover:scale-110 hover:shadow-lg">
+                        <i class="fa fa-facebook-official text-3xl"></i>
+                    </a>
+                    <a href="#"
+                        class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary text-white transition-all hover:scale-110 hover:shadow-lg">
+                        <i class="fa fa-instagram text-3xl"></i>
+                    </a>
+                    <a href="#"
+                        class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary text-white transition-all hover:scale-110 hover:shadow-lg">
+                        <i class="fa fa-twitter text-3xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-consulta" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+            <div class="p-6 border-b bg-slate-50">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-primary"><i
+                            data-lucide="calendar-plus"></i> Nueva Consulta</h2>
+                    <button onclick="ui.closeModal('modal-consulta')" class="text-neutral hover:text-slate-600"><i
+                            data-lucide="x"></i></button>
+                </div>
+                <div class="flex justify-center items-center gap-10">
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="circle-1" class="step-circle step-active">1</div>
+                        <span class="text-[10px] font-bold text-primary">DATOS</span>
+                    </div>
+                    <div class="w-12 h-1 bg-slate-200"></div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="circle-2" class="step-circle step-inactive">2</div>
+                        <span class="text-[10px] font-bold text-neutral">AGENDA</span>
+                    </div>
+                    <div class="w-12 h-1 bg-slate-200"></div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="circle-3" class="step-circle step-inactive">3</div>
+                        <span class="text-[10px] font-bold text-neutral">PAGO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 overflow-y-auto max-h-[70vh]">
+                <div id="step-1" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h3 class="font-black text-primary border-b pb-2">Datos de la Mascota</h3>
+                            <input type="text" id="pet-name" oninput="logic.validateStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Nombre de la mascota">
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="pet-species" onchange="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50">
+                                    <option disabled selected>Tipo de especie</option>
+                                    <option>Canino</option>
+                                    <option>Felino</option>
+                                    <option>Exótico</option>
+                                </select>
+                                <select id="pet-gender" onchange="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50">
+                                    <option disabled selected>Género</option>
+                                    <option>Macho</option>
+                                    <option>Hembra</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="pet-years" oninput="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Edad (Años)">
+                                <input type="number" id="pet-months" oninput="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Meses">
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="font-black text-primary border-b pb-2">Síntomas y Salud</h3>
+                            <textarea id="symptom-desc" oninput="logic.validateStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50"
+                                placeholder="Descripción breve del síntoma"></textarea>
+                            <input type="text" id="symptom-time" oninput="logic.validateStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Tiempo con el malestar">
+                            <div class="flex flex-row gap-10 text-sm text-neutral justify-center items-center">
+                                <label class="flex items-center gap-2"><input type="checkbox" class="accent-[#02939E]">
+                                    ¿Vacunas al día?</label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="accent-[#02939E]">
+                                    ¿Desparasitado?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="pt-4 border-t">
+                            <h3 class="font-black text-primary mb-4">Datos del Dueño</h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="owner-name" oninput="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Nombre del dueño">
+                                <input type="tel" id="owner-phone" oninput="logic.validateStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Número de celular">
+                            </div>
+                        </div>
+                        <div class="bg-[#02949e25] p-4 rounded-xl border border-[#02939E]">
+                            <h3 class="font-black text-primary mb-1">Costo de Consulta</h3>
+                            <div class="flex items-center justify-center">
+                                <p class=" font-black text-primary text-2xl">S/. <span class="text-4xl">50.00</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-next-1" onclick="logic.nextStep(2)"
+                        class="btn-disabled w-full bg-primary text-white py-4 rounded-xl font-bold">Siguiente
+                        Paso</button>
+                </div>
+
+                <div id="step-2" class="step-hidden space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-black mb-4 text-primary text-center border-b pb-2">Marzo 2026</h3>
+                            <div id="calendar-grid"
+                                class="grid grid-cols-7 gap-1 text-center text-xs border p-4 rounded-xl"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="font-black text-primary border-b pb-2">Horarios Disponibles</h3>
+                            <div class="flex gap-2">
+                                <button onclick="logic.filterHours('M')" id="btn-morning"
+                                    class="px-4 py-1 bg-secondary/20 text-primary font-bold rounded-full text-xs">Mañana</button>
+                                <button onclick="logic.filterHours('T')" id="btn-afternoon"
+                                    class="px-4 py-1 bg-slate-100 text-neutral font-bold rounded-full text-xs">Tarde</button>
+                            </div>
+                            <div id="hours-container" class="grid grid-cols-3 gap-2"></div>
+                        </div>
+                        <div class="pt-4 border-t">
+                            <h3 class="font-black text-primary mb-4">Modalidad:</h3>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="mod"
+                                        class="accent-[#02939E]" onchange="logic.validateStep2()" checked> Presencial
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="mod"
+                                        class="accent-[#02939E]" onchange="logic.validateStep2()"> Virtual </label>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t">
+                            <h3 class="font-black text-primary mb-4">Doctor(a):</h3>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="doc"
+                                        class="accent-[#02939E]" checked> Juan A. Pérez G.</label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="doc"
+                                        class="accent-[#02939E]"> María S. García F.</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button onclick="logic.nextStep(1)" class="text-neutral font-bold">Atrás</button>
+                        <button id="btn-next-2" onclick="logic.nextStep(3)"
+                            class="btn-disabled bg-primary text-white px-10 py-3 rounded-xl font-bold">Siguiente</button>
+                    </div>
+                </div>
+
+                <div id="step-3" class="step-hidden text-center space-y-6">
+                    <h3 class="font-bold text-xl text-primary">Confirmar y Pagar</h3>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                        class="mx-auto w-40 border p-2 rounded-xl">
+                    <input type="text" id="yape-code" oninput="logic.validateStep3()"
+                        placeholder="Código de operación Yape"
+                        class="w-full border rounded-xl p-4 text-center font-mono text-lg bg-slate-50">
+                    <button id="btn-finish" onclick="ui.confirmFinal()"
+                        class="btn-disabled w-full bg-primary text-white py-4 rounded-2xl font-black">Finalizar
+                        Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-grooming" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-6 border-b bg-slate-50">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-primary"><i data-lucide="scissors"></i>
+                        Reserva de Grooming</h2>
+                    <button onclick="ui.closeModal('modal-grooming')" class="text-neutral"><i
+                            data-lucide="x"></i></button>
+                </div>
+                <div class="flex justify-center items-center gap-10">
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="g-circle-1" class="step-circle step-active">1</div>
+                        <span class="text-[10px] font-bold text-primary">DATOS</span>
+                    </div>
+                    <div class="w-12 h-1 bg-slate-200"></div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="g-circle-2" class="step-circle step-inactive">2</div>
+                        <span class="text-[10px] font-bold text-neutral">AGENDA</span>
+                    </div>
+                    <div class="w-12 h-1 bg-slate-200"></div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div id="g-circle-3" class="step-circle step-inactive">3</div>
+                        <span class="text-[10px] font-bold text-neutral">PAGO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 overflow-y-auto max-h-[70vh]">
+                <div id="g-step-1" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h3 class="font-black text-primary border-b pb-2">Datos de la Mascota</h3>
+                            <input type="text" id="g-pet-name" oninput="logic.validateGroomingStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Nombre de la mascota">
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="g-pet-species" onchange="logic.validateGroomingStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50">
+                                    <option disabled selected>Especie</option>
+                                    <option>Canino</option>
+                                    <option>Felino</option>
+                                </select>
+                                <select id="g-pet-gender" onchange="logic.validateGroomingStep1()"
+                                    class="w-full border rounded-lg p-3 bg-slate-50">
+                                    <option disabled selected>Género</option>
+                                    <option>Macho</option>
+                                    <option>Hembra</option>
+                                </select>
+                            </div>
+                            <input type="text" id="g-pet-breed" oninput="logic.validateGroomingStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50"
+                                placeholder="Raza (Ej: Poodle, Yorkie...)">
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="font-black text-primary border-b pb-2">Configuración del Servicio</h3>
+                            <select id="g-service-type" onchange="logic.validateGroomingStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50">
+                                <option disabled selected>Tipo de Baño</option>
+                                <option>Estándar</option>
+                                <option>Premium (4 etapas)</option>
+                                <option>Hipoalergénico</option>
+                                <option>Medicado</option>
+                                <option>Antipulgas</option>
+                            </select>
+                            <select id="g-tech-type" class="w-full border rounded-lg p-3 bg-slate-50">
+                                <option selected>Técnica: Tradicional</option>
+                                <option>Desmotado (Dematting)</option>
+                                <option>Deslanado</option>
+                                <option>Stripping (Pelo duro)</option>
+                            </select>
+                            <div class="bg-[#CDE262]/20 p-3 rounded-lg border border-secondary text-xs italic">
+                                * Cada sesión incluye revisión de 7 puntos, limpieza de oídos y glándulas anales.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                        <div>
+                            <h3 class="font-black text-primary mb-2">Dueño</h3>
+                            <input type="tel" id="g-owner-phone" oninput="logic.validateGroomingStep1()"
+                                class="w-full border rounded-lg p-3 bg-slate-50" placeholder="Celular de contacto">
+                        </div>
+                        <div
+                            class="bg-[#02949e25] p-4 rounded-xl border border-[#02939E] flex flex-col justify-center items-center">
+                            <p class="text-xs font-bold uppercase text-primary">Costo Estimado</p>
+                            <p class="font-black text-primary text-3xl">S/. 70.00</p>
+                        </div>
+                    </div>
+                    <button id="g-btn-next-1" onclick="logic.nextStepGrooming(2)"
+                        class="btn-disabled w-full bg-primary text-white py-4 rounded-xl font-bold">Siguiente
+                        Paso</button>
+                </div>
+
+                <div id="g-step-2" class="step-hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-black mb-4 text-primary text-center">Marzo 2026</h3>
+                            <div id="g-calendar-grid"
+                                class="grid grid-cols-7 gap-1 text-center text-xs border p-4 rounded-xl"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="font-black text-primary border-b pb-2">Horarios de Estética</h3>
+                            <div id="g-hours-container" class="grid grid-cols-3 gap-2"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between border-t pt-4">
+                        <button onclick="logic.nextStepGrooming(1)" class="text-neutral font-bold">Atrás</button>
+                        <button id="g-btn-next-2" onclick="logic.nextStepGrooming(3)"
+                            class="btn-disabled bg-primary text-white px-10 py-3 rounded-xl font-bold">Siguiente</button>
+                    </div>
+                </div>
+
+                <div id="g-step-3" class="step-hidden text-center space-y-6">
+                    <h3 class="font-bold text-xl text-primary">Confirmar Pago de Estética</h3>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                        class="mx-auto w-40 border p-2 rounded-xl">
+                    <input type="text" id="g-yape-code" oninput="logic.validateGroomingStep3()"
+                        placeholder="Código de Yape" class="w-full border rounded-xl p-4 text-center font-mono text-lg">
+                    <button id="g-btn-finish" onclick="ui.confirmFinal('modal-grooming')"
+                        class="btn-disabled w-full bg-primary text-white py-4 rounded-2xl font-black">Finalizar
+                        Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-root" class="hidden fixed inset-0 z-[100] bg-slate-50 overflow-y-auto">
+        <div id="admin-login" class="min-h-screen flex items-center justify-center bg-primary/5">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-primary/10">
+                <div class="text-center mb-8">
+                    <div class="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="shield-check" class="text-primary w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Acceso Veterinario</h2>
+                    <p class="text-slate-500 text-sm">Ingrese sus credenciales de staff</p>
+                    <p class="text-xs text-slate-400 mt-2">Modo demo sin base de datos: credenciales por defecto en
+                        <code class="text-[11px] bg-slate-100 px-1 rounded">js/config.js</code>
+                        (<code class="text-[11px] bg-slate-100 px-1">SISTEMA_DEMO_LOGIN</code>).</p>
+                </div>
+                <div class="space-y-4">
+                    <input type="text" id="admin-user" placeholder="Usuario" autocomplete="username"
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+                    <input type="password" id="admin-pass" placeholder="Contraseña" autocomplete="current-password"
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+                    <button onclick="adminLogic.login()"
+                        class="w-full bg-primary text-white py-4 rounded-xl font-bold hover:shadow-lg transition-all">Ingresar
+                        al Sistema</button>
+                    <button onclick="adminUI.closeAdmin()" class="w-full text-slate-400 text-sm font-medium">Volver al
+                        sitio público</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-dashboard" class="hidden flex flex-col h-screen">
+            <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-8">
+                    <span class="font-bold text-xl text-primary">Vet<span class="text-secondary">App</span> <span
+                            class="text-slate-300 text-sm ml-2 font-normal">| Staff Panel</span></span>
+                    <div class="flex gap-4">
+                        <button onclick="adminUI.switchTab('agenda')" id="tab-agenda"
+                            class="px-4 py-2 rounded-lg bg-primary text-white font-medium">Agenda y Citas</button>
+                        <button onclick="adminUI.switchTab('casos')" id="tab-casos"
+                            class="px-4 py-2 rounded-lg text-slate-500 hover:bg-slate-100 font-medium">Casos Clínicos &
+                            IA</button>
+                    </div>
+                </div>
+                <button onclick="adminLogic.logout()" class="text-red-500 flex items-center gap-2 font-medium"><i
+                        data-lucide="log-out" size="18"></i> Salir</button>
+            </nav>
+
+            <main class="flex-1 overflow-hidden p-6">
+                <div id="view-agenda" class="grid grid-cols-12 gap-6 h-full">
+                    <div class="col-span-4 bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                        <h3 class="font-bold text-lg mb-4">Calendario de Servicios</h3>
+                        <div id="admin-calendar" class="grid grid-cols-7 gap-2 text-center text-xs"></div>
+                    </div>
+                    <div class="col-span-8 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 overflow-y-auto">
+                        <div id="day-details-header" class="mb-6">
+                            <h3 class="font-bold text-2xl text-slate-800">Seleccione una fecha</h3>
+                            <p class="text-slate-500">Detalle de actividades programadas</p>
+                        </div>
+                        <div id="day-agenda-list" class="space-y-4">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-casos" class="hidden grid grid-cols-12 gap-6 h-full">
+                    <div class="col-span-4 space-y-4 overflow-y-auto pr-2" id="patients-list">
+                    </div>
+                    <div class="col-span-8 flex flex-col bg-slate-900 rounded-3xl overflow-hidden shadow-2xl relative">
+                        <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                            <span class="text-white font-bold flex items-center gap-2"><i data-lucide="bot"
+                                    class="text-secondary"></i> Asistente Veterinario IA</span>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by GPT-4</span>
+                        </div>
+                        <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 text-sm text-slate-300"></div>
+                        <div id="ai-summary"
+                            class="absolute right-4 top-20 w-64 bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl text-xs text-white space-y-3 hidden">
+                            <h4 class="font-bold border-b border-white/20 pb-2 text-secondary uppercase">Análisis
+                                Clínico</h4>
+                            <div id="ai-summary-content"></div>
+                        </div>
+                        <div class="p-4 bg-slate-800 border-t border-slate-700 flex gap-2">
+                            <input type="text" id="ai-input" placeholder="Preguntar sobre síntomas o tratamientos..."
+                                class="flex-1 bg-slate-700 border-none rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-secondary">
+                            <button onclick="adminLogic.askAI()"
+                                class="bg-secondary text-primary font-bold px-6 rounded-xl hover:scale-105 transition-transform">Consultar</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/logic.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin_logic.js"></script>
+    <script src="js/admin_ui.js"></script>
+</body>
+
+</html>

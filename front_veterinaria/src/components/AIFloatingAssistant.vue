@@ -10,7 +10,7 @@
       v-for="(question, index) in questions" 
       :key="index"
       @click="$emit('select', question)"
-      class="bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 text-xs font-medium px-4 py-3 rounded-xl shadow-lg border border-slate-200 hover:border-indigo-200 transition-all duration-300 transform hover:-translate-x-1 hover:scale-105 text-right max-w-xs"
+      class="bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 text-xs font-medium px-4 py-3 rounded-none shadow-lg border border-slate-200 hover:border-indigo-200 transition-all duration-300 transform hover:-translate-x-1 hover:scale-105 text-right max-w-xs"
     >
       {{ question }}
     </button>

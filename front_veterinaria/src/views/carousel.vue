@@ -19,7 +19,7 @@
             :key="index" 
             class="flex-none w-48 h-28"
           >
-            <div class="w-full h-full bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:bg-white hover:shadow-lg hover:border-[#02939E]/30 hover:scale-105 group/card">
+            <div class="w-full h-full bg-gray-50 rounded-none border border-gray-100 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:bg-white hover:shadow-lg hover:border-[#02939E]/30 hover:scale-105 group/card">
               
               <div class="opacity-40 group-hover/card:opacity-100 transition-opacity duration-300">
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 mb-2 mx-auto text-gray-600 group-hover/card:text-[#02939E]">
@@ -27,7 +27,7 @@
                   </svg>
               </div>
 
-              <span class="text-gray-400 font-bold text-lg group-hover/card:text-gray-800 transition-colors duration-300">
+              <span class="text-gray-400 font-semibold text-sm group-hover/card:text-gray-800 transition-colors duration-300">
                 {{ item.text }}
               </span>
               

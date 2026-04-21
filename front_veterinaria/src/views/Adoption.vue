@@ -4,13 +4,13 @@
     <div class="max-w-7xl mx-auto">
 
       <div class="text-center mb-16">
-        <span class="text-[#a4ad74] font-bold tracking-[0.2em] uppercase text-sm block mb-3">
+        <span class="text-[#a4ad74] font-bold tracking-[0.2em] uppercase text-xs block mb-3">
           Tu futuro mejor amigo
         </span>
-        <h2 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 tracking-tight mb-4">
+        <h2 class="app-type-title tracking-tight mb-4">
           Adopción <span class="text-[#02939E]">Online</span>
         </h2>
-        <p class="text-gray-500 max-w-2xl mx-auto text-lg font-light">
+        <p class="text-gray-500 max-w-2xl mx-auto text-base font-light">
           Descubre a los pequeños que están buscando un hogar lleno de amor.
         </p>
       </div>
@@ -21,7 +21,7 @@
           v-for="(mascota, index) in mascotas" 
           :key="index" 
           to="/adopcion" 
-          class="group relative h-96 w-full rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-[#02939E]/20 transition-all duration-500 ease-out transform hover:-translate-y-2"
+          class="group relative h-96 w-full rounded-none overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-[#02939E]/20 transition-all duration-500 ease-out transform hover:-translate-y-2"
         >
           <div class="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
             <div class="w-2 h-2 rounded-full bg-[#a4ad74] animate-pulse"></div>
@@ -41,7 +41,7 @@
           <div class="absolute bottom-0 left-0 w-full p-8 text-left">
             
             <div class="relative inline-block">
-              <h3 class="text-3xl font-serif font-bold text-white mb-1 drop-shadow-md relative z-10">
+              <h3 class="app-type-panel-heading text-white mb-1 drop-shadow-md relative z-10">
                 {{ mascota.name }}
               </h3>
               <div class="absolute -bottom-2 left-0 h-1 bg-[#a4ad74] w-8 group-hover:w-full transition-all duration-500 ease-out rounded-full"></div>

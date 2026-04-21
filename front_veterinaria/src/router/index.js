@@ -91,6 +91,12 @@ const routes = [
         meta: { title: 'Veterinario - Historial' }
       },
       {
+        path: 'analisis',
+        name: 'VetAnalytics',
+        component: () => import('../views/veterinario/VetAnalytics.vue'),
+        meta: { title: 'Veterinario - Análisis' }
+      },
+      {
         path: 'chat',
         name: 'VetChat',
         component: () => import('../views/veterinario/VetChat.vue'),

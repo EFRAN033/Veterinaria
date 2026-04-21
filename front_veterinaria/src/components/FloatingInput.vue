@@ -100,7 +100,7 @@ const inputClasses = computed(() => ({
 
 <style scoped>
 .floating-input {
-  @apply block px-4 pb-2.5 pt-5 w-full text-gray-900 bg-gray-50 border-2 rounded-xl appearance-none 
+  @apply block px-4 pb-2.5 pt-5 w-full text-gray-900 bg-gray-50 border-2 rounded-none appearance-none 
   focus:outline-none focus:ring-4 transition-all duration-300;
 }
 

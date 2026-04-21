@@ -2,10 +2,17 @@
 Servicio de gestión de citas
 Contiene la lógica de negocio para CRUD de citas con validaciones
 """
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from datetime import date, time
-from app.application.dtos.appointment_dto import AppointmentCreateDTO, AppointmentUpdateDTO, AppointmentDTO
+from datetime import date, time, datetime
+from app.application.dtos.appointment_dto import (
+    AppointmentCreateDTO,
+    AppointmentUpdateDTO,
+    AppointmentDTO,
+    AppointmentClinicalUpdateDTO,
+)
+from app.application.dtos.vet_dto import VetAnalyticsDTO, VetMonthCountDTO, VetStatusCountDTO
+from app.application.mappers.appointment_mapper import appointment_to_dto
 from app.infrastructure.repositories.appointment_repository_impl import AppointmentRepositoryImpl
 from app.infrastructure.repositories.service_repository_impl import ServiceRepositoryImpl
 from app.infrastructure.database.models.appointment import Appointment
@@ -23,12 +30,55 @@ class AppointmentService:
     def get_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener citas de un usuario"""
         appointments = self.appointment_repo.get_by_user(user_id, skip=skip, limit=limit)
-        return [AppointmentDTO.model_validate(appointment) for appointment in appointments]
+        return [appointment_to_dto(appointment) for appointment in appointments]
 
     def get_all_appointments(self, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener todas las citas (para veterinarios)"""
         appointments = self.appointment_repo.get_all(skip=skip, limit=limit)
-        return [AppointmentDTO.model_validate(appointment) for appointment in appointments]
+        return [appointment_to_dto(appointment) for appointment in appointments]
+
+    def get_vet_history(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        species: Optional[str] = None,
+        sex: Optional[str] = None,
+    ) -> List[AppointmentDTO]:
+        """Historial de citas para veterinario (todas las mascotas/pacientes)."""
+        appointments = self.appointment_repo.get_vet_history(
+            skip=skip, limit=limit, species=species, sex=sex
+        )
+        return [appointment_to_dto(a) for a in appointments]
+
+    def get_vet_analytics(
+        self,
+        species: Optional[str] = None,
+        sex: Optional[str] = None,
+        range_months: int = 12,
+    ) -> VetAnalyticsDTO:
+        month_rows, status_rows, total, unique_pets, follow_up = (
+            self.appointment_repo.get_analytics_aggregates(
+                species=species, sex=sex, range_months=range_months
+            )
+        )
+        by_month: List[VetMonthCountDTO] = []
+        for m, c in month_rows:
+            if m is None:
+                continue
+            if isinstance(m, datetime):
+                d = m.date()
+            else:
+                d = m
+            by_month.append(VetMonthCountDTO(month=d.isoformat(), count=int(c)))
+        by_status = [VetStatusCountDTO(status=s, count=int(cnt)) for s, cnt in status_rows]
+        return VetAnalyticsDTO(
+            appointments_by_month=by_month,
+            appointments_by_status=by_status,
+            total_appointments=total,
+            unique_pets_attended=unique_pets,
+            follow_up_patients_count=follow_up,
+            range_months=range_months,
+        )
     
     def get_history_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener historial de citas (completadas, canceladas o pasadas)"""
@@ -40,7 +90,7 @@ class AppointmentService:
             (app.appointment_date < date.today() and app.status != "cancelled")
         ]
         
-        return [AppointmentDTO.model_validate(app) for app in history[skip:skip+limit]]
+        return [appointment_to_dto(app) for app in history[skip : skip + limit]]
 
     def get_pending_by_user(self, user_id: int, skip: int = 0, limit: int = 100) -> List[AppointmentDTO]:
         """Obtener citas pendientes (futuras y no canceladas)"""
@@ -51,18 +101,23 @@ class AppointmentService:
             if app.status in ["pending", "confirmed"] and app.appointment_date >= date.today()
         ]
         
-        return [AppointmentDTO.model_validate(app) for app in pending[skip:skip+limit]]
+        return [appointment_to_dto(app) for app in pending[skip : skip + limit]]
     
     def get_by_id(self, appointment_id: int, user_id: int) -> AppointmentDTO:
-        """Obtener cita por ID verificando que pertenece al usuario"""
+        """Obtener cita por ID (dueño o veterinario)."""
         appointment = self.appointment_repo.get_by_id(appointment_id)
         if not appointment:
             raise NotFoundException("Cita", appointment_id)
-        
-        if appointment.user_id != user_id:
+
+        from app.infrastructure.database.models.user import User
+
+        user = self.db.query(User).filter(User.id == user_id).first()
+        is_vet = user.role == "veterinario" if user else False
+
+        if appointment.user_id != user_id and not is_vet:
             raise BusinessRuleException("No tienes permiso para ver esta cita")
-        
-        return AppointmentDTO.model_validate(appointment)
+
+        return appointment_to_dto(appointment)
     
     def create(self, user_id: int, appointment_data: AppointmentCreateDTO) -> AppointmentDTO:
         """
@@ -97,7 +152,8 @@ class AppointmentService:
         )
         
         created_appointment = self.appointment_repo.create(new_appointment)
-        return AppointmentDTO.model_validate(created_appointment)
+        created_appointment = self.appointment_repo.get_by_id(created_appointment.id)
+        return appointment_to_dto(created_appointment)
     
     def update(self, appointment_id: int, user_id: int, appointment_data: AppointmentUpdateDTO) -> AppointmentDTO:
         """Actualizar una cita existente"""
@@ -130,8 +186,35 @@ class AppointmentService:
             appointment.notes = appointment_data.notes
         
         updated_appointment = self.appointment_repo.update(appointment)
-        return AppointmentDTO.model_validate(updated_appointment)
-    
+        refreshed = self.appointment_repo.get_by_id(updated_appointment.id)
+        return appointment_to_dto(refreshed)
+
+    def update_clinical(
+        self,
+        appointment_id: int,
+        user_id: int,
+        data: AppointmentClinicalUpdateDTO,
+    ) -> AppointmentDTO:
+        """Actualizar diagnóstico final y tratamiento (solo veterinario)."""
+        from app.infrastructure.database.models.user import User
+
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user or user.role != "veterinario":
+            raise BusinessRuleException("Solo los veterinarios pueden editar el registro clínico")
+
+        appointment = self.appointment_repo.get_by_id(appointment_id)
+        if not appointment:
+            raise NotFoundException("Cita", appointment_id)
+
+        if data.final_diagnosis is not None:
+            appointment.final_diagnosis = data.final_diagnosis
+        if data.treatment is not None:
+            appointment.treatment = data.treatment
+
+        self.appointment_repo.update(appointment)
+        refreshed = self.appointment_repo.get_by_id(appointment_id)
+        return appointment_to_dto(refreshed)
+
     def cancel(self, appointment_id: int, user_id: int) -> AppointmentDTO:
         """Cancelar una cita"""
         appointment = self.appointment_repo.get_by_id(appointment_id)
@@ -147,4 +230,5 @@ class AppointmentService:
         
         appointment.status = "cancelled"
         updated_appointment = self.appointment_repo.update(appointment)
-        return AppointmentDTO.model_validate(updated_appointment)
+        refreshed = self.appointment_repo.get_by_id(updated_appointment.id)
+        return appointment_to_dto(refreshed)

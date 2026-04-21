@@ -8,7 +8,7 @@
 
         <div class="text-center mb-16 max-w-3xl mx-auto">
           <span class="text-[#1BB0B9] font-bold tracking-widest text-xs uppercase mb-3 block">Veterinaria & Estética</span>
-          <h1 class="text-4xl lg:text-5xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+          <h1 class="app-type-title mb-6">
             Elige el cuidado ideal <br />
             para tu <span class="relative inline-block">
               mascota
@@ -17,7 +17,7 @@
               </svg>
             </span>
           </h1>
-          <p class="text-gray-500 text-lg">Selecciona una categoría abajo para personalizar la atención.</p>
+          <p class="text-gray-500 text-base">Selecciona una categoría abajo para personalizar la atención.</p>
         </div>
 
         <!-- Step Indicator -->
@@ -46,7 +46,7 @@
             v-for="service in serviceTypes" 
             :key="service.id"
             @click="selectedService = service.id"
-            class="group relative flex flex-col items-center justify-center p-6 rounded-3xl transition-all duration-300 border-2"
+            class="group relative flex flex-col items-center justify-center p-6 rounded-none transition-all duration-300 border-2"
             :class="selectedService === service.id 
               ? 'border-[#1BB0B9] bg-[#1BB0B9]/5 shadow-lg shadow-[#1BB0B9]/10' 
               : 'border-gray-100 bg-white hover:border-[#BEDC74] hover:shadow-md'"
@@ -75,7 +75,7 @@
               <div v-if="currentStep === 1">
                 <div v-if="selectedService === 'consultation'" key="consultation" class="space-y-10">
                 <div class="border-l-4 border-[#1BB0B9] pl-6">
-                  <h2 class="text-3xl font-serif font-bold text-gray-900">Detalles de la Consulta</h2>
+                  <h2 class="app-type-panel-heading">Detalles de la Consulta</h2>
                   <p class="text-gray-500 mt-1">Cuéntanos qué le sucede a tu mascota.</p>
                 </div>
 
@@ -95,6 +95,14 @@
                         <option value="pez">Pez</option>
                       </select>
                       <label class="floating-label">Especie</label>
+                    </div>
+                    <div class="group relative">
+                      <select v-model="consultation.gender" class="floating-input peer pt-6 pb-2">
+                        <option value="">Prefiero no indicar</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Hembra">Hembra</option>
+                      </select>
+                      <label class="floating-label">Sexo</label>
                     </div>
                   </div>
 
@@ -119,7 +127,7 @@
                       <div class="flex gap-4">
                         <label v-for="level in ['baja', 'media', 'alta']" :key="level" class="flex-1 cursor-pointer">
                           <input type="radio" v-model="consultation.urgency" :value="level" class="hidden peer">
-                          <div class="py-3 px-4 rounded-xl border-2 border-gray-100 text-center capitalize font-bold text-gray-400 transition-all peer-checked:border-[#1BB0B9] peer-checked:text-[#1BB0B9] peer-checked:bg-[#1BB0B9]/5 hover:bg-gray-50">
+                          <div class="py-3 px-4 rounded-none border-2 border-gray-100 text-center capitalize font-bold text-gray-400 transition-all peer-checked:border-[#1BB0B9] peer-checked:text-[#1BB0B9] peer-checked:bg-[#1BB0B9]/5 hover:bg-gray-50">
                             {{ level }}
                           </div>
                         </label>
@@ -131,7 +139,7 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Fotos de evidencia</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div v-for="i in 4" :key="i" @click="triggerFileInput(i)"
-                        class="aspect-square rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#1BB0B9] hover:bg-[#1BB0B9]/5 cursor-pointer flex items-center justify-center transition-all overflow-hidden relative group">
+                        class="aspect-square rounded-none border-2 border-dashed border-gray-200 hover:border-[#1BB0B9] hover:bg-[#1BB0B9]/5 cursor-pointer flex items-center justify-center transition-all overflow-hidden relative group">
                         <template v-if="evidencePreviews[i]">
                           <img :src="evidencePreviews[i]" class="w-full h-full object-cover" />
                           <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
@@ -150,11 +158,25 @@
 
               <div v-else-if="selectedService === 'general'" key="general" class="space-y-10">
                 <div class="border-l-4 border-[#1BB0B9] pl-6">
-                  <h2 class="text-3xl font-serif font-bold text-gray-900">Servicios Generales</h2>
+                  <h2 class="app-type-panel-heading">Servicios Generales</h2>
                   <p class="text-gray-500 mt-1">Mantenimiento y prevención.</p>
                 </div>
 
                 <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-8">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="group relative">
+                      <input type="text" v-model="general.petName" placeholder=" " class="floating-input peer" />
+                      <label class="floating-label">Nombre de la Mascota</label>
+                    </div>
+                    <div class="group relative">
+                      <select v-model="general.gender" class="floating-input peer pt-6 pb-2">
+                        <option value="">Sexo (opcional)</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Hembra">Hembra</option>
+                      </select>
+                      <label class="floating-label">Sexo</label>
+                    </div>
+                  </div>
                   <div class="grid grid-cols-1 gap-8">
                      <div class="group relative">
                       <select v-model="general.serviceType" class="floating-input peer pt-6 pb-2">
@@ -180,11 +202,33 @@
 
               <div v-else-if="selectedService === 'clinical'" key="clinical" class="space-y-10">
                  <div class="border-l-4 border-[#1BB0B9] pl-6">
-                  <h2 class="text-3xl font-serif font-bold text-gray-900">Caso Clínico</h2>
+                  <h2 class="app-type-panel-heading">Caso Clínico</h2>
                   <p class="text-gray-500 mt-1">Información detallada para diagnósticos complejos.</p>
                 </div>
 
                 <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-8">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="group relative">
+                      <input type="text" v-model="clinical.petName" placeholder=" " class="floating-input peer" />
+                      <label class="floating-label">Nombre de la Mascota</label>
+                    </div>
+                    <div class="group relative">
+                      <select v-model="clinical.species" class="floating-input peer pt-6 pb-2">
+                        <option value="">Especie</option>
+                        <option value="perro">Perro</option>
+                        <option value="gato">Gato</option>
+                      </select>
+                      <label class="floating-label">Especie</label>
+                    </div>
+                    <div class="group relative">
+                      <select v-model="clinical.gender" class="floating-input peer pt-6 pb-2">
+                        <option value="">Sexo</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Hembra">Hembra</option>
+                      </select>
+                      <label class="floating-label">Sexo</label>
+                    </div>
+                  </div>
                    <div class="group relative">
                     <textarea v-model="clinical.description" rows="6" placeholder=" " class="floating-input peer resize-none"></textarea>
                     <label class="floating-label">Descripción del Caso</label>
@@ -196,7 +240,7 @@
                   </div>
 
                   <div class="flex flex-col gap-4">
-                    <label class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                    <label class="flex items-center gap-3 p-4 border border-gray-200 rounded-none cursor-pointer hover:bg-gray-50 transition-colors">
                       <input type="checkbox" v-model="clinical.isFollowUp" class="w-5 h-5 accent-[#1BB0B9]">
                       <span class="font-bold text-gray-700">¿Es una cita de control?</span>
                     </label>
@@ -211,12 +255,12 @@
 
               <div v-else-if="selectedService === 'aesthetic'" key="aesthetic" class="space-y-10">
                  <div class="border-l-4 border-[#1BB0B9] pl-6">
-                  <h2 class="text-3xl font-serif font-bold text-gray-900">Estética & Spa</h2>
+                  <h2 class="app-type-panel-heading">Estética & Spa</h2>
                   <p class="text-gray-500 mt-1">Belleza y cuidado para tu mejor amigo.</p>
                 </div>
 
                 <form @submit.prevent="handleStep1Submit" id="mainForm" class="space-y-10">
-                   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                       <div class="group relative">
                         <input type="text" v-model="aesthetic.petName" placeholder=" " class="floating-input peer" />
                         <label class="floating-label">Nombre de la Mascota</label>
@@ -233,10 +277,18 @@
                         </select>
                         <label class="floating-label">Especie</label>
                       </div>
+                      <div class="group relative">
+                        <select v-model="aesthetic.gender" class="floating-input peer pt-6 pb-2">
+                          <option value="">Sexo (opcional)</option>
+                          <option value="Macho">Macho</option>
+                          <option value="Hembra">Hembra</option>
+                        </select>
+                        <label class="floating-label">Sexo</label>
+                      </div>
                     </div>
 
                     <div class="space-y-6">
-                      <div v-for="(item, index) in aesthetic.services" :key="index" class="p-6 rounded-3xl bg-gray-50 border border-gray-100 relative">
+                      <div v-for="(item, index) in aesthetic.services" :key="index" class="p-6 rounded-none bg-gray-50 border border-gray-100 relative">
                          <div class="flex justify-between items-start mb-6">
                            <h3 class="font-bold text-gray-800 text-lg">Servicio #{{ index + 1 }}</h3>
                            <button v-if="aesthetic.services.length > 1" @click="removeService(index)" type="button" class="text-red-400 hover:text-red-600">
@@ -245,7 +297,7 @@
                          </div>
 
                          <div class="grid gap-6">
-                           <div class="group relative bg-white rounded-xl">
+                           <div class="group relative bg-white rounded-none">
                               <select v-model="item.type" class="floating-input peer pt-6 pb-2 bg-white">
                                 <option value="" disabled selected></option>
                                 <option value="baño">Baño Completo</option>
@@ -257,20 +309,22 @@
                               <label class="floating-label bg-white">Tipo de Servicio</label>
                             </div>
                             
-                            <div class="group relative bg-white rounded-xl">
+                            <div class="group relative bg-white rounded-none">
                               <textarea v-model="item.instructions" rows="2" placeholder=" " class="floating-input peer resize-none bg-white"></textarea>
                               <label class="floating-label bg-white">Instrucciones Especiales</label>
                             </div>
                          </div>
                       </div>
 
-                      <button @click="addService" type="button" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-[#1BB0B9] hover:text-[#1BB0B9] transition-all flex items-center justify-center gap-2">
+                      <button @click="addService" type="button" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-none text-gray-500 font-bold hover:border-[#1BB0B9] hover:text-[#1BB0B9] transition-all flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         Agregar otro servicio
                       </button>
                     </div>
                 </form>
               </div>
+
+              <OwnerContactFields v-if="selectedService" v-model="ownerContact" />
 
               </div>
 
@@ -286,6 +340,7 @@
                   :details="currentServiceDetails"
                   :dateTime="dateTime"
                   :estimatedCost="estimatedCost"
+                  :ownerContact="ownerContact"
                   @edit="goToStep"
                 />
               </div>
@@ -296,15 +351,15 @@
           <div class="lg:w-1/3">
             <div class="sticky top-8 space-y-6">
               
-              <div class="bg-white rounded-3xl p-8 shadow-2xl relative overflow-hidden border-2 border-gray-100">
+              <div class="bg-white rounded-none p-8 shadow-2xl relative overflow-hidden border-2 border-gray-100">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-[#1BB0B9] rounded-full blur-[60px] opacity-10"></div>
                 <div class="absolute bottom-0 left-0 w-24 h-24 bg-[#BEDC74] rounded-full blur-[40px] opacity-10"></div>
 
                 <div class="relative z-10">
                   <h3 class="text-gray-500 font-medium mb-1 uppercase tracking-wider text-xs">Total Estimado</h3>
                   <div class="flex items-baseline gap-1 mb-6">
-                    <span class="text-2xl text-[#1BB0B9]">S/.</span>
-                    <span class="text-6xl font-serif font-bold tracking-tighter text-gray-900">{{ estimatedCost }}</span>
+                    <span class="app-type-price-currency">S/.</span>
+                    <span class="app-type-price">{{ estimatedCost }}</span>
                   </div>
 
                   <div class="border-t border-gray-200 pt-6 mb-8 space-y-3">
@@ -321,7 +376,7 @@
                   <button 
                     v-if="currentStep === 1"
                     @click="triggerSubmit"
-                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-none transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
                   >
                     <span>Continuar</span>
                     <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -330,7 +385,7 @@
                   <button 
                     v-else-if="currentStep === 2"
                     @click="nextStep"
-                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-none transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group"
                   >
                     <span>Revisar Solicitud</span>
                     <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -340,7 +395,7 @@
                     v-else
                     @click="submitRequest"
                     :disabled="loading"
-                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                    class="w-full py-4 bg-[#1BB0B9] hover:bg-[#16a0a8] text-white font-bold rounded-none transition-all shadow-lg hover:shadow-[#1BB0B9]/40 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     <span v-if="loading" class="animate-spin mr-2">⌛</span>
                     <span v-if="loading">Enviando...</span>
@@ -360,7 +415,7 @@
                 </div>
               </div>
 
-              <div class="bg-[#F3F4F6] rounded-3xl p-6 border border-gray-100 hidden lg:block">
+              <div class="bg-[#F3F4F6] rounded-none p-6 border border-gray-100 hidden lg:block">
                 <div class="flex items-start gap-4">
                   <div class="bg-white p-3 rounded-full shadow-sm text-[#1BB0B9]">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -386,18 +441,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Header from './Header.vue';
 import BackButton from '@/components/BackButton.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import ServiceSummary from '@/components/ServiceSummary.vue';
+import OwnerContactFields from '@/components/OwnerContactFields.vue';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import { useToast } from '@/composables/useToast';
+import { useUserStore } from '@/stores/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 const { createServiceRequest, loading, error } = useServiceRequests();
 const { addToast } = useToast();
+
+const ownerContact = ref({
+  ownerName: '',
+  ownerPhone: '',
+  ownerEmail: '',
+});
 
 const currentStep = ref(1);
 const selectedService = ref('consultation');
@@ -410,9 +474,37 @@ const serviceTypes = [
   { id: 'aesthetic', name: 'Estética' }
 ];
 
+const PHONE_PE_RE = /^\d{9}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateOwnerContact() {
+  const name = ownerContact.value.ownerName?.trim();
+  const phone = (ownerContact.value.ownerPhone || '').replace(/\s/g, '');
+  const email = ownerContact.value.ownerEmail?.trim();
+  if (!name) {
+    addToast('Indica el nombre completo de la persona de contacto.', 'warning');
+    return false;
+  }
+  if (!PHONE_PE_RE.test(phone)) {
+    addToast('El celular debe tener 9 dígitos (Perú, sin prefijo 51).', 'warning');
+    return false;
+  }
+  if (!email || !EMAIL_RE.test(email)) {
+    addToast('Introduce un correo electrónico válido.', 'warning');
+    return false;
+  }
+  return true;
+}
+
 const triggerSubmit = () => {
   const form = document.getElementById('mainForm');
+  if (form && !form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+  if (!validateOwnerContact()) return;
   if (form) form.requestSubmit();
+  else nextStep();
 };
 
 const evidencePreviews = ref({});
@@ -433,10 +525,18 @@ const handleFileChange = (event, index) => {
   }
 };
 
-const consultation = ref({ petName: '', species: '', symptoms: '', duration: '', urgency: '' });
-const general = ref({ serviceType: '', petName: '', preferredDate: '', notes: '' });
-const clinical = ref({ description: '', history: '', isFollowUp: false, previousCase: '' });
-const aesthetic = ref({ petName: '', breed: '', services: [{ type: '', instructions: '' }] });
+const consultation = ref({ petName: '', species: '', gender: '', symptoms: '', duration: '', urgency: '' });
+const general = ref({ serviceType: '', petName: '', gender: '', preferredDate: '', notes: '' });
+const clinical = ref({
+  petName: '',
+  species: '',
+  gender: '',
+  description: '',
+  history: '',
+  isFollowUp: false,
+  previousCase: '',
+});
+const aesthetic = ref({ petName: '', breed: '', species: '', gender: '', services: [{ type: '', instructions: '' }] });
 
 const addService = () => {
   aesthetic.value.services.push({ type: '', instructions: '' });
@@ -514,6 +614,9 @@ const submitRequest = async () => {
       estimated_cost: estimatedCost.value,
       service_data: {
         ...currentServiceDetails.value,
+        owner_full_name: ownerContact.value.ownerName.trim(),
+        owner_phone: (ownerContact.value.ownerPhone || '').replace(/\s/g, ''),
+        owner_email: ownerContact.value.ownerEmail.trim(),
         preferredDate: dateTime.value.date,
         preferredTime: dateTime.value.timeSlot,
         isUrgent: dateTime.value.isUrgent
@@ -532,9 +635,7 @@ const submitRequest = async () => {
     } else if (selectedService.value === 'aesthetic') {
       requestData.pet_name = aesthetic.value.petName;
     } else if (selectedService.value === 'clinical') {
-      // Clinical request doesn't have a specific pet name field in the current form
-      // We could add it, but for now we'll send it without if not present
-      // or we could assume it's part of the description
+      requestData.pet_name = clinical.value.petName || 'Paciente clínico';
     }
 
     await createServiceRequest(requestData);
@@ -548,8 +649,36 @@ const submitRequest = async () => {
 };
 
 const handleStep1Submit = () => {
+  if (!validateOwnerContact()) return;
   nextStep();
 };
+
+function prefillOwnerFromUser() {
+  const u = userStore.user;
+  if (!u) return;
+  if (!ownerContact.value.ownerName?.trim() && userStore.userName) {
+    ownerContact.value.ownerName = userStore.userName;
+  }
+  if (!ownerContact.value.ownerEmail?.trim() && userStore.userEmail) {
+    ownerContact.value.ownerEmail = userStore.userEmail;
+  }
+  if (!ownerContact.value.ownerPhone?.trim() && u.phone) {
+    let p = String(u.phone).replace(/\D/g, '');
+    if (p.startsWith('51') && p.length >= 11) p = p.slice(2);
+    if (p.length === 9) ownerContact.value.ownerPhone = p;
+  }
+}
+
+onMounted(async () => {
+  prefillOwnerFromUser();
+  if (!userStore.isLoggedIn) return;
+  try {
+    await userStore.fetchProfile();
+  } catch {
+    /* perfil opcional; JWT/local puede bastar */
+  }
+  prefillOwnerFromUser();
+});
 
 
 </script>
@@ -557,7 +686,7 @@ const handleStep1Submit = () => {
 <style scoped>
 /* ESTILO FLOATING LABELS (Material Design Moderno) */
 .floating-input {
-  @apply block px-4 pb-2.5 pt-5 w-full text-gray-900 bg-gray-50 border-2 border-gray-100 rounded-xl appearance-none focus:outline-none focus:ring-0 focus:border-[#1BB0B9] focus:bg-white transition-all;
+  @apply block px-4 pb-2.5 pt-5 w-full text-gray-900 bg-gray-50 border-2 border-gray-100 rounded-none appearance-none focus:outline-none focus:ring-0 focus:border-[#1BB0B9] focus:bg-white transition-all;
 }
 
 .floating-label {

@@ -1,0 +1,47 @@
+# PostgreSQL + API FastAPI (back_veterinaria)
+# Uso: desde la raíz del repo → docker compose up --build
+# API: http://localhost:8000/docs
+# Base de datos (host): localhost:5433  usuario/clave/db → ver variables POSTGRES_*
+
+services:
+  db:
+    image: postgres:16-bookworm
+    container_name: veterinaria-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-veterinaria}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-veterinaria_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-veterinaria}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - veterinaria_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build:
+      context: ./back_veterinaria
+      dockerfile: Dockerfile
+    container_name: veterinaria-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-veterinaria}:${POSTGRES_PASSWORD:-veterinaria_secret}@db:5432/${POSTGRES_DB:-veterinaria}
+      SECRET_KEY: ${SECRET_KEY:-cambiar-en-produccion-usa-openssl-rand-hex-32}
+      PORT: "8000"
+      HOST: "0.0.0.0"
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+
+volumes:
+  veterinaria_pgdata:

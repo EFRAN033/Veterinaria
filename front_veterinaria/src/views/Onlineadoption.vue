@@ -20,11 +20,11 @@
             />
           </div>
 
-          <h1 class="font-serif text-4xl lg:text-5xl text-gray-800 font-bold mb-4 leading-tight">
+          <h1 class="app-type-title text-gray-800 mb-4">
             Dale una <br>
             <span class="text-[#1BB0B9]">segunda oportunidad.</span>
           </h1>
-          <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
+          <p class="text-gray-600 text-base md:text-lg mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
             El proceso es simple, seguro y lleno de amor. Registra los datos en el formulario y nosotros hacemos el resto.
           </p>
           
@@ -34,14 +34,14 @@
           </div>
         </div>
 
-        <div class="w-full lg:w-7/12 bg-[#1BB0B9] rounded-3xl shadow-2xl relative overflow-hidden ring-8 ring-white/40">
+        <div class="w-full lg:w-7/12 bg-[#1BB0B9] rounded-none shadow-2xl relative overflow-hidden ring-8 ring-white/40">
           
           <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-bl-full pointer-events-none"></div>
 
           <div class="p-4 md:p-5">
             
             <div class="mb-8">
-              <h2 class="text-white text-3xl font-serif font-bold tracking-wide">
+              <h2 class="app-type-title-inverse tracking-wide">
                 Registro de Mascota
               </h2>
               <p class="text-[#BFF1F6] opacity-90 mt-1">Ingresa la información para encontrarle un hogar.</p>
@@ -53,7 +53,7 @@
                 
                 <div class="w-full sm:w-4/12 shrink-0">
                   <label class="label-standar">Fotografía</label>
-                  <div class="relative aspect-square w-full bg-[#158f96] rounded-2xl border-2 border-dashed border-[#BFF1F6]/50 hover:border-[#BEDC74] hover:bg-[#138086] cursor-pointer group overflow-hidden transition-all shadow-inner flex flex-col items-center justify-center text-center p-4">
+                  <div class="relative aspect-square w-full bg-[#158f96] rounded-none border-2 border-dashed border-[#BFF1F6]/50 hover:border-[#BEDC74] hover:bg-[#138086] cursor-pointer group overflow-hidden transition-all shadow-inner flex flex-col items-center justify-center text-center p-4">
                     
                     <div v-if="!previewImage" class="flex flex-col items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 text-[#BFF1F6] group-hover:text-[#BEDC74] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -104,13 +104,13 @@
                      <div class="flex gap-4 mt-1">
                         <label class="flex-1 cursor-pointer">
                           <input type="radio" v-model="form.gender" value="Macho" name="gender" class="peer sr-only" />
-                          <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-xl peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
+                          <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-none peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
                             Macho
                           </div>
                         </label>
                         <label class="flex-1 cursor-pointer">
                           <input type="radio" v-model="form.gender" value="Hembra" name="gender" class="peer sr-only" />
-                          <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-xl peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
+                          <div class="bg-white/10 border border-white/30 text-white text-center py-3 rounded-none peer-checked:bg-[#BEDC74] peer-checked:text-[#1a5f63] peer-checked:border-[#BEDC74] transition-all font-medium text-sm">
                             Hembra
                           </div>
                         </label>
@@ -136,7 +136,7 @@
               </div>
 
               <div class="pt-2">
-                <button type="submit" :disabled="loading" class="w-full bg-[#BEDC74] text-[#1a5f63] font-serif font-bold text-xl py-4 rounded-xl shadow-[0_10px_30px_-10px_rgba(190,220,116,0.5)] hover:bg-[#d4ed95] hover:shadow-[0_15px_35px_-10px_rgba(190,220,116,0.7)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-not-allowed">
+                <button type="submit" :disabled="loading" class="w-full bg-[#BEDC74] text-[#1a5f63] font-serif font-bold text-base py-3.5 rounded-none shadow-[0_10px_30px_-10px_rgba(190,220,116,0.5)] hover:bg-[#d4ed95] hover:shadow-[0_15px_35px_-10px_rgba(190,220,116,0.7)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-not-allowed">
                   <span v-if="loading">Registrando...</span>
                   <span v-else>Registrar Mascota</span>
                   <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -247,7 +247,7 @@ const handleSubmit = async () => {
 
 /* Input cómodo: Buen tamaño de texto y padding */
 .form-input {
-  @apply w-full bg-white text-gray-800 rounded-xl px-4 py-2 text-sm md:text-base outline-none border-0 shadow-sm placeholder-gray-400 transition-all duration-200;
+  @apply w-full bg-white text-gray-800 rounded-none px-4 py-2 text-sm md:text-base outline-none border-0 shadow-sm placeholder-gray-400 transition-all duration-200;
 }
 
 .form-input:focus {

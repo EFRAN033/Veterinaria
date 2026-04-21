@@ -7,17 +7,17 @@
         <div class="flex-1 text-left space-y-8">
           
           <div>
-            <span class="text-[#a4ad74] font-bold tracking-[0.2em] uppercase text-sm md:text-base block mb-2">
+            <span class="text-[#a4ad74] font-bold tracking-[0.2em] uppercase text-xs block mb-2">
               Sobre Nosotros
             </span>
-            <h2 class="text-4xl md:text-5xl font-serif font-bold text-gray-900 leading-tight">
+            <h2 class="app-type-title">
               Bienvenido a <br/>
               <span class="text-[#02939E]">Clínica Velit</span>
             </h2>
             <div class="w-20 h-1 bg-[#a4ad74] mt-6"></div>
           </div>
 
-          <p class="text-lg md:text-xl text-gray-600 leading-relaxed font-light max-w-xl">
+          <p class="text-base md:text-lg text-gray-600 leading-relaxed font-light max-w-xl">
             Creemos que cada mascota es un miembro más de la familia. En 
             <strong class="text-gray-800 font-medium">Velit</strong>, combinamos la pasión por los animales con la excelencia médica.
             Nuestro compromiso es brindar una atención personalizada, donde el amor y la ciencia se unen para el bienestar de tu mejor amigo.
@@ -39,22 +39,18 @@
           </ul>
 
           <div class="pt-4">
-            <a href="#" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-300 bg-[#02939E] rounded-lg hover:bg-[#027a83] hover:-translate-y-1 shadow-lg shadow-[#02939E]/30">
+            <a href="#" class="app-btn-cta-primary shadow-[#02939E]/25">
               Conoce Nuestros Servicios
             </a>
           </div>
         </div>
 
-        <div class="flex-1 relative flex justify-center lg:justify-end">
-          
-          <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
-            <img 
-              :src="humanDogImage" 
-              alt="Veterinario cuidando a un perro" 
-              class="w-full max-w-md lg:max-w-lg object-cover" 
-            />
-          </div>
-
+        <div class="flex-1 flex justify-center lg:justify-end">
+          <img
+            :src="humanDogImage"
+            alt="Veterinario cuidando a un perro"
+            class="w-full max-w-md lg:max-w-lg h-auto object-cover"
+          />
         </div>
 
       </div>

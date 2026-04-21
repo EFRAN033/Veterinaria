@@ -1,15 +1,15 @@
 <template>
   <div class="space-y-8">
     <div class="text-center">
-      <h3 class="text-2xl font-serif font-bold text-gray-900">Resumen de tu Solicitud</h3>
+      <h3 class="app-type-panel-heading">Resumen de tu Solicitud</h3>
       <p class="text-gray-500 mt-2">Por favor verifica que toda la información sea correcta.</p>
     </div>
 
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden max-w-2xl mx-auto">
+    <div class="bg-white rounded-none border border-gray-100 shadow-xl overflow-hidden max-w-2xl mx-auto">
       <!-- Header with Service Type -->
       <div class="bg-[#1BB0B9]/10 p-6 border-b border-[#1BB0B9]/10 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="p-3 bg-white rounded-xl text-[#1BB0B9] shadow-sm">
+          <div class="p-3 bg-white rounded-none text-[#1BB0B9] shadow-sm">
             <component :is="getServiceIcon(serviceType)" class="w-6 h-6" />
           </div>
           <div>
@@ -19,7 +19,7 @@
         </div>
         <div class="text-right">
           <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Costo Estimado</p>
-          <p class="text-2xl font-serif font-bold text-[#1BB0B9]">S/. {{ estimatedCost }}</p>
+          <p class="app-type-price-accent">S/. {{ estimatedCost }}</p>
         </div>
       </div>
 
@@ -45,6 +45,22 @@
 
         <div class="h-px bg-gray-100"></div>
 
+        <!-- Contacto -->
+        <div v-if="ownerContact && (ownerContact.ownerName || ownerContact.ownerPhone || ownerContact.ownerEmail)" class="flex items-start gap-4">
+          <div class="p-2 bg-gray-50 rounded-lg text-gray-400 mt-1">
+            <UserIcon class="w-5 h-5" />
+          </div>
+          <div class="flex-1">
+            <h5 class="font-bold text-gray-900 mb-1">Datos del contacto</h5>
+            <p class="text-gray-600 font-medium">{{ ownerContact.ownerName }}</p>
+            <p class="text-sm text-gray-500">+51 {{ ownerContact.ownerPhone }}</p>
+            <p class="text-sm text-gray-500">{{ ownerContact.ownerEmail }}</p>
+          </div>
+          <button type="button" @click="$emit('edit', 1)" class="text-sm font-bold text-[#1BB0B9] hover:underline">Editar</button>
+        </div>
+
+        <div v-if="ownerContact && (ownerContact.ownerName || ownerContact.ownerPhone || ownerContact.ownerEmail)" class="h-px bg-gray-100"></div>
+
         <!-- Pet Details -->
         <div class="flex items-start gap-4">
           <div class="p-2 bg-gray-50 rounded-lg text-gray-400 mt-1">
@@ -52,7 +68,7 @@
           </div>
           <div class="flex-1">
             <h5 class="font-bold text-gray-900 mb-1">Mascota</h5>
-            <p class="text-gray-600 font-medium">{{ details.petName }}</p>
+            <p class="text-gray-600 font-medium">{{ details?.petName || '—' }}</p>
             <p class="text-sm text-gray-500 capitalize" v-if="details.species">{{ details.species }} {{ details.breed ? `• ${details.breed}` : '' }}</p>
           </div>
           <button @click="$emit('edit', 1)" class="text-sm font-bold text-[#1BB0B9] hover:underline">Editar</button>
@@ -105,14 +121,19 @@ import {
   ClipboardDocumentListIcon, 
   HeartIcon, 
   BeakerIcon, 
-  ScissorsIcon 
+  ScissorsIcon,
+  UserIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   serviceType: String,
   details: Object,
   dateTime: Object,
-  estimatedCost: Number
+  estimatedCost: Number,
+  ownerContact: {
+    type: Object,
+    default: null,
+  },
 });
 
 defineEmits(['edit']);

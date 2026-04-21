@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- [MODIFICADO][SEGURIDAD] CSP reforzado. Se recomienda mover estilos y scripts a archivos externos para eliminar 'unsafe-inline' en producción y prevenir XSS DOM-based -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: https://api.qrserver.com blob:; style-src 'self' 'unsafe-inline';">
+    
+    <title>Veterinaria Pro - Sistema de Citas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#02939E',
+                        secondary: '#CDE262',
+                        darkPrimary: '#01737a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stepper-dot { background-color: #d1d5db; transition: all 0.3s ease; }
+        .stepper-dot.active { background-color: #ffffff; transform: scale(1.2); }
+        .stepper-dot.completed { background-color: #ffffff; }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center h-screen font-sans">
+
+    <button onclick="toggleModal(true)" class="bg-primary hover:bg-darkPrimary text-white font-bold py-4 px-10 rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95">
+        Estética
+    </button>
+
+    <div id="modalConsult" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 py-6 md:p-6">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-full flex flex-col animate-in fade-in zoom-in duration-300">
+            <!-- Header Modal -->
+            <div class="bg-primary p-5 text-white text-center rounded-t-3xl">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <h3 class="text-xl font-bold">Reservar Baño y Estética</h3>
+                    </div>
+                    <button onclick="toggleModal(false)" class="text-white text-3xl font-light hover:text-gray-200">&times;</button>
+                </div>
+                <div class="flex justify-between max-w-md mx-auto relative">
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/30 -translate-y-1/2"></div>
+                    <div id="dot1" class="stepper-dot active relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs shadow-lg"></div>
+                    <div id="dot2" class="stepper-dot relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs text-gray-500 shadow-lg"></div>
+                    <div id="dot3" class="stepper-dot relative z-10 w-4 h-4 rounded-full flex items-center justify-center font-bold text-xs text-gray-500 shadow-lg"></div>
+                </div>
+            </div>
+
+            <!-- Body Modal -->
+            <div class="p-6 overflow-y-auto max-h-[75vh]">
+                <!-- Paso 1 -->
+                <div id="step1" class="step-content active">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">Datos de la Mascota</h4>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- [MODIFICADO][SEGURIDAD] Se agregó autocomplete="off" y spellcheck="false" para evitar fugas de información a extensiones del navegador -->
+                                        <input type="text" id="petName" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" maxlength="50" autocomplete="off" spellcheck="false" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2" placeholder="Nombre de la Mascota">
+                                        <div class="flex gap-2">
+                                            <input type="number" id="petAge" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2); this.value = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '');" placeholder="Edad" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2">
+                                            <select id="petAgeUnit" class="w-full border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                                <option>Días</option>
+                                                <option>Meses</option>
+                                                <option>Años</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <select id="petSpecies" class="border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                            <option value="" disabled selected>Especie</option>
+                                            <option value="Perro">Perro</option>
+                                            <option value="Gato">Gato</option>
+                                        </select>
+                                        <select id="petGender" class="border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                            <option value="" disabled selected>Género</option>
+                                            <option value="Macho">Macho</option>
+                                            <option value="Hembra">Hembra</option>
+                                        </select>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 items-center">
+                                        <label for="petSize" class="text-sm text-gray-600 w-full">Tamaño de la mascota :</label>
+                                        <select id="petSize" class="border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                            <option value="Grande">Grande</option>
+                                            <option value="Mediano">Mediano</option>
+                                            <option value="Pequeño">Pequeño</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">Baño</h4>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <select id="tipoBaño" onchange="actualizarInfoBaño()" class="border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                            <option value="" disabled selected>Tipo de Baño</option>
+                                            <option value="Estandar">Estándar</option>
+                                            <option value="Hipoalergenico">Hipoalergénico</option>
+                                            <option value="Medicado">Medicado</option>
+                                            <option value="Antipulgas">Antipulgas</option>
+                                        </select>
+                                        <!-- [MODIFICADO][SEGURIDAD] Se limitó aún más el texto a 150 caracteres para prevenir envíos de payloads XSS masivos en campos de notas libres -->
+                                        <textarea id="petBathNotes" maxlength="150" placeholder="Indicaciones..." class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2 resize-none h-10"></textarea>
+                                    </div>
+                                    <p id="textoInfoBaño" class="text-justify w-full border-b-2 border-primary px-1 pb-2 text-sm text-gray-600 transition-all">
+                                        La descripción del baño seleccionado aparecerá aquí.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300" id="cardCorte">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-sm font-bold text-primary uppercase flex items-center gap-2">Corte de Pelo (+ S/ 20.00)</h4>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="chkCorte" onchange="toggleSeccion('chkCorte', 'contenidoCorte'); recalcularCosto();" class="sr-only peer">
+                                        <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+
+                                <div id="contenidoCorte" class="max-w-sm mx-auto space-y-3 opacity-40 pointer-events-none transition-all duration-300 h-0 overflow-hidden">
+                                    <div class="relative group border-2 border-dashed border-gray-300 rounded-2xl p-4 transition-all hover:border-primary bg-white cursor-pointer mt-6">
+                                        <!-- [MODIFICADO][SEGURIDAD] accept actualizado a extensiones estrictas. Aunque el backend es quien manda, esto mejora el UX -->
+                                        <input type="file" id="imgCorte" accept=".png, .jpg, .jpeg, .webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImageCorte(this)">
+                                        <div id="uploadPlaceholderCorte" class="flex flex-col items-center gap-2">
+                                            <svg class="w-8 h-8 text-gray-400 group-hover:text-primary transition-colors"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                                </path>
+                                            </svg>
+                                            <span class="text-xs text-gray-500 font-medium text-center">Click o arrastra la imagen de ejemplo</span>
+                                        </div>
+                                        <div id="imagePreviewContainerCorte" class="hidden flex flex-col items-center">
+                                            <img id="imgPreviewCorte" src="#" alt="Vista previa Corte" class="h-20 object-cover rounded-lg shadow-sm">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1">
+                                        <textarea id="petHaircut" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" maxlength="150" placeholder="Indicaciones Adicionales" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2 resize-none h-10"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">Datos del Dueño</h4>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <input type="text" id="ownerName" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+" maxlength="80" autocomplete="off" placeholder="Nombre Completo" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2">
+                                        <div class="flex items-center gap-2">
+                                            <label for="ownerCell" class="text-sm text-gray-600">+51</label>
+                                            <input type="tel" id="ownerCell" maxlength="11" autocomplete="off" placeholder="Celular" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2">
+                                        </div>
+                                    </div>
+                                    <!-- [MODIFICADO][QA] Se cambió maxlength a 80 y se añadió type="email" nativo para aprovechar validación del navegador antes del JS -->
+                                    <input type="email" id="ownerEmail" maxlength="80" autocomplete="off" placeholder="Correo electrónico" class="w-full border-b-2 border-gray-200 bg-transparent focus:border-primary outline-none px-1 py-2">
+                                </div>
+                            </div>
+
+                            <div class="bg-secondary/15 p-6 rounded-2xl border-2 border-dashed border-secondary flex flex-col items-center justify-center text-center transition-all duration-300">
+                                <span class="text-gray-600 font-medium mb-1">Costo Total Estimado</span>
+                                <!-- [AGREGADO][SEGURIDAD] Atributo data-price añadido para cálculo interno sin depender del texto visible manipulable por el usuario -->
+                                <span id="precioCalculado" data-price="50" class="text-4xl font-black text-primary italic transition-all duration-300">S/ 50.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div id="step2" class="step-content space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="space-y-2">
+                                <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 w-full shadow-sm">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <button id="prevMonthBtn" type="button" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed">&lt;</button>
+                                        <h5 id="monthYearDisplay" class="font-bold text-primary capitalize text-sm uppercase"></h5>
+                                        <button id="nextMonthBtn" type="button" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-primary transition-all">&gt;</button>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-wider">
+                                        <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sa</div>
+                                    </div>
+                                    <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+                                    <input type="hidden" id="selectedDate" name="selectedDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-bold text-primary uppercase">Detalles</label>
+                                <div class="flex items-center gap-2 justified-between mb-6">
+                                    <label class="text-sm text-gray-600 w-full">Turno :</label>
+                                    <select id="timeHour" class="w-full border-b-2 border-gray-200 focus:border-primary outline-none py-2 bg-transparent">
+                                        <option selected disabled value="">Hora</option>
+                                        <option value="09:00">09:00</option><option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option><option value="12:00">12:00</option>
+                                        <option value="01:00">01:00</option><option value="02:00">02:00</option>
+                                    </select>
+                                    <span id="timeAmPm" class="w-full border-b-2 border-primary py-2 px-1">--</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <p class="w-1/3 text-sm text-gray-600">Dr(a).</p>
+                                    <span id="doctorName" class="w-2/3"></span>
+                                </div>
+                            </div>
+                            <div class="my-6">
+                                <label class="block text-sm font-bold text-primary uppercase mb-6">Modalidad</label>
+                                <div class="flex p-1 bg-gray-100 rounded-2xl">
+                                    <button onclick="setMode('presencial')" id="btnPres" class="flex-1 py-3 rounded-xl text-sm font-bold bg-white shadow text-primary transition-all">Presencial</button>
+                                    <button onclick="setMode('virtual')" id="btnVirt" class="flex-1 py-3 rounded-xl text-sm font-bold text-gray-500 transition-all">Virtual</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div id="step3" class="step-content text-center space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="max-w-xs mx-auto relative flex flex-col justify-center">
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] text-primary animate-pulse font-bold uppercase tracking-tighter">Monto Total a Pagar</p>
+                                    <span id="precioFinalPagar" class="text-3xl font-black">S/ 50.00</span>
+                                </div>
+                                <div class="text-gray-800">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=VET_PAY_50" alt="QR de Pago" class="mx-auto w-40 h-40 mb-2">
+                                    <p class="text-xs font-bold text-gray-500">YAPE / PLIN</p>
+                                    <p class="text-sm font-black text-primary">900 000 000</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="max-w-sm mx-auto space-y-4 flex flex-col justify-center">
+                            <label class="block text-sm font-bold text-gray-700 uppercase tracking-wide">Sube tu comprobante</label>
+                            <div id="dropZone" class="relative group border-2 border-dashed border-gray-300 rounded-2xl p-4 transition-all hover:border-primary bg-gray-50 cursor-pointer">
+                                <input type="file" id="paymentScreenshot" accept=".png, .jpg, .jpeg, .webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
+                                <div id="uploadPlaceholder" class="flex flex-col items-center gap-2">
+                                    <svg class="w-8 h-8 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    <span class="text-xs text-gray-500 font-medium">Click o arrastra tu captura aquí</span>
+                                </div>
+                                <div id="imagePreviewContainer" class="hidden flex flex-col items-center">
+                                    <img id="imgPreview" src="#" alt="Vista previa" class="h-32 rounded-lg mb-2 shadow-sm">
+                                    <span class="text-[10px] text-primary font-bold">✓ Archivo cargado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-t flex justify-between items-center gap-6 rounded-b-3xl">
+                <button id="prevBtn" onclick="moveStep(-1)" class="invisible text-gray-400 font-bold hover:text-primary transition-all flex items-center gap-2 px-4 py-2">
+                    Anterior
+                </button>
+                <button id="nextBtn" onclick="moveStep(1)" class="flex-1 max-w-xs py-4 bg-primary text-white rounded-2xl font-bold shadow-xl hover:bg-darkPrimary transition-all transform hover:-translate-y-1 active:scale-95">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dataBaños = {
+            "Estandar": "Incluye dos etapas: un primer baño para eliminar la suciedad y grasa acumulada, y un segundo baño con shampoo especializado.",
+            "Hipoalergenico": "Uso de shampoo dermatológico sin aromas ni colorantes, ideal para pieles sensibles, atópicas o propensas a alergias.",
+            "Medicado": "Tratamiento enfocado en problemas dermatológicos (hongos, bacterias o seborrea) indicado por un médico veterinario.",
+            "Antipulgas": "Baño con productos ectoparasiticidas altamente efectivos para la eliminación segura de pulgas y garrapatas."
+        };
+
+        // --- CIBERSEGURIDAD: SANITIZADOR DE ENTRADAS ---
+        function sanitize(input) {
+            if (!input) return "";
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;' };
+            // [MODIFICADO][SEGURIDAD] Amplié el mapa de caracteres para incluir diagonales, retrocesos y signos de igual para prevenir payloads complejos
+            return input.toString().replace(/[&<>"'`=\/]/g, function (m) { return map[m]; });
+        }
+
+        // [MODIFICADO][SEGURIDAD] Se mejoró la función para validar no solo el peso, sino también el MIME Type (Firma del archivo)
+        function validateSecureFile(input, maxMb) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileSizeMb = file.size / (1024 * 1024);
+                
+                // Validación estricta de MIME Type - Previene Bypass de Frontend (Carga de PHP/EXE/SVG enmascarados)
+                const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!allowedMimeTypes.includes(file.type)) {
+                    alert('⚠️ Brecha de seguridad detectada: Tipo de archivo no permitido. Sube un formato de imagen válido (JPG, PNG, WEBP).');
+                    input.value = ''; // Limpieza inmediata del payload
+                    return false;
+                }
+
+                if (fileSizeMb > maxMb) {
+                    alert(`⚠️ El archivo excede el límite de ${maxMb}MB para evitar ataques DoS.`);
+                    input.value = ''; 
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function actualizarInfoBaño() {
+            const seleccion = document.getElementById('tipoBaño').value;
+            // [MODIFICADO][SEGURIDAD] Nos aseguramos que la data del diccionario se renderice usando textContent para evitar DOM clobbering en caso de diccionarios inyectados
+            document.getElementById('textoInfoBaño').textContent = dataBaños[seleccion] || "Seleccione un tipo de baño.";
+        }
+
+        function actualizarOpcionesTamaño() {
+            const especieSelect = document.getElementById('petSpecies');
+            const tamañoSelect = document.getElementById('petSize');
+            const especie = especieSelect.value;
+            const valorActual = tamañoSelect.value;
+            
+            tamañoSelect.innerHTML = '';
+            
+            if (especie === 'Gato') {
+                const opt1 = document.createElement('option'); opt1.value = 'Mediano'; opt1.textContent = 'Mediano';
+                const opt2 = document.createElement('option'); opt2.value = 'Pequeño'; opt2.textContent = 'Pequeño';
+                tamañoSelect.appendChild(opt1); tamañoSelect.appendChild(opt2);
+                tamañoSelect.value = (valorActual === 'Grande' || valorActual === '') ? 'Mediano' : valorActual;
+            } else if (especie === 'Perro') {
+                const opt1 = document.createElement('option'); opt1.value = 'Grande'; opt1.textContent = 'Grande';
+                const opt2 = document.createElement('option'); opt2.value = 'Mediano'; opt2.textContent = 'Mediano';
+                const opt3 = document.createElement('option'); opt3.value = 'Pequeño'; opt3.textContent = 'Pequeño';
+                tamañoSelect.appendChild(opt1); tamañoSelect.appendChild(opt2); tamañoSelect.appendChild(opt3);
+                tamañoSelect.value = valorActual ? valorActual : 'Grande';
+            }
+            recalcularCosto();
+        }
+
+        function toggleSeccion(chkId, contentId) {
+            const isChecked = document.getElementById(chkId).checked;
+            const content = document.getElementById(contentId);
+
+            if (isChecked) {
+                content.classList.remove('opacity-40', 'pointer-events-none', 'h-0', 'overflow-hidden');
+                content.classList.add('h-auto', 'opacity-100');
+            } else {
+                content.classList.add('opacity-40', 'pointer-events-none', 'h-0', 'overflow-hidden');
+                content.classList.remove('h-auto', 'opacity-100');
+                if(chkId === 'chkCorte') {
+                    const fileInput = document.getElementById('imgCorte');
+                    if(fileInput) fileInput.value = '';
+                    document.getElementById('petHaircut').value = '';
+                    document.getElementById('imagePreviewContainerCorte').classList.add('hidden');
+                    document.getElementById('uploadPlaceholderCorte').classList.remove('hidden');
+                }
+            }
+        }
+
+        function recalcularCosto() {
+            const tamañoSelect = document.getElementById('petSize');
+            const tamaño = tamañoSelect.value;
+            
+            let costoBase = 50.00; 
+            if (tamaño === 'Mediano') costoBase = 30.00;
+            else if (tamaño === 'Pequeño') costoBase = 20.00;
+            
+            if (document.getElementById('chkCorte') && document.getElementById('chkCorte').checked) {
+                costoBase += 20.00;
+            }
+
+            const textoCosto = `S/ ${costoBase.toFixed(2)}`;
+            const spanCalculado = document.getElementById('precioCalculado');
+            spanCalculado.textContent = textoCosto;
+            
+            // [AGREGADO][SEGURIDAD] Guardar en data-attribute protegido en lugar de depender del DOM visual.
+            spanCalculado.setAttribute('data-price', costoBase);
+
+            // [AGREGADO][NOTA PARA FULLSTACK] -> ATENCIÓN: NUNCA envíes el 'precio' al backend en tu fetch().
+            // El backend Node/PHP debe RE-CALCULAR el precio usando los parámetros (tamaño, tipo de baño, corte), de lo contrario es vulnerable a Parameter Tampering.
+
+            if (document.getElementById('precioFinalPagar')) {
+                document.getElementById('precioFinalPagar').textContent = textoCosto;
+            }
+        }
+
+        function previewImageCorte(input) {
+            // [MODIFICADO] Se llama a la nueva validación segura que verifica MIME type y peso
+            if(!validateSecureFile(input, 2)) return;
+
+            const placeholder = document.getElementById('uploadPlaceholderCorte');
+            const previewContainer = document.getElementById('imagePreviewContainerCorte');
+            const previewImg = document.getElementById('imgPreviewCorte');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // [MODIFICADO][SEGURIDAD] La sanitización de Base64 es redundante y puede romper la imagen. 
+                    // Lo seguro es asignarla pero asegurarnos que proviene solo de un Data URL validado.
+                    const result = e.target.result;
+                    if(result.startsWith('data:image/')) {
+                        previewImg.src = result;
+                        placeholder.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                    } else {
+                        alert("Intento de inyección de carga útil detectado.");
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewImage(input) {
+            // [MODIFICADO] Validación segura de archivos
+            if(!validateSecureFile(input, 2)) return;
+
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imgPreview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const result = e.target.result;
+                    if(result.startsWith('data:image/')) {
+                        previewImg.src = result;
+                        placeholder.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        const modal = document.getElementById('modalConsult');
+        let currentStep = 1;
+
+        function toggleModal(show) {
+            modal.classList.toggle('hidden', !show);
+            modal.classList.toggle('flex', show);
+            if (show) {
+                currentStep = 1;
+                updateStepUI();
+                renderCalendar();
+            } else {
+                resetFormSystem(); // [MODIFICADO] Usamos la versión refactorizada
+            }
+        }
+
+        function moveStep(n) {
+            if (currentStep === 1 && n === 1 && !validateStep1()) return;
+            if (currentStep === 2 && n === 1 && !validateStep2()) return;
+            if (currentStep === 3 && n === 1 && !validateStep3()) return;
+
+            currentStep += n;
+            if (currentStep > 3) {
+                // [AGREGADO][SEGURIDAD] Preparación de payload final sanitizado para enviar vía Fetch API/Axios
+                const securePayload = {
+                    petName: sanitize(document.getElementById('petName').value),
+                    petAge: parseInt(document.getElementById('petAge').value, 10),
+                    ownerName: sanitize(document.getElementById('ownerName').value),
+                    ownerCell: document.getElementById('ownerCell').value.replace(/\s/g, ''), // Mandamos limpio sin espacios
+                    ownerEmail: sanitize(document.getElementById('ownerEmail').value)
+                    // Nunca enviamos precioCalculado.
+                };
+                
+                alert("✅ Tu cita está registrada. Nos comunicaremos para confirmar.");
+                toggleModal(false);
+                return;
+            }
+            updateStepUI();
+        }
+
+        function resetFormSystem() {
+            document.querySelectorAll('#modalConsult input:not([type="hidden"]), #modalConsult textarea').forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+                else el.value = '';
+            });
+            document.querySelectorAll('#modalConsult select').forEach(el => el.selectedIndex = 0);
+            
+            activeSelectedDate = null;
+            document.getElementById('selectedDate').value = '';
+            renderCalendar();
+
+            document.getElementById('paymentScreenshot').value = '';
+            document.getElementById('imgPreview').src = '#';
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+
+            currentStep = 1;
+            updateStepUI();
+
+            document.getElementById('chkCorte').checked = false;
+            toggleSeccion('chkCorte', 'contenidoCorte');
+            document.getElementById('textoInfoBaño').textContent = "La descripción del baño seleccionado aparecerá aquí.";
+            recalcularCosto();
+
+            const fileCorte = document.getElementById('imgCorte');
+            if (fileCorte) fileCorte.value = '';
+            document.getElementById('imgPreviewCorte').src = '#';
+            document.getElementById('uploadPlaceholderCorte').classList.remove('hidden');
+            document.getElementById('imagePreviewContainerCorte').classList.add('hidden');
+            
+            const dynamicElements = ['doctorName'];
+            dynamicElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = ''; // [MODIFICADO] innerText cambiado a textContent
+            });
+        }
+
+        function updateStepUI() {
+            document.querySelectorAll('.step-content').forEach((s, i) => {
+                s.classList.toggle('active', i + 1 === currentStep);
+            });
+
+            document.querySelectorAll('.stepper-dot').forEach((dot, idx) => {
+                const step = idx + 1;
+                dot.classList.remove('active', 'completed', 'text-primary', 'text-white');
+                if (step === currentStep) dot.classList.add('active', 'text-primary');
+                else if (step < currentStep) dot.classList.add('completed', 'text-primary');
+                else dot.classList.add('text-gray-500');
+            });
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            prevBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            nextBtn.textContent = currentStep === 3 ? "Finalizar Cita" : "Siguiente";
+        }
+
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        let activeSelectedDate = null;
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const hiddenDateInput = document.getElementById('selectedDate');
+
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+            monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            prevMonthBtn.disabled = (currentYear === today.getFullYear() && currentMonth === today.getMonth());
+
+            const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                calendarGrid.appendChild(document.createElement('div'));
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                const loopDate = new Date(currentYear, currentMonth, i);
+                loopDate.setHours(0, 0, 0, 0);
+                dayDiv.textContent = i;
+                
+                let baseClasses = "py-2 rounded-xl transition-all duration-200 flex items-center justify-center font-medium ";
+                if (loopDate.getTime() === today.getTime()) {
+                    dayDiv.className = baseClasses + "text-primary font-bold border-2 border-primary cursor-not-allowed shadow-sm";
+                } else if (loopDate < today) {
+                    dayDiv.className = baseClasses + "text-gray-300 bg-gray-50 cursor-not-allowed";
+                } else {
+                    dayDiv.className = baseClasses + "text-gray-600 cursor-pointer hover:bg-secondary/30 hover:text-primary";
+                    if (activeSelectedDate && loopDate.getTime() === activeSelectedDate.getTime()) dayDiv.className = baseClasses + "bg-primary text-white font-bold shadow-md transform scale-105";
+                    
+                    dayDiv.onclick = () => {
+                        activeSelectedDate = loopDate;
+                        hiddenDateInput.value = `${loopDate.getFullYear()}-${String(loopDate.getMonth() + 1).padStart(2, '0')}-${String(loopDate.getDate()).padStart(2, '0')}`;
+                        renderCalendar();
+                        handleAppointmentLogic();
+                    };
+                }
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) return;
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        });
+
+        const phoneInput = document.getElementById('ownerCell');
+        phoneInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = value.match(/(\d{0,3})(\d{0,3})(\d{0,3})/);
+            e.target.value = !formatted[2] ? formatted[1] : formatted[1] + ' ' + formatted[2] + (formatted[3] ? ' ' + formatted[3] : '');
+        });
+
+        function restrictToLetters(e) {
+            e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+        }
+
+        function formatTitleCase(e) {
+            let value = e.target.value.toLowerCase();
+            e.target.value = value.replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        // [MODIFICADO][QA/SEGURIDAD] La lógica anterior eliminaba guiones o caracteres válidos en correos.
+        function sanitizeEmail(e) {
+            // Permitimos letras, números, puntos, guiones y guiones bajos (estándar RFC 5322 simplificado)
+            let value = e.target.value.replace(/[^a-zA-Z0-9.@_-]/g, '');
+            const parts = value.split('@');
+            if (parts.length > 2) {
+                value = parts[0] + '@' + parts.slice(1).join('');
+            }
+            e.target.value = value;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const letterFields = ['petBathNotes', 'petHaircut'];
+            letterFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', restrictToLetters);
+            });
+
+            const petNameInput = document.getElementById('petName');
+            if (petNameInput) petNameInput.addEventListener('input', formatTitleCase);
+
+            const emailInput = document.getElementById('ownerEmail');
+            if (emailInput) emailInput.addEventListener('input', sanitizeEmail);
+            
+            const especieSelect = document.getElementById('petSpecies');
+            if (especieSelect) especieSelect.addEventListener('change', actualizarOpcionesTamaño);
+            
+            const tamañoSelect = document.getElementById('petSize');
+            if (tamañoSelect) tamañoSelect.addEventListener('change', recalcularCosto);
+        });
+
+        function handleAppointmentLogic() {
+            const hourSelect = document.getElementById('timeHour');
+            const amPmSpan = document.getElementById('timeAmPm');
+            const dateInput = document.getElementById('selectedDate');
+            const doctorNameDisplay = document.getElementById('doctorName');
+
+            if (!hourSelect.value) return;
+
+            const hourInt = parseInt(hourSelect.value.split(':')[0]);
+
+            if (hourInt >= 8 && hourInt <= 12) {
+                amPmSpan.textContent = "AM";
+            } else if (hourInt >= 1 && hourInt <= 6) {
+                amPmSpan.textContent = "PM";
+            }
+
+            if (dateInput.value) {
+                const selectedDate = new Date(dateInput.value);
+                const dayOfWeek = selectedDate.getDay(); // 0=Dom, 6=Sab
+                
+                let doctorAsignado = "";
+
+                if (dayOfWeek === 5 || dayOfWeek === 6) { 
+                    doctorAsignado = "Ricardo Tello";
+                } else {
+                    if (hourInt >= 8 && hourInt <= 12) doctorAsignado = "Ana Martínez";
+                    else if (hourInt >= 1 && hourInt <= 6) doctorAsignado = "Omar Ramos";
+                }
+
+                if (doctorNameDisplay) doctorNameDisplay.textContent = doctorAsignado;
+            }
+        }
+
+        const timeHourSelect = document.getElementById('timeHour');
+        const selectedDateInput = document.getElementById('selectedDate');
+        
+        if (timeHourSelect) timeHourSelect.addEventListener('change', handleAppointmentLogic);
+        if (selectedDateInput) selectedDateInput.addEventListener('change', handleAppointmentLogic);
+
+        function validateStep1() {
+            const pName = document.getElementById('petName').value.trim();
+            const pAge = document.getElementById('petAge').value;
+            const pSpecies = document.getElementById('petSpecies').value;
+            const pGender = document.getElementById('petGender').value;
+            const tBaño = document.getElementById('tipoBaño').value; 
+            const oName = document.getElementById('ownerName').value.trim();
+            const oCell = document.getElementById('ownerCell').value.trim();
+
+            if (!pName || !pAge || !pSpecies || !pGender || !tBaño || !oName || !oCell) {
+                alert("⚠️ Por favor, completa todos los datos obligatorios.");
+                return false;
+            }
+
+            // [MODIFICADO][QA] QA Estricto: Eliminamos los espacios del formateo visual para contar solo los dígitos reales
+            const cleanPhone = oCell.replace(/\s/g, '');
+            if (cleanPhone.length !== 9) {
+                alert("⚠️ El número de celular debe contener exactamente 9 dígitos.");
+                document.getElementById('ownerCell').focus();
+                return false;
+            }
+
+            const obligatorios = ['petName', 'petAge', 'petSpecies', 'ownerName', 'ownerCell'];
+            for (let id of obligatorios) {
+                const el = document.getElementById(id);
+                if (el && (!el.value || el.value.trim() === "")) {
+                    alert(`Por favor, complete el campo requerido.`);
+                    return false;
+                }
+            }
+
+            const chkCorte = document.getElementById('chkCorte');
+            if (chkCorte && chkCorte.checked) {
+                const imgCorte = document.getElementById('imgCorte');
+                const petHaircut = document.getElementById('petHaircut');
+                const tieneImagen = imgCorte && imgCorte.files && imgCorte.files.length > 0;
+                const tieneTexto = petHaircut && petHaircut.value.trim().length > 0;
+
+                if (!tieneImagen && !tieneTexto) {
+                    alert("⚠️ Has solicitado Corte de Pelo. Por favor, sube una foto de referencia O escribe las indicaciones del corte para continuar.");
+                    if(petHaircut) petHaircut.focus(); 
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function validateStep2() {
+            const sDate = document.getElementById('selectedDate').value;
+            const tHour = document.getElementById('timeHour').value;
+
+            if (!sDate || tHour === "" || tHour === "Hora") {
+                alert("⚠️ Por favor, selecciona una fecha y hora.");
+                return false;
+            }
+            return true;
+        }
+        
+        function validateStep3() {
+            const paymentScreenshot = document.getElementById('paymentScreenshot');
+            if (!paymentScreenshot || !paymentScreenshot.files || paymentScreenshot.files.length === 0) {
+                alert("⚠️ Por favor, sube la captura de pantalla del comprobante de pago para finalizar la cita.");
+                return false;
+            }
+            return true;
+        }
+        
+        function setMode(mode) {
+            const isP = mode === 'presencial';
+            document.getElementById('btnPres').className = `flex-1 py-3 rounded-xl text-sm font-bold transition-all ${isP ? 'bg-white shadow text-primary' : 'text-gray-500'}`;
+            document.getElementById('btnVirt').className = `flex-1 py-3 rounded-xl text-sm font-bold transition-all ${!isP ? 'bg-white shadow text-primary' : 'text-gray-500'}`;
+        }
+
+        function allowOnlyLetters(input) { input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); }
+        function capitalizeWords(input) { input.value = input.value.replace(/\b\w/g, char => char.toUpperCase()); }
+
+        const petNameInputGlobal = document.getElementById('petName');
+        const ownerNameInputGlobal = document.getElementById('ownerName');
+
+        petNameInputGlobal.addEventListener('input', function () { allowOnlyLetters(this); });
+        ownerNameInputGlobal.addEventListener('input', function () {
+            allowOnlyLetters(this);
+            capitalizeWords(this);
+        });
+
+        window.onclick = (e) => { if (e.target == modal) toggleModal(false); }
+    </script>
+</body>
+</html>

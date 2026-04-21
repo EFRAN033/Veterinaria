@@ -3,7 +3,7 @@
     <UserIcon 
       v-if="role === 'user'" 
       class="h-6 w-6 transition-colors duration-500"
-      :class="isLatest ? 'text-indigo-700' : 'text-slate-300'" 
+      :class="isLatest ? 'text-[#02939E]' : 'text-slate-300'" 
     />
 
     <SparklesIcon 

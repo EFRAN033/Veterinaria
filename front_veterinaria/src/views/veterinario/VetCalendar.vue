@@ -5,39 +5,39 @@
       
       <div class="col-span-12 lg:col-span-3 flex flex-col justify-center">
         <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-          <CalendarDaysIcon class="h-6 w-6 text-indigo-800" /> Agenda Veterinaria
+          <CalendarDaysIcon class="h-6 w-6 text-[#02939E]" /> Agenda Veterinaria
         </h1>
         <p class="text-xs text-slate-500 mt-1">Panel de control de turnos</p>
       </div>
 
       <div class="col-span-12 lg:col-span-9 grid grid-cols-3 gap-4">
         
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+        <div class="bg-white p-3 rounded-none border border-slate-200 shadow-sm flex items-center justify-between group hover:border-[#02939E]/35 transition-colors">
           <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Citas Hoy</p>
-            <p class="text-lg font-bold text-slate-800">{{ metrics.today }}</p>
+            <p class="app-type-stat-slate">{{ metrics.today }}</p>
           </div>
-          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+          <div class="p-2 bg-[#02939E] rounded-none text-white shadow-md shadow-[#02939E]/25">
             <ClockIcon class="h-5 w-5" />
           </div>
         </div>
 
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+        <div class="bg-white p-3 rounded-none border border-slate-200 shadow-sm flex items-center justify-between group hover:border-[#02939E]/35 transition-colors">
           <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pendientes</p>
-            <p class="text-lg font-bold text-amber-600">{{ metrics.pending }}</p>
+            <p class="app-type-stat text-amber-600">{{ metrics.pending }}</p>
           </div>
-          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+          <div class="p-2 bg-[#02939E] rounded-none text-white shadow-md shadow-[#02939E]/25">
             <ExclamationCircleIcon class="h-5 w-5" />
           </div>
         </div>
 
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-200 transition-colors">
+        <div class="bg-white p-3 rounded-none border border-slate-200 shadow-sm flex items-center justify-between group hover:border-[#02939E]/35 transition-colors">
           <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Confirmadas</p>
-            <p class="text-lg font-bold text-emerald-600">{{ metrics.confirmed }}</p>
+            <p class="app-type-stat text-emerald-600">{{ metrics.confirmed }}</p>
           </div>
-          <div class="p-2 bg-indigo-800 rounded-lg text-white shadow-md shadow-indigo-200">
+          <div class="p-2 bg-[#02939E] rounded-none text-white shadow-md shadow-[#02939E]/25">
             <CheckBadgeIcon class="h-5 w-5" />
           </div>
         </div>
@@ -46,7 +46,7 @@
 
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0"> 
       
-      <div class="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+      <div class="lg:col-span-8 xl:col-span-9 bg-white rounded-none shadow-sm border border-slate-200 overflow-hidden flex flex-col">
         <div class="flex-1 p-2">
           <FullCalendar :options="calendarOptions" class="micro-calendar h-full" />
         </div>
@@ -54,13 +54,13 @@
 
       <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-4 h-full min-h-0">
         
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 shrink-0 space-y-3">
+        <div class="bg-white p-3 rounded-none shadow-sm border border-slate-200 shrink-0 space-y-3">
           <div class="relative">
             <input 
               v-model="searchQuery" 
               type="text" 
               placeholder="Buscar cliente o mascota..." 
-              class="w-full pl-9 pr-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 transition-all"
+              class="w-full pl-9 pr-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#02939E] focus:border-transparent placeholder-slate-400 transition-all"
             />
             <MagnifyingGlassIcon class="h-4 w-4 text-slate-400 absolute left-3 top-2" />
           </div>
@@ -71,7 +71,7 @@
               @click="activeFilter = filter.id"
               class="flex-1 py-1.5 text-[10px] font-bold rounded-md border transition-all duration-200 flex justify-center items-center gap-1"
               :class="activeFilter === filter.id 
-                ? 'bg-indigo-800 text-white border-indigo-800' 
+                ? 'bg-[#02939E] text-white border-[#02939E]' 
                 : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'"
             >
               <component :is="filter.icon" class="h-3 w-3" />
@@ -80,7 +80,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 overflow-hidden flex flex-col">
+        <div class="bg-white rounded-none shadow-sm border border-slate-200 flex-1 overflow-hidden flex flex-col">
           <div class="bg-slate-50 px-4 py-2 border-b border-slate-200 shrink-0 flex justify-between items-center">
             <h3 class="text-[11px] font-bold uppercase text-slate-500 tracking-wider">
               {{ selectedDate ? formatDateHeader(selectedDate) : 'Agenda Global' }}
@@ -99,7 +99,7 @@
             <div 
               v-for="app in filteredList" 
               :key="app.id" 
-              class="group relative bg-white p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200 cursor-pointer"
+              class="group relative bg-white p-3 rounded-none border border-slate-200 hover:border-[#02939E] hover:shadow-md transition-all duration-200 cursor-pointer"
               @click="openDetails(app)"
             >
               <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg transition-colors" :class="getStatusBorder(app.extendedProps.status)"></div>
@@ -136,14 +136,14 @@
     </div>
 
     <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm" @click.self="closeModal">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 transform transition-all">
+      <div class="bg-white rounded-none shadow-2xl w-full max-w-sm overflow-hidden border border-slate-200 transform transition-all">
         
-        <div class="bg-indigo-800 px-5 py-4 flex justify-between items-center">
+        <div class="bg-[#02939E] px-5 py-4 flex justify-between items-center">
           <div>
-            <p class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Detalle de Cita</p>
+            <p class="text-[10px] font-bold text-white/80 uppercase tracking-widest">Detalle de Cita</p>
             <h3 class="text-sm font-bold text-white mt-0.5">ID #{{ selectedEvent.id }}</h3>
           </div>
-          <button @click="closeModal" class="text-indigo-200 hover:text-white transition-colors">
+          <button @click="closeModal" class="text-white/75 hover:text-white transition-colors">
             <XMarkIcon class="h-5 w-5"/>
           </button>
         </div>
@@ -153,14 +153,14 @@
             <div class="space-y-1">
               <span class="text-[10px] font-semibold text-slate-400 uppercase">Fecha</span>
               <p class="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <CalendarDaysIcon class="h-3 w-3 text-indigo-600" />
+                <CalendarDaysIcon class="h-3 w-3 text-[#02939E]" />
                 {{ formatFullDate(selectedEvent.start) }}
               </p>
             </div>
             <div class="space-y-1">
               <span class="text-[10px] font-semibold text-slate-400 uppercase">Hora</span>
               <p class="text-xs font-bold text-slate-700 flex items-center gap-1">
-                <ClockIcon class="h-3 w-3 text-indigo-600" />
+                <ClockIcon class="h-3 w-3 text-[#02939E]" />
                 {{ selectedEvent.time }}
               </p>
             </div>
@@ -168,7 +168,7 @@
 
           <div class="border-t border-slate-100 pt-3 space-y-3">
             <div class="flex items-start gap-3">
-              <div class="mt-0.5 p-1.5 bg-indigo-50 rounded-md text-indigo-600">
+              <div class="mt-0.5 p-1.5 bg-[#02939E]/10 rounded-none text-[#02939E]">
                 <UserIcon class="h-4 w-4" />
               </div>
               <div>
@@ -178,7 +178,7 @@
             </div>
             
             <div class="flex items-start gap-3">
-              <div class="mt-0.5 p-1.5 bg-purple-50 rounded-md text-purple-600">
+              <div class="mt-0.5 p-1.5 bg-[#02939E]/10 rounded-none text-[#02939E]">
                 <TagIcon class="h-4 w-4" />
               </div>
               <div>

@@ -42,7 +42,7 @@
     <!-- Arrow icon for primary buttons -->
     <svg
       v-if="!loading && variant === 'primary' && !$slots.iconRight"
-      class="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
+      class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -109,9 +109,9 @@ const buttonClasses = computed(() => {
   const classes = [];
 
   const sizeClasses = {
-    sm: 'py-2 px-4 text-sm',
-    md: 'py-3 px-6 text-base',
-    lg: 'py-4 px-8 text-lg',
+    sm: 'py-1.5 px-3 text-xs',
+    md: 'py-2 px-4 text-sm',
+    lg: 'py-2.5 px-5 text-sm',
   };
   classes.push(sizeClasses[props.size]);
 
@@ -138,7 +138,7 @@ const buttonClasses = computed(() => {
 
 <style scoped>
 .base-button {
-  @apply font-bold rounded-xl transition-all duration-300 
+  @apply font-bold rounded-none transition-all duration-300 
   flex items-center justify-center gap-2 
   active:scale-95
   focus:outline-none focus:ring-4 focus:ring-[#1BB0B9]/20;

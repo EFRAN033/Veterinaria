@@ -1,0 +1,21 @@
+Credenciales de demostración (API: POST /api/v1/auth/login, JSON email + password)
+Solo para desarrollo. En Docker el seed corre solo tras las migraciones.
+
+En local (Windows), usar el Python del venv (el python global no tiene dependencias):
+  cd back_veterinaria
+  python -m venv .venv
+  .\.venv\Scripts\pip install -r requirements.txt
+  .\.venv\Scripts\python seed_users.py
+  (necesitas archivo .env con DATABASE_URL y SECRET_KEY como en app/core/config)
+
+--- Veterinario (panel /veterinario en el front) ---
+Email:    veterinario@demo.vet
+Password: veterinario123
+
+--- Cliente / usuario final ---
+Email:    cliente@demo.vet
+Password: cliente123
+
+--- Administrador (gestión catálogo: productos, servicios, usuarios vía API admin) ---
+Email:    admin@demo.vet
+Password: admin123

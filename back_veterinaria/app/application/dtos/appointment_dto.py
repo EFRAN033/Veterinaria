@@ -25,8 +25,16 @@ class AppointmentUpdateDTO(BaseModel):
     notes: Optional[str] = None
 
 
+class AppointmentClinicalUpdateDTO(BaseModel):
+    """Actualización de notas clínicas (solo veterinario)."""
+
+    final_diagnosis: Optional[str] = None
+    treatment: Optional[str] = None
+
+
 class AppointmentDTO(BaseModel):
     """DTO para respuesta de cita"""
+
     id: int
     user_id: int
     pet_id: Optional[int] = None
@@ -35,7 +43,12 @@ class AppointmentDTO(BaseModel):
     appointment_time: time
     status: str
     notes: Optional[str] = None
+    final_diagnosis: Optional[str] = None
+    treatment: Optional[str] = None
     estimated_cost: Optional[Decimal] = None
-    
+    pet_name: Optional[str] = None
+    species: Optional[str] = None
+    gender: Optional[str] = None
+
     class Config:
         from_attributes = True

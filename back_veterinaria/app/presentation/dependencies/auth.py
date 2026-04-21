@@ -50,6 +50,18 @@ async def get_current_user(
     return user
 
 
+async def get_current_veterinario_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Solo usuarios con rol veterinario."""
+    if current_user.role != "veterinario":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requiere rol de veterinario",
+        )
+    return current_user
+
+
 async def get_current_admin_user(
     current_user: User = Depends(get_current_user)
 ) -> User:

@@ -127,7 +127,7 @@ const alertClasses = computed(() => {
 
 <style scoped>
 .error-message {
-  @apply p-4 rounded-xl border-2 shadow-sm;
+  @apply p-4 rounded-none border-2 shadow-sm;
 }
 
 .fade-slide-enter-active,

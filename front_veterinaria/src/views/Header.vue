@@ -5,10 +5,10 @@
         </div>
 
       <nav class="hidden md:flex items-center gap-4">
-        <div class="flex items-center gap-4 bg-white/6 backdrop-blur-sm rounded-md px-2 py-1 shadow-sm">
+        <div class="flex items-center gap-2 rounded-md px-1.5 py-1">
           <router-link 
             to="/servicios" 
-            class="flex items-center justify-center px-5 py-3 rounded-md text-white bg-gradient-to-br from-[#16aeb1] to-[#1BB0B9] hover:translate-y-0.5 transform transition-transform duration-150 min-w-[120px] text-base font-medium border border-white/20"
+            class="app-btn-nav"
             aria-label="Ir a servicios"
           >
             <span>Servicios</span>
@@ -16,7 +16,7 @@
 
           <router-link 
             to="/petshop" 
-            class="flex items-center justify-center px-5 py-3 rounded-md text-white bg-gradient-to-br from-[#16aeb1] to-[#1BB0B9] hover:translate-y-0.5 transform transition-transform duration-150 min-w-[120px] text-base font-medium border border-white/20"
+            class="app-btn-nav"
             aria-label="Ir a pet shop"
           >
             <span>Pet Shop</span>
@@ -24,23 +24,23 @@
 
           <router-link 
             to="/adopcion" 
-            class="flex items-center justify-center px-5 py-3 rounded-md text-white bg-gradient-to-br from-[#16aeb1] to-[#1BB0B9] hover:translate-y-0.5 transform transition-transform duration-150 min-w-[120px] text-base font-medium border border-white/20"
+            class="app-btn-nav"
             aria-label="Ir a adopción"
           >
             <span>Adopción</span>
           </router-link>
         </div>
 
-        <div v-if="!userStore.isLoggedIn && isHomePage" class="flex items-center gap-3">
+        <div v-if="!userStore.isLoggedIn && isHomePage" class="flex items-center gap-2">
           <router-link 
             to="/login" 
-            class="px-4 py-2 text-sm font-bold text-[#1BB0B9] hover:text-[#16a0a8] transition-colors"
+            class="app-btn-auth-ghost"
           >
             Iniciar Sesión
           </router-link>
           <router-link 
             to="/register" 
-            class="px-5 py-2.5 bg-gradient-to-r from-[#1BB0B9] to-[#16a0a8] text-white font-bold rounded-lg hover:shadow-lg transition-all text-sm"
+            class="app-btn-auth-solid"
           >
             Registrarse
           </router-link>
@@ -64,7 +64,7 @@
             leave-from-class="transform scale-100 opacity-100"
             leave-to-class="transform scale-95 opacity-0"
           >
-            <MenuItems class="absolute right-0 mt-0 w-48 origin-top-right rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden space-y-2">
+            <MenuItems class="absolute right-0 mt-0 w-48 origin-top-right rounded-none bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden space-y-2">
               
               <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
                 <p class="text-sm font-bold text-gray-800 truncate leading-snug mb-0">{{ userStore.userShortName }}</p>

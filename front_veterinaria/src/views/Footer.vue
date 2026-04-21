@@ -23,7 +23,7 @@
         
         <div class="flex flex-col space-y-3">
           
-          <h3 class="text-xl font-serif font-bold text-gray-800 tracking-wide border-l-4 border-[#02939E] pl-3">
+          <h3 class="app-type-footer-title border-l-4 border-[#02939E] pl-3">
             Contáctanos
           </h3>
 
@@ -60,7 +60,7 @@
 
         <div class="flex flex-col items-center md:items-end text-center md:text-right space-y-3 mt-4 md:mt-0">
           
-          <h3 class="text-xl font-serif font-bold text-gray-800 tracking-wide">
+          <h3 class="app-type-footer-title">
             Síguenos
           </h3>
 

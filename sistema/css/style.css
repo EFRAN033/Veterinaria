@@ -1,0 +1,70 @@
+.modal-active {
+    display: flex !important;
+}
+
+.step-hidden {
+    display: none;
+}
+
+/* Imagen de fondo para la primera sección */
+.bg-hero-section {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.418), rgba(0, 0, 0, 0.418)), url('../assets/Imagen-principal.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.text-shadow-lg {
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Imagen de fondo fija (Parallax effect) */
+.bg-fixed-section {
+    background-image: url('https://i.pinimg.com/1200x/a0/dc/05/a0dc056c7cfc97b8ffad5e576b168050.jpg');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Estilos del Stepper */
+.step-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.step-active {
+    background-color: #02939E;
+    color: white;
+}
+
+.step-inactive {
+    background-color: #E2E8F0;
+    color: #848484;
+}
+
+.brand-carousel {
+    animation: scroll 20s linear infinite;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.day-disabled {
+    color: #cbd5e1;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}

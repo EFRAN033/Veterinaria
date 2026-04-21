@@ -13,7 +13,7 @@
         
         <!-- Header Section -->
         <div class="mb-12 mt-8">
-          <h1 class="text-5xl font-serif font-bold text-gray-900 mb-4 tracking-tight">
+          <h1 class="app-type-title mb-4 tracking-tight">
             Mis <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#16aeb1] to-[#1BB0B9]">Citas</span>
           </h1>
           <p class="text-xl text-gray-500 font-light max-w-2xl">
@@ -36,7 +36,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">No tienes citas programadas</h3>
+            <h3 class="app-type-panel-heading mb-2">No tienes citas programadas</h3>
             <p class="text-gray-500 mb-8 max-w-md mx-auto">Agenda una cita para el cuidado de tus mascotas con nuestros especialistas.</p>
             <router-link to="/servicios" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-[#16aeb1] to-[#1BB0B9] hover:from-[#149ea1] hover:to-[#189ea6] transition-all transform hover:scale-105">
               Agendar Nueva Cita
@@ -50,14 +50,14 @@
                 
                 <!-- Date & Time -->
                 <div class="flex items-start gap-6">
-                  <div class="flex flex-col items-center justify-center w-20 h-20 bg-white border border-gray-200 rounded-2xl shadow-sm group-hover:border-[#1BB0B9] group-hover:shadow-md transition-all">
+                  <div class="flex flex-col items-center justify-center w-20 h-20 bg-white border border-gray-200 rounded-none shadow-sm group-hover:border-[#1BB0B9] group-hover:shadow-md transition-all">
                     <span class="text-xs font-bold text-gray-400 uppercase">{{ getMonth(appointment.date) }}</span>
-                    <span class="text-3xl font-bold text-gray-900">{{ getDay(appointment.date) }}</span>
+                    <span class="app-type-stat">{{ getDay(appointment.date) }}</span>
                   </div>
                   
                   <div>
                     <div class="flex items-center gap-3 mb-1">
-                      <h3 class="text-2xl font-bold text-gray-900 group-hover:text-[#1BB0B9] transition-colors">
+                      <h3 class="app-type-panel-heading group-hover:text-[#1BB0B9] transition-colors">
                         {{ appointment.service_name || 'Consulta General' }}
                       </h3>
                       <span :class="getStatusClass(appointment.status)" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">

@@ -282,7 +282,7 @@
                 Rechazar Solicitud
             </button>
             <button 
-                @click="updateStatus(selectedRequest, 'reviewed'); closeModal()"
+                @click="updateStatus(selectedRequest, 'reviewed')"
                 class="px-5 py-2.5 rounded-none text-sm font-semibold text-white bg-[#02939E] hover:bg-[#027a83] shadow-md hover:shadow-[#02939E]/25 transition-all"
             >
                 Aprobar y Agendar

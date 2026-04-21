@@ -319,7 +319,8 @@
 
               <!-- STEP 2: Date & Time -->
               <div v-else-if="currentStep === 2" key="datetime">
-                <DateTimePicker v-model="dateTime" :hide-urgency-option="selectedService === 'clinical'" />
+                <!-- Sin «Lo antes posible»: la urgencia se canaliza por el bloque de chat de emergencia del lateral. -->
+                <DateTimePicker v-model="dateTime" :hide-urgency-option="true" />
               </div>
 
               <!-- STEP 3: Confirmation -->
@@ -404,7 +405,10 @@
                 </div>
               </div>
 
-              <div class="bg-[#F3F4F6] rounded-none p-6 border border-gray-100 hidden lg:block">
+              <div
+                v-if="selectedService !== 'aesthetic'"
+                class="bg-[#F3F4F6] rounded-none p-6 border border-gray-100 hidden lg:block"
+              >
                 <div class="flex items-start gap-4">
                   <div class="bg-white p-3 rounded-full shadow-sm text-[#1BB0B9]">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -675,13 +679,8 @@ const nextStep = () => {
     }
     currentStep.value = 2;
   } else if (currentStep.value === 2) {
-    if (selectedService.value === 'clinical') {
-      if (!dateTime.value.date || !dateTime.value.timeSlot) {
-        addToast('Por favor selecciona una fecha y hora.', 'warning');
-        return;
-      }
-    } else if (!dateTime.value.isUrgent && (!dateTime.value.date || !dateTime.value.timeSlot)) {
-      addToast('Por favor selecciona una fecha y hora, o marca la opción de urgencia.', 'warning');
+    if (!dateTime.value.date || !dateTime.value.timeSlot) {
+      addToast('Por favor selecciona una fecha y hora.', 'warning');
       return;
     }
     currentStep.value = 3;
@@ -716,8 +715,7 @@ const submitRequest = async () => {
         ...ownerFields,
         preferredDate: dateTime.value.date,
         preferredTime: dateTime.value.timeSlot,
-        isUrgent:
-          selectedService.value === 'clinical' ? false : dateTime.value.isUrgent
+        isUrgent: false
       },
       images: selectedService.value === 'consultation' ? Object.values(evidencePreviews.value).filter(img => img) : []
     };

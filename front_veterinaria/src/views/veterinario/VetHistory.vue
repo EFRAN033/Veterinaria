@@ -264,7 +264,7 @@ const getStatusDot = (status) => {
 
 const getStatusLabel = (status) => {
   if (status === 'completed') return 'Completada';
-  if (status === 'cancelled') return 'Cancelada';
+  if (status === 'cancelled') return 'Finalizada';
   if (status === 'reviewed') return 'Revisada';
   if (status === 'pending') return 'Pendiente';
   if (status === 'confirmed') return 'Confirmada';

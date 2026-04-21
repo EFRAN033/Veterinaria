@@ -172,7 +172,7 @@
                       v-if="normStatus(app.status) !== 'cancelled'"
                       @click="updateStatus(app.id, 'cancelled')"
                       class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                      title="Cancelar"
+                      title="Marcar como finalizada"
                     >
                       <XMarkIcon class="h-5 w-5" />
                     </button>
@@ -221,7 +221,7 @@ const filters = [
   { id: 'all', label: 'Todas', icon: FunnelIcon },
   { id: 'pending', label: 'Pendientes', icon: ExclamationCircleIcon },
   { id: 'confirmed', label: 'Confirmadas', icon: CheckBadgeIcon },
-  { id: 'cancelled', label: 'Canceladas', icon: XMarkIcon },
+  { id: 'cancelled', label: 'Finalizadas', icon: XMarkIcon },
 ];
 
 /** Alinea con el backend (pending, confirmed, cancelled); tolera mayúsculas/espacios. */
@@ -251,7 +251,7 @@ const getStatusLabel = (status) => {
   const labels = {
     pending: 'Pendiente',
     confirmed: 'Confirmada',
-    cancelled: 'Cancelada',
+    cancelled: 'Finalizada',
     completed: 'Completada'
   };
   return labels[normStatus(status)] || status;
@@ -331,7 +331,7 @@ const fetchAppointments = async () => {
 };
 
 const updateStatus = async (id, status) => {
-  if (status === 'cancelled' && !confirm(`¿Estás seguro de cancelar la cita #${id}?`)) return;
+  if (status === 'cancelled' && !confirm(`¿Marcar la cita #${id} como finalizada?`)) return;
 
   try {
     await apiClient.patch(`/v1/appointments/${id}/status`, { status });
@@ -342,7 +342,7 @@ const updateStatus = async (id, status) => {
       appointments.value[appIndex].status = status;
     }
     
-    addToast(`Cita ${status === 'confirmed' ? 'confirmada' : 'cancelada'} correctamente`, 'success');
+    addToast(`Cita ${status === 'confirmed' ? 'confirmada' : 'finalizada'} correctamente`, 'success');
   } catch (err) {
     console.error('Error updating status:', err);
     addToast('Error al actualizar el estado', 'error');

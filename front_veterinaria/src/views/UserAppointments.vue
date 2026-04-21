@@ -134,7 +134,7 @@ const getStatusLabel = (status) => {
     pending: 'Pendiente',
     confirmed: 'Confirmada',
     completed: 'Completada',
-    cancelled: 'Cancelada'
+    cancelled: 'Finalizada'
   };
   return labels[status] || status;
 };

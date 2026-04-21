@@ -97,15 +97,16 @@
             </td>
 
             <td class="py-4 px-4 text-right">
+              <div class="inline-flex flex-col items-end gap-2.5">
                   <button 
                     @click.stop="updateStatus(request, 'reviewed')"
-                    class="text-xs font-bold text-[#02939E] hover:text-[#027a83] hover:bg-[#02939E]/10 px-3 py-1.5 rounded-none transition-colors opacity-0 group-hover:opacity-100 mr-2"
+                    class="text-xs font-bold text-[#02939E] hover:text-[#027a83] hover:bg-[#02939E]/10 px-3 py-1.5 rounded-none transition-colors opacity-0 group-hover:opacity-100"
                   >
                     Revisar
                   </button>
                   <button 
                     @click="analyzeRequest(request)"
-                    class="text-[#02939E] hover:text-[#027a83] bg-[#02939E]/10 hover:bg-[#02939E]/15 px-3 py-1 rounded-none transition-colors text-xs font-medium flex items-center gap-1 mr-1"
+                    class="text-[#02939E] hover:text-[#027a83] bg-[#02939E]/10 hover:bg-[#02939E]/15 px-3 py-1 rounded-none transition-colors text-xs font-medium inline-flex items-center gap-1"
                     title="Generar análisis automático"
                   >
                     <SparklesIcon class="h-3 w-3" />
@@ -118,6 +119,7 @@
                   >
                     <ChatBubbleLeftRightIcon class="h-4 w-4" />
                   </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -342,8 +344,7 @@ import { useToast } from '@/composables/useToast';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
+import apiClient from '@/axios';
 import { getApiBaseUrl, getBackendBaseUrl } from '@/config/publicUrl';
 import { formatLocalDateOnly } from '@/utils/formatLocalDateOnly';
 import { 
@@ -403,10 +404,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
   
   try {
     const dateStr = formatLocalDateOnly(newDate);
-    const userStore = useUserStore();
-    const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
+    const response = await apiClient.get('/v1/appointments/all');
     
     // Filter for selected date
     const dayAppointments = response.data.filter(app => app.appointment_date === dateStr && app.status !== 'cancelled');
@@ -449,13 +447,8 @@ const openImage = (img) => {
 
 const analyzeRequest = async (request) => {
     analyzing.value = true;
-    const userStore = useUserStore();
     try {
-        const response = await axios.post(
-            `${apiOrigin}/v1/service-requests/${request.id}/analyze`,
-            {},
-            { headers: { Authorization: `Bearer ${userStore.token}` } }
-        );
+        const response = await apiClient.post(`/v1/service-requests/${request.id}/analyze`);
         
         // Update local state
         const updatedRequest = response.data;
@@ -502,11 +495,7 @@ const updateStatus = async (request, newStatus) => {
     request.status = newStatus;
     
     // Call API to update status
-    const userStore = useUserStore();
-    await axios.patch(`${apiOrigin}/v1/service-requests/${request.id}`, 
-      { status: newStatus },
-      { headers: { Authorization: `Bearer ${userStore.token}` } }
-    );
+    await apiClient.patch(`/v1/service-requests/${request.id}`, { status: newStatus });
     
     addToast('Estado actualizado correctamente', 'success');
   } catch (error) {
@@ -524,7 +513,6 @@ const confirmAppointment = async () => {
   }
 
   scheduling.value = true;
-  const userStore = useUserStore();
 
   try {
     // 1. Create Appointment
@@ -551,19 +539,14 @@ const confirmAppointment = async () => {
       notes: scheduleNotes.value || undefined
     };
 
-    await axios.post(`${apiOrigin}/v1/appointments/`, payload, {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
+    await apiClient.post(`/v1/appointments/`, payload);
 
     // 2. Update Request Status to 'scheduled' (or 'completed'/'reviewed' depending on workflow)
-    // We'll use 'reviewed' as per current flow, or maybe 'scheduled' if backend supports it.
-    // Let's stick to 'reviewed' as the "Done" state for requests for now, or 'completed'.
-    await axios.patch(`${apiOrigin}/v1/service-requests/${selectedRequest.value.id}`, 
-      { status: 'completed' }, // Mark as completed since it's now an appointment
-      { headers: { Authorization: `Bearer ${userStore.token}` } }
+    await apiClient.patch(`/v1/service-requests/${selectedRequest.value.id}`, 
+      { status: 'completed' } // Mark as completed since it's now an appointment
     );
 
-    addToast('Cita agendada y solicitud procesada', 'success');
+    addToast('Cita confirmada y solicitud actualizada exitosamente', 'success');
     showScheduleModal.value = false;
     closeModal(); // Close details modal if open
     fetchRequests(); // Refresh list

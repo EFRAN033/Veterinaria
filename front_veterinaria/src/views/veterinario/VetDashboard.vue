@@ -181,7 +181,8 @@ import {
   CheckBadgeIcon,
   PlusIcon,
   ChartBarIcon,
-  ClockIcon
+  ClockIcon,
+  SparklesIcon
 } from '@heroicons/vue/24/outline';
 
 const userStore = useUserStore();

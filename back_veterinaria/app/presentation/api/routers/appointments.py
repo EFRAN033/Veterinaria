@@ -19,6 +19,13 @@ from app.core.exceptions import NotFoundException, BusinessRuleException
 router = APIRouter()
 
 
+def _not_found_status_for_create(e: NotFoundException) -> int:
+    """Servicio inexistente es error de datos (catálogo vacío), no de ruta."""
+    if (e.details or {}).get("resource") == "Servicio":
+        return status.HTTP_400_BAD_REQUEST
+    return status.HTTP_404_NOT_FOUND
+
+
 def _can_view_all_appointments(role: Optional[str]) -> bool:
     """Veterinario y admin gestionan la agenda global; el rol se normaliza por datos legacy."""
     normalized = (role or "").strip().lower()
@@ -134,7 +141,10 @@ async def create_appointment(
         appointment_service = AppointmentService(db)
         return appointment_service.create(current_user.id, appointment_data)
     except NotFoundException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
+        raise HTTPException(
+            status_code=_not_found_status_for_create(e),
+            detail=e.message,
+        )
     except BusinessRuleException as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)
 

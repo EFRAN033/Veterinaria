@@ -13,6 +13,7 @@ from sqlalchemy import text
 
 from app.core.database import SessionLocal
 from app.core.security import get_password_hash
+from app.core.catalog_bootstrap import ensure_demo_services_session
 
 # Credenciales demo (solo desarrollo; cambiar en producción)
 DEMO_USERS = [
@@ -41,6 +42,16 @@ DEMO_USERS = [
         "address": "Oficina central",
     },
 ]
+
+
+def seed_demo_services(db) -> None:
+    """
+    Servicios con ids 1–4: el front (agendar desde solicitud / chat) envía estos service_id.
+    Misma lógica SQL que al arrancar la API (`catalog_bootstrap`).
+    """
+    ensure_demo_services_session(db)
+    db.commit()
+    print("[seed_users] Catálogo demo de servicios (ids 1–4) verificado.")
 
 
 def seed_users() -> None:
@@ -73,6 +84,7 @@ def seed_users() -> None:
                 },
             )
             db.commit()
+        seed_demo_services(db)
         print("[seed_users] Listo.")
     except Exception as e:
         print(f"[seed_users] Error: {e}")

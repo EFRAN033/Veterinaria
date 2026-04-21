@@ -7,6 +7,7 @@ En local (Windows), usar el Python del venv (el python global no tiene dependenc
   .\.venv\Scripts\pip install -r requirements.txt
   .\.venv\Scripts\python seed_users.py
   (necesitas archivo .env con DATABASE_URL y SECRET_KEY como en app/core/config)
+  Ese script también crea los servicios demo (ids 1–4) si faltan; sin ellos, agendar cita responde 404.
 
 --- Veterinario (panel /veterinario en el front) ---
 Email:    veterinario@demo.vet

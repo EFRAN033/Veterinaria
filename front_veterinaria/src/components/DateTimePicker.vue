@@ -50,33 +50,10 @@
         </div>
       </div>
 
-      <!-- Time Selection & Urgency -->
+      <!-- Time Selection -->
       <div class="space-y-8">
-        <!-- Urgency Toggle (oculto en flujos como Seguimiento/clinical) -->
-        <div
-          v-if="!hideUrgencyOption"
-          class="bg-[#FFF8F6] border border-[#FFDDD6] rounded-none p-4 flex items-start gap-4 cursor-pointer hover:bg-[#FFF0EB] transition-colors"
-          @click="toggleUrgency"
-        >
-          <div class="bg-white p-2 rounded-none text-[#FF6B6B] shadow-sm shrink-0">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between">
-              <h4 class="font-bold text-[#FF6B6B]">Lo antes posible</h4>
-              <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors"
-                :class="modelValue.isUrgent ? 'border-[#FF6B6B] bg-[#FF6B6B]' : 'border-[#FFDDD6] bg-white'">
-                <svg v-if="modelValue.isUrgent" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-              </div>
-            </div>
-            <p class="text-sm text-[#FF6B6B]/80 mt-1">
-              {{ mode === 'vet' ? 'Marcar como cita de urgencia prioritaria.' : 'Selecciona esto si es una emergencia. Nos pondremos en contacto de inmediato.' }}
-            </p>
-          </div>
-        </div>
-
         <!-- Time Slots -->
-        <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': modelValue.isUrgent && !hideUrgencyOption }">
+        <div class="space-y-4">
           <h4 class="font-bold text-gray-900 flex items-center gap-2">
             <svg class="w-5 h-5 text-[#02939E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Horarios Disponibles
@@ -118,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { SunIcon, MoonIcon, CloudIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -134,11 +111,6 @@ const props = defineProps({
   takenSlots: {
     type: Array,
     default: () => []
-  },
-  /** Si es true, no se muestra la opción «Lo antes posible» y no aplica urgencia (ej. Seguimiento). */
-  hideUrgencyOption: {
-    type: Boolean,
-    default: false
   }
 });
 
@@ -230,31 +202,4 @@ const selectTime = (slotId) => {
   });
 };
 
-const toggleUrgency = () => {
-  const newValue = !props.modelValue.isUrgent;
-  emit('update:modelValue', {
-    ...props.modelValue,
-    isUrgent: newValue,
-    date: newValue ? null : props.modelValue.date,
-    timeSlot: newValue ? '' : props.modelValue.timeSlot
-  });
-};
-
-watch(
-  () => props.hideUrgencyOption,
-  (hide) => {
-    if (hide && props.modelValue.isUrgent) {
-      emit('update:modelValue', {
-        ...props.modelValue,
-        isUrgent: false
-      });
-    }
-  },
-  { immediate: true }
-);
-
-onMounted(() => {
-  if (!props.modelValue.date) {
-  }
-});
 </script>

@@ -320,7 +320,7 @@
               <!-- STEP 2: Date & Time -->
               <div v-else-if="currentStep === 2" key="datetime">
                 <!-- Sin «Lo antes posible»: la urgencia se canaliza por el bloque de chat de emergencia del lateral. -->
-                <DateTimePicker v-model="dateTime" :hide-urgency-option="true" />
+                <DateTimePicker v-model="dateTime" />
               </div>
 
               <!-- STEP 3: Confirmation -->

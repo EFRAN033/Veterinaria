@@ -36,8 +36,16 @@ app = FastAPI(
     description="API REST para sistema de gestión veterinaria con arquitectura limpia",
     version="2.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
+
+
+@app.on_event("startup")
+def _startup_ensure_service_catalog() -> None:
+    from app.core.catalog_bootstrap import ensure_demo_services_rows
+
+    ensure_demo_services_rows()
+
 
 origins = list({settings.FRONTEND_URL, "http://localhost:5173", "http://127.0.0.1:5173"} | set(settings.BACKEND_CORS_ORIGINS))
 
@@ -52,9 +60,13 @@ app.add_middleware(
 
 @app.exception_handler(NotFoundException)
 async def not_found_exception_handler(request: Request, exc: NotFoundException):
+    # «Servicio» inexistente es catálogo vacío / datos, no recurso de URL → 400
+    code = status.HTTP_404_NOT_FOUND
+    if (exc.details or {}).get("resource") == "Servicio":
+        code = status.HTTP_400_BAD_REQUEST
     return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"detail": exc.message, "type": "not_found"}
+        status_code=code,
+        content={"detail": exc.message, "type": "not_found"},
     )
 
 

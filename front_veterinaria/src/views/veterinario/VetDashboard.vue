@@ -94,10 +94,6 @@
                 <ChartBarIcon class="h-5 w-5" />
                 Análisis
               </button>
-              <button class="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-none font-medium transition-all border border-white/10">
-                <UserPlusIcon class="h-5 w-5" />
-                Registrar Paciente
-              </button>
             </div>
           </div>
 
@@ -182,7 +178,6 @@ import {
   CheckBadgeIcon,
   PlusIcon,
   ChartBarIcon,
-  UserPlusIcon,
   ClockIcon
 } from '@heroicons/vue/24/outline';
 

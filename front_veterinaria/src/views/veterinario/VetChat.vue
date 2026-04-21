@@ -457,9 +457,15 @@ const loadClinicalCase = async () => {
       pet_id: req.pet_id || (req.service_data && req.service_data.pet_id), 
       user_id: req.user_id, 
       date: req.service_data.preferredDate ? req.service_data.preferredDate.split('T')[0] : 'Pendiente',
-      petName: req.pet_name || req.service_data.petName || 'Sin nombre',
+      petName: req.pet_name || req.service_data.petName || req.service_data.patient_code || 'Sin nombre',
       species: req.service_data.species || 'General',
-      description: req.service_data.symptoms || req.service_data.description || req.service_data.notes || 'Solicitud de servicio',
+      description:
+        req.service_data.symptoms
+        || req.service_data.symptoms_duration
+        || req.service_data.description
+        || req.service_data.notes
+        || (req.service_data.patient_code ? `Seguimiento (${req.service_data.patient_code})` : null)
+        || 'Solicitud de servicio',
       images: req.images || [],
       clinical_insights: req.service_data.clinical_insights 
     }));
@@ -808,7 +814,7 @@ const confirmAppointment = async () => {
       user_id: currentUserId.value, 
       service_id: 1,
       appointment_date: appointmentData.value.date.toISOString().split('T')[0],
-      appointment_time: appointmentData.value.isUrgent ? '08:00:00' : timeMap[appointmentData.value.timeSlot],
+      appointment_time: appointmentData.value.isUrgent ? '08:00:00' : (timeMap[appointmentData.value.timeSlot] || '10:00:00'),
       notes: scheduleNotes.value
     };
 

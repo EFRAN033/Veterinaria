@@ -31,7 +31,7 @@
           </div>
           <div class="flex-1">
             <h5 class="font-bold text-gray-900 mb-1">Fecha y Hora</h5>
-            <div v-if="dateTime.isUrgent" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-bold">
+            <div v-if="dateTime.isUrgent && serviceType !== 'clinical'" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-bold">
               <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               Lo antes posible (Urgencia)
             </div>
@@ -61,8 +61,8 @@
 
         <div v-if="ownerContact && (ownerContact.ownerName || ownerContact.ownerPhone || ownerContact.ownerEmail)" class="h-px bg-gray-100"></div>
 
-        <!-- Pet Details -->
-        <div class="flex items-start gap-4">
+        <!-- Pet Details (no aplica a seguimiento por código) -->
+        <div v-if="serviceType !== 'clinical'" class="flex items-start gap-4">
           <div class="p-2 bg-gray-50 rounded-lg text-gray-400 mt-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
           </div>
@@ -74,7 +74,7 @@
           <button @click="$emit('edit', 1)" class="text-sm font-bold text-[#1BB0B9] hover:underline">Editar</button>
         </div>
 
-        <div class="h-px bg-gray-100"></div>
+        <div v-if="serviceType !== 'clinical'" class="h-px bg-gray-100"></div>
 
         <!-- Specific Details -->
         <div class="flex items-start gap-4">
@@ -96,10 +96,16 @@
               <p v-if="details.notes" class="text-sm text-gray-600"><span class="font-bold text-gray-400 text-xs uppercase">Notas:</span> {{ details.notes }}</p>
             </div>
 
-            <!-- Clinical -->
+            <!-- Seguimiento (clinical); compat. solicitudes antiguas con descripción -->
             <div v-if="serviceType === 'clinical'" class="space-y-2">
-              <p class="text-sm text-gray-600 line-clamp-2"><span class="font-bold text-gray-400 text-xs uppercase">Caso:</span> {{ details.description }}</p>
-              <p class="text-sm text-gray-600"><span class="font-bold text-gray-400 text-xs uppercase">Tipo:</span> {{ details.isFollowUp ? 'Control / Seguimiento' : 'Primera Consulta' }}</p>
+              <template v-if="details.patient_code">
+                <p class="text-sm text-gray-600"><span class="font-bold text-gray-400 text-xs uppercase">Código:</span> {{ details.patient_code }}</p>
+                <p class="text-sm text-gray-600 line-clamp-4"><span class="font-bold text-gray-400 text-xs uppercase">Síntomas y duración:</span> {{ details.symptoms_duration }}</p>
+              </template>
+              <template v-else>
+                <p class="text-sm text-gray-600 line-clamp-2"><span class="font-bold text-gray-400 text-xs uppercase">Caso:</span> {{ details.description }}</p>
+                <p v-if="details.history" class="text-sm text-gray-600 line-clamp-2"><span class="font-bold text-gray-400 text-xs uppercase">Antecedentes:</span> {{ details.history }}</p>
+              </template>
             </div>
 
             <!-- Aesthetic -->
@@ -152,7 +158,7 @@ const getServiceName = (type) => {
   const names = {
     consultation: 'Consulta Veterinaria',
     general: 'Servicios Generales',
-    clinical: 'Caso Clínico',
+    clinical: 'Seguimiento',
     aesthetic: 'Estética & Spa'
   };
   return names[type] || type;

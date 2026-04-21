@@ -354,7 +354,7 @@ const fetchAppointments = async () => {
             type: 'request',
             status: req.status,
             statusLabel: req.service_data.isUrgent ? 'URGENTE' : (req.status === 'pending' ? 'Solicitud' : 'Rev.'),
-            notes: req.service_data.symptoms || req.service_data.notes || req.service_data.description,
+            notes: req.service_data.symptoms || req.service_data.symptoms_duration || req.service_data.notes || req.service_data.description,
             client: req.user_name || `Cliente #${req.user_id}`,
             pet: req.pet_name || req.service_data.petName || 'Sin nombre',
             species: req.service_data.species || '',

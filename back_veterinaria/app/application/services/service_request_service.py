@@ -52,29 +52,33 @@ class ServiceRequestService:
                 logger.error(f"Error saving images: {e}")
                 raise ValidationException(f"Error al guardar imágenes: {str(e)}")
         
-        try:
-            pet = self.db.query(Pet).filter(
-                Pet.owner_id == user_id, 
-                Pet.name == request_data.pet_name
-            ).first()
-            
-            if not pet:
+        if request_data.service_type != ServiceTypeEnum.CLINICAL:
+            try:
+                pet = self.db.query(Pet).filter(
+                    Pet.owner_id == user_id,
+                    Pet.name == request_data.pet_name
+                ).first()
 
-                pet = Pet(
-                    owner_id=user_id,
-                    name=request_data.pet_name,
-                    species=request_data.service_data.get('species', 'unknown'),
-                    breed=request_data.service_data.get('breed'),
+                if not pet:
+                    pet = Pet(
+                        owner_id=user_id,
+                        name=request_data.pet_name,
+                        species=request_data.service_data.get('species', 'unknown'),
+                        breed=request_data.service_data.get('breed'),
+                    )
+                    self.db.add(pet)
+                    self.db.flush()
+                    logger.info(f"Auto-created new pet '{pet.name}' (ID: {pet.id}) for user {user_id}")
 
-                )
-                self.db.add(pet)
-                self.db.flush() 
-                logger.info(f"Auto-created new pet '{pet.name}' (ID: {pet.id}) for user {user_id}")
-            
-            request_data.service_data['pet_id'] = pet.id
-            
-        except Exception as e:
-            logger.error(f"Error managing pet record: {e}")
+                request_data.service_data['pet_id'] = pet.id
+
+            except Exception as e:
+                logger.error(f"Error managing pet record: {e}")
+        else:
+            pc = (request_data.service_data or {}).get('patient_code')
+            if pc:
+                request_data.service_data['patient_code'] = str(pc).strip().upper()
+            request_data.service_data.pop('pet_id', None)
 
         ai_insights = {}
         try:
@@ -224,7 +228,7 @@ class ServiceRequestService:
         required_fields = {
             ServiceTypeEnum.CONSULTATION: ['species', 'symptoms', 'urgency'],
             ServiceTypeEnum.GENERAL: ['serviceType'],
-            ServiceTypeEnum.CLINICAL: ['description'],
+            ServiceTypeEnum.CLINICAL: ['patient_code', 'symptoms_duration'],
             ServiceTypeEnum.AESTHETIC: ['species', 'services']
         }
         

@@ -288,8 +288,12 @@ class AIService:
                 context += f"Duración: {data.get('duration', 'No especificado')}\n"
                 context += f"Urgencia Reportada: {data.get('urgency', 'No especificado')}\n"
             elif service_type == 'clinical':
-                context += f"Descripción: {data.get('description', 'No especificado')}\n"
-                context += f"Historia: {data.get('history', 'No especificado')}\n"
+                if data.get('patient_code'):
+                    context += f"Código de paciente: {data.get('patient_code', 'No especificado')}\n"
+                    context += f"Síntomas y duración: {data.get('symptoms_duration', 'No especificado')}\n"
+                else:
+                    context += f"Descripción: {data.get('description', 'No especificado')}\n"
+                    context += f"Historia: {data.get('history', 'No especificado')}\n"
             else:
                 context += f"Detalles: {str(data)}\n"
 

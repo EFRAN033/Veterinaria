@@ -112,7 +112,7 @@
                     Analizar
                   </button>
                   <button 
-                    @click="$router.push(`/veterinario/chat?petId=${request.pet_id}&petName=${request.pet_name || 'Paciente'}&requestId=${request.id}`)"
+                    @click="$router.push(`/veterinario/chat?petId=${petIdFromRequest(request) ?? ''}&petName=${encodeURIComponent(request.pet_name || 'Paciente')}&requestId=${request.id}`)"
                     class="text-slate-400 hover:text-[#02939E] p-1 rounded-none hover:bg-slate-100 transition-colors"
                     title="Abrir chat con IA"
                   >
@@ -366,6 +366,21 @@ const { addToast } = useToast();
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 
+/** El API guarda `pet_id` dentro de `service_data`, no en la raíz del DTO. */
+function petIdFromRequest(request) {
+  if (!request) return null;
+  const fromData = request.service_data?.pet_id;
+  if (fromData != null && fromData !== '') {
+    const n = Number(fromData);
+    return Number.isFinite(n) ? n : fromData;
+  }
+  if (request.pet_id != null && request.pet_id !== '') {
+    const n = Number(request.pet_id);
+    return Number.isFinite(n) ? n : request.pet_id;
+  }
+  return null;
+}
+
 const showScheduleModal = ref(false);
 const appointmentData = ref({
   date: null,
@@ -522,12 +537,14 @@ const confirmAppointment = async () => {
       'aesthetic': 4
     };
 
+    const petId = petIdFromRequest(selectedRequest.value);
     const payload = {
-      pet_id: selectedRequest.value.pet_id,
-      service_id: serviceTypeToId[selectedRequest.value.service_type] || 1, // Default to 1 if unknown
+      user_id: selectedRequest.value.user_id,
+      ...(petId != null ? { pet_id: petId } : {}),
+      service_id: serviceTypeToId[selectedRequest.value.service_type] || 1,
       appointment_date: appointmentData.value.date.toISOString().split('T')[0],
       appointment_time: appointmentData.value.isUrgent ? '08:00:00' : (timeMap[appointmentData.value.timeSlot] || '10:00:00'),
-      notes: scheduleNotes.value
+      notes: scheduleNotes.value || undefined
     };
 
     await axios.post(`${import.meta.env.VITE_API_URL}/v1/appointments/`, payload, {
@@ -549,7 +566,8 @@ const confirmAppointment = async () => {
 
   } catch (err) {
     console.error('Error scheduling:', err);
-    addToast('Error al agendar la cita', 'error');
+    const d = err.response?.data?.detail;
+    addToast(typeof d === 'string' && d ? d : 'Error al agendar la cita', 'error');
   } finally {
     scheduling.value = false;
   }
@@ -559,7 +577,7 @@ const getServiceTypeName = (type) => {
   const names = {
     consultation: 'Consulta',
     general: 'General',
-    clinical: 'Clínico',
+    clinical: 'Seguimiento',
     aesthetic: 'Estética'
   };
   return names[type] || type;

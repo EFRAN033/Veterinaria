@@ -58,7 +58,7 @@
                   <div>
                     <div class="flex items-center gap-3 mb-1">
                       <h3 class="app-type-panel-heading group-hover:text-[#1BB0B9] transition-colors">
-                        {{ appointment.service_name || 'Consulta General' }}
+                        {{ appointment.service_name }}
                       </h3>
                       <span :class="getStatusClass(appointment.status)" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                         {{ getStatusLabel(appointment.status) }}
@@ -149,10 +149,30 @@ const getStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-700';
 };
 
+const SERVICE_LABELS = {
+  1: 'Consulta veterinaria',
+  2: 'Servicios generales',
+  3: 'Seguimiento',
+  4: 'Estética y spa'
+};
+
+function normalizeAppointment(a) {
+  const d = a.appointment_date;
+  const t = a.appointment_time;
+  const timeStr = typeof t === 'string' ? t.substring(0, 8) : t ? String(t).substring(0, 8) : '';
+  return {
+    ...a,
+    date: d,
+    time: timeStr,
+    service_name: SERVICE_LABELS[a.service_id] || 'Consulta'
+  };
+}
+
 onMounted(async () => {
   try {
     loading.value = true;
-    appointments.value = await userStore.fetchAppointments();
+    const raw = await userStore.fetchAppointments();
+    appointments.value = Array.isArray(raw) ? raw.map(normalizeAppointment) : [];
   } catch (e) {
     error.value = 'No se pudieron cargar tus citas. Por favor, intenta de nuevo.';
     console.error(e);

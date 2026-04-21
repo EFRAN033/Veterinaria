@@ -6,7 +6,7 @@
         Análisis
       </h2>
       <p class="text-sm text-slate-500 mt-1">
-        Métricas de citas con filtros por especie y sexo. Los datos respetan el rango de meses seleccionado.
+        Métricas de citas con filtros por especie y género. Los datos respetan el rango de meses seleccionado.
       </p>
     </div>
 
@@ -23,7 +23,7 @@
         </select>
       </div>
       <div>
-        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Sexo</label>
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Género</label>
         <select
           v-model="filters.sex"
           class="border border-slate-200 rounded-none px-3 py-2 text-sm min-w-[140px] focus:border-[#02939E] focus:ring-1 focus:ring-[#02939E]/30"

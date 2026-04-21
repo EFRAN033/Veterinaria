@@ -81,7 +81,7 @@
                 Mis mascotas
               </h3>
               <p class="text-sm text-gray-500 mb-6 pl-4 border-l-2 border-gray-100">
-                Registra o actualiza el sexo de tus mascotas para un mejor seguimiento clínico.
+                Registra o actualiza el género de tus mascotas para un mejor seguimiento clínico.
               </p>
 
               <div v-if="petsLoading" class="pl-4 text-sm text-gray-400">Cargando mascotas…</div>
@@ -100,7 +100,7 @@
                       v-model="petGenderEdits[pet.id]"
                       class="text-sm border border-gray-200 px-3 py-2 rounded-none min-w-[140px] focus:border-[#1BB0B9] focus:outline-none"
                     >
-                      <option value="">Sin indicar</option>
+                      <option value="">Selecciona género</option>
                       <option value="Macho">Macho</option>
                       <option value="Hembra">Hembra</option>
                     </select>
@@ -135,8 +135,9 @@
                     <select
                       v-model="newPet.gender"
                       class="text-sm border border-gray-200 px-3 py-2 rounded-none focus:border-[#1BB0B9] focus:outline-none"
+                      aria-label="Género"
                     >
-                      <option value="">Sexo</option>
+                      <option value="">Género</option>
                       <option value="Macho">Macho</option>
                       <option value="Hembra">Hembra</option>
                     </select>

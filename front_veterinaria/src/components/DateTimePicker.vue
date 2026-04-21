@@ -52,8 +52,12 @@
 
       <!-- Time Selection & Urgency -->
       <div class="space-y-8">
-        <!-- Urgency Toggle -->
-        <div class="bg-[#FFF8F6] border border-[#FFDDD6] rounded-none p-4 flex items-start gap-4 cursor-pointer hover:bg-[#FFF0EB] transition-colors" @click="toggleUrgency">
+        <!-- Urgency Toggle (oculto en flujos como Seguimiento/clinical) -->
+        <div
+          v-if="!hideUrgencyOption"
+          class="bg-[#FFF8F6] border border-[#FFDDD6] rounded-none p-4 flex items-start gap-4 cursor-pointer hover:bg-[#FFF0EB] transition-colors"
+          @click="toggleUrgency"
+        >
           <div class="bg-white p-2 rounded-none text-[#FF6B6B] shadow-sm shrink-0">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
@@ -72,7 +76,7 @@
         </div>
 
         <!-- Time Slots -->
-        <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': modelValue.isUrgent }">
+        <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': modelValue.isUrgent && !hideUrgencyOption }">
           <h4 class="font-bold text-gray-900 flex items-center gap-2">
             <svg class="w-5 h-5 text-[#02939E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Horarios Disponibles
@@ -114,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { SunIcon, MoonIcon, CloudIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -130,6 +134,11 @@ const props = defineProps({
   takenSlots: {
     type: Array,
     default: () => []
+  },
+  /** Si es true, no se muestra la opción «Lo antes posible» y no aplica urgencia (ej. Seguimiento). */
+  hideUrgencyOption: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -230,6 +239,19 @@ const toggleUrgency = () => {
     timeSlot: newValue ? '' : props.modelValue.timeSlot
   });
 };
+
+watch(
+  () => props.hideUrgencyOption,
+  (hide) => {
+    if (hide && props.modelValue.isUrgent) {
+      emit('update:modelValue', {
+        ...props.modelValue,
+        isUrgent: false
+      });
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   if (!props.modelValue.date) {

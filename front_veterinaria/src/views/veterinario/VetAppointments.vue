@@ -171,10 +171,10 @@
                     <button 
                       v-if="normStatus(app.status) !== 'cancelled'"
                       @click="updateStatus(app.id, 'cancelled')"
-                      class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      class="p-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                       title="Marcar como finalizada"
                     >
-                      <XMarkIcon class="h-5 w-5" />
+                      <DocumentTextIcon class="h-5 w-5" />
                     </button>
                   </div>
                 </td>
@@ -204,7 +204,7 @@ import {
   InboxIcon,
   UserIcon,
   CheckIcon,
-  XMarkIcon,
+  DocumentTextIcon,
   FunnelIcon,
   CheckBadgeIcon,
   ExclamationCircleIcon
@@ -221,7 +221,7 @@ const filters = [
   { id: 'all', label: 'Todas', icon: FunnelIcon },
   { id: 'pending', label: 'Pendientes', icon: ExclamationCircleIcon },
   { id: 'confirmed', label: 'Confirmadas', icon: CheckBadgeIcon },
-  { id: 'cancelled', label: 'Finalizadas', icon: XMarkIcon },
+  { id: 'cancelled', label: 'Finalizadas', icon: DocumentTextIcon },
 ];
 
 /** Alinea con el backend (pending, confirmed, cancelled); tolera mayúsculas/espacios. */

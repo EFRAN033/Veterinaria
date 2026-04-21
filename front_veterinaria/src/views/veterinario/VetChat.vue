@@ -372,8 +372,18 @@ import ChatAvatar from '@/components/ChatAvatar.vue';
 import ClinicalInsights from '@/components/ClinicalInsights.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
 import { useToast } from '@/composables/useToast';
+import { formatLocalDateOnly } from '@/utils/formatLocalDateOnly';
 
 const { addToast } = useToast();
+
+function appointmentErrorMessage(err) {
+  const d = err?.response?.data?.detail;
+  if (typeof d === 'string' && d) return d;
+  if (Array.isArray(d) && d.length) {
+    return d.map((e) => (e && typeof e.msg === 'string' ? e.msg : null)).filter(Boolean).join(' ') || '';
+  }
+  return '';
+}
 
 const messages = ref([
   { role: 'assistant', content: '¡Hola Dr.! Soy tu asistente veterinario. Puedo ayudarte a analizar síntomas, revisar dosis o buscar información clínica. ¿Por dónde empezamos?' }
@@ -765,7 +775,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
   }
   
   try {
-    const dateStr = newDate.toISOString().split('T')[0];
+    const dateStr = formatLocalDateOnly(newDate);
     const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
@@ -815,7 +825,7 @@ const confirmAppointment = async () => {
       pet_id: currentPetId.value,
       user_id: currentUserId.value, 
       service_id: 1,
-      appointment_date: appointmentData.value.date.toISOString().split('T')[0],
+      appointment_date: formatLocalDateOnly(appointmentData.value.date),
       appointment_time: appointmentData.value.isUrgent ? '08:00:00' : (timeMap[appointmentData.value.timeSlot] || '10:00:00'),
       notes: scheduleNotes.value
     };
@@ -832,7 +842,8 @@ const confirmAppointment = async () => {
 
   } catch (err) {
     console.error('Error scheduling appointment:', err);
-    addToast('Error al agendar la cita', 'error');
+    const msg = appointmentErrorMessage(err);
+    addToast(msg || 'Error al agendar la cita', 'error');
   } finally {
     loading.value = false;
   }
@@ -840,7 +851,8 @@ const confirmAppointment = async () => {
 
 onMounted(async () => {
   if (route.query.petId) {
-    currentPetId.value = route.query.petId;
+    const pid = Number(route.query.petId);
+    currentPetId.value = Number.isFinite(pid) ? pid : route.query.petId;
     const petName = route.query.petName || 'el paciente';
     messages.value.push({
       role: 'assistant',
@@ -851,6 +863,9 @@ onMounted(async () => {
       try {
         const req = await getRequestById(route.query.requestId);
         if (req) {
+          if (req.user_id) {
+            currentUserId.value = req.user_id;
+          }
 
           const foundPetId = req.pet_id || (req.service_data && req.service_data.pet_id);
           

@@ -3,7 +3,7 @@ Router de citas refactorizado con arquitectura limpia
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.core.database import get_db
 from app.application.services.appointment_service import AppointmentService
 from app.application.dtos.appointment_dto import (
@@ -17,6 +17,12 @@ from app.infrastructure.database.models.user import User
 from app.core.exceptions import NotFoundException, BusinessRuleException
 
 router = APIRouter()
+
+
+def _can_view_all_appointments(role: Optional[str]) -> bool:
+    """Veterinario y admin gestionan la agenda global; el rol se normaliza por datos legacy."""
+    normalized = (role or "").strip().lower()
+    return normalized in ("veterinario", "admin")
 
 
 @router.get("/history", response_model=List[AppointmentDTO])
@@ -80,20 +86,20 @@ async def get_vet_appointment_history(
 @router.get("/all", response_model=List[AppointmentDTO])
 async def get_all_appointments(
     skip: int = 0,
-    limit: int = 100,
+    limit: int = Query(500, ge=1, le=2000),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
     Obtener todas las citas.
-    - Veterinarios: ven todas las citas del sistema.
+    - Veterinarios y administradores: ven todas las citas del sistema.
     - Usuarios: ven solo sus propias citas.
     """
     appointment_service = AppointmentService(db)
-    
-    if current_user.role == "veterinario":
+
+    if _can_view_all_appointments(getattr(current_user, "role", None)):
         return appointment_service.get_all_appointments(skip=skip, limit=limit)
-    
+
     return appointment_service.get_by_user(current_user.id, skip=skip, limit=limit)
 
 

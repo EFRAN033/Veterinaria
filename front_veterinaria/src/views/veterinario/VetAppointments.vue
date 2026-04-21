@@ -160,7 +160,7 @@
                 <td class="py-4 px-6 text-right">
                   <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
-                      v-if="app.status === 'pending'"
+                      v-if="normStatus(app.status) === 'pending'"
                       @click="updateStatus(app.id, 'confirmed')"
                       class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                       title="Confirmar"
@@ -169,7 +169,7 @@
                     </button>
                     
                     <button 
-                      v-if="app.status !== 'cancelled'"
+                      v-if="normStatus(app.status) !== 'cancelled'"
                       @click="updateStatus(app.id, 'cancelled')"
                       class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                       title="Cancelar"
@@ -195,11 +195,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
-import { getApiBaseUrl } from '@/config/publicUrl';
-
-const apiOrigin = getApiBaseUrl();
+import apiClient from '@/axios';
 import { useToast } from '@/composables/useToast';
 import { 
   CalendarDaysIcon, 
@@ -219,7 +215,6 @@ const loading = ref(true);
 const searchQuery = ref('');
 const activeFilter = ref('all');
 const dateFilter = ref('');
-const userStore = useUserStore();
 const { addToast } = useToast();
 
 const filters = [
@@ -229,9 +224,12 @@ const filters = [
   { id: 'cancelled', label: 'Canceladas', icon: XMarkIcon },
 ];
 
+/** Alinea con el backend (pending, confirmed, cancelled); tolera mayúsculas/espacios. */
+const normStatus = (s) => String(s ?? '').trim().toLowerCase();
+
 const getCount = (status) => {
   if (status === 'all') return appointments.value.length;
-  return appointments.value.filter(a => a.status === status).length;
+  return appointments.value.filter((a) => normStatus(a.status) === status).length;
 };
 
 const getDayName = (dateStr) => {
@@ -253,27 +251,30 @@ const getStatusLabel = (status) => {
   const labels = {
     pending: 'Pendiente',
     confirmed: 'Confirmada',
-    cancelled: 'Cancelada'
+    cancelled: 'Cancelada',
+    completed: 'Completada'
   };
-  return labels[status] || status;
+  return labels[normStatus(status)] || status;
 };
 
 const getStatusClass = (status) => {
   const classes = {
     pending: 'bg-amber-50 text-amber-700 border-amber-100',
     confirmed: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    cancelled: 'bg-rose-50 text-rose-700 border-rose-100'
+    cancelled: 'bg-rose-50 text-rose-700 border-rose-100',
+    completed: 'bg-slate-50 text-slate-700 border-slate-200'
   };
-  return classes[status] || 'bg-slate-50 text-slate-700';
+  return classes[normStatus(status)] || 'bg-slate-50 text-slate-700';
 };
 
 const getStatusDotClass = (status) => {
   const classes = {
     pending: 'bg-amber-500',
     confirmed: 'bg-emerald-500',
-    cancelled: 'bg-rose-500'
+    cancelled: 'bg-rose-500',
+    completed: 'bg-slate-500'
   };
-  return classes[status] || 'bg-slate-500';
+  return classes[normStatus(status)] || 'bg-slate-500';
 };
 
 const filteredAppointments = computed(() => {
@@ -281,7 +282,7 @@ const filteredAppointments = computed(() => {
 
   // Status Filter
   if (activeFilter.value !== 'all') {
-    list = list.filter(app => app.status === activeFilter.value);
+    list = list.filter((app) => normStatus(app.status) === activeFilter.value);
   }
 
   // Date Filter
@@ -317,10 +318,10 @@ const clearFilters = () => {
 const fetchAppointments = async () => {
   loading.value = true;
   try {
-    const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
-      headers: { Authorization: `Bearer ${userStore.token}` }
+    const response = await apiClient.get('/v1/appointments/all', {
+      params: { limit: 1000 }
     });
-    appointments.value = response.data;
+    appointments.value = Array.isArray(response.data) ? response.data : [];
   } catch (err) {
     console.error('Error fetching appointments:', err);
     addToast('Error al cargar las citas', 'error');
@@ -333,10 +334,7 @@ const updateStatus = async (id, status) => {
   if (status === 'cancelled' && !confirm(`¿Estás seguro de cancelar la cita #${id}?`)) return;
 
   try {
-    await axios.patch(`${apiOrigin}/v1/appointments/${id}/status`, 
-      { status },
-      { headers: { Authorization: `Bearer ${userStore.token}` } }
-    );
+    await apiClient.patch(`/v1/appointments/${id}/status`, { status });
     
     // Update local state
     const appIndex = appointments.value.findIndex(a => a.id === id);

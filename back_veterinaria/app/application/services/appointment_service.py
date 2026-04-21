@@ -19,6 +19,11 @@ from app.infrastructure.database.models.appointment import Appointment
 from app.core.exceptions import NotFoundException, ValidationException, BusinessRuleException
 
 
+def _is_staff_schedule_role(role: Optional[str]) -> bool:
+    """Veterinario o admin pueden gestionar la agenda de cualquier usuario."""
+    return (role or "").strip().lower() in ("veterinario", "admin")
+
+
 class AppointmentService:
     """Servicio de gestión de citas"""
     
@@ -112,9 +117,9 @@ class AppointmentService:
         from app.infrastructure.database.models.user import User
 
         user = self.db.query(User).filter(User.id == user_id).first()
-        is_vet = user.role == "veterinario" if user else False
+        is_staff = _is_staff_schedule_role(user.role) if user else False
 
-        if appointment.user_id != user_id and not is_vet:
+        if appointment.user_id != user_id and not is_staff:
             raise BusinessRuleException("No tienes permiso para ver esta cita")
 
         return appointment_to_dto(appointment)
@@ -163,9 +168,9 @@ class AppointmentService:
         
         from app.infrastructure.database.models.user import User
         user = self.db.query(User).filter(User.id == user_id).first()
-        is_vet = user.role == "veterinario" if user else False
+        is_staff = _is_staff_schedule_role(user.role) if user else False
 
-        if appointment.user_id != user_id and not is_vet:
+        if appointment.user_id != user_id and not is_staff:
             raise BusinessRuleException("No tienes permiso para modificar esta cita")
         
         if (appointment_data.appointment_date or appointment_data.appointment_time):
@@ -199,8 +204,8 @@ class AppointmentService:
         from app.infrastructure.database.models.user import User
 
         user = self.db.query(User).filter(User.id == user_id).first()
-        if not user or user.role != "veterinario":
-            raise BusinessRuleException("Solo los veterinarios pueden editar el registro clínico")
+        if not user or not _is_staff_schedule_role(user.role):
+            raise BusinessRuleException("Solo el personal autorizado puede editar el registro clínico")
 
         appointment = self.appointment_repo.get_by_id(appointment_id)
         if not appointment:
@@ -223,9 +228,9 @@ class AppointmentService:
         
         from app.infrastructure.database.models.user import User
         user = self.db.query(User).filter(User.id == user_id).first()
-        is_vet = user.role == "veterinario" if user else False
+        is_staff = _is_staff_schedule_role(user.role) if user else False
 
-        if appointment.user_id != user_id and not is_vet:
+        if appointment.user_id != user_id and not is_staff:
             raise BusinessRuleException("No tienes permiso para cancelar esta cita")
         
         appointment.status = "cancelled"

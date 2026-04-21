@@ -345,6 +345,7 @@ import DateTimePicker from '@/components/DateTimePicker.vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { getApiBaseUrl, getBackendBaseUrl } from '@/config/publicUrl';
+import { formatLocalDateOnly } from '@/utils/formatLocalDateOnly';
 import { 
   CheckCircleIcon, 
   XCircleIcon, 
@@ -401,7 +402,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
   }
   
   try {
-    const dateStr = newDate.toISOString().split('T')[0];
+    const dateStr = formatLocalDateOnly(newDate);
     const userStore = useUserStore();
     const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
@@ -545,7 +546,7 @@ const confirmAppointment = async () => {
       user_id: selectedRequest.value.user_id,
       ...(petId != null ? { pet_id: petId } : {}),
       service_id: serviceTypeToId[selectedRequest.value.service_type] || 1,
-      appointment_date: appointmentData.value.date.toISOString().split('T')[0],
+      appointment_date: formatLocalDateOnly(appointmentData.value.date),
       appointment_time: appointmentData.value.isUrgent ? '08:00:00' : (timeMap[appointmentData.value.timeSlot] || '10:00:00'),
       notes: scheduleNotes.value || undefined
     };
@@ -570,7 +571,12 @@ const confirmAppointment = async () => {
   } catch (err) {
     console.error('Error scheduling:', err);
     const d = err.response?.data?.detail;
-    addToast(typeof d === 'string' && d ? d : 'Error al agendar la cita', 'error');
+    let msg = '';
+    if (typeof d === 'string' && d) msg = d;
+    else if (Array.isArray(d) && d.length) {
+      msg = d.map((e) => (e && typeof e.msg === 'string' ? e.msg : '')).filter(Boolean).join(' ');
+    }
+    addToast(msg || 'Error al agendar la cita', 'error');
   } finally {
     scheduling.value = false;
   }

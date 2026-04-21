@@ -167,6 +167,9 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+import { getApiBaseUrl } from '@/config/publicUrl';
+
+const apiOrigin = getApiBaseUrl();
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import ServiceRequestsList from '@/components/ServiceRequestsList.vue';
 import { 
@@ -229,7 +232,7 @@ const refreshData = async () => {
   loading.value = true;
   try {
     const [appsRes, reqsData] = await Promise.all([
-      axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+      axios.get(`${apiOrigin}/v1/appointments/all`, {
         headers: { Authorization: `Bearer ${userStore.token}` }
       }),
       getAllRequests()

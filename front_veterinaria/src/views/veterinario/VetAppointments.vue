@@ -197,6 +197,9 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+import { getApiBaseUrl } from '@/config/publicUrl';
+
+const apiOrigin = getApiBaseUrl();
 import { useToast } from '@/composables/useToast';
 import { 
   CalendarDaysIcon, 
@@ -314,7 +317,7 @@ const clearFilters = () => {
 const fetchAppointments = async () => {
   loading.value = true;
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+    const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     appointments.value = response.data;
@@ -330,7 +333,7 @@ const updateStatus = async (id, status) => {
   if (status === 'cancelled' && !confirm(`¿Estás seguro de cancelar la cita #${id}?`)) return;
 
   try {
-    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/appointments/${id}/status`, 
+    await axios.patch(`${apiOrigin}/v1/appointments/${id}/status`, 
       { status },
       { headers: { Authorization: `Bearer ${userStore.token}` } }
     );

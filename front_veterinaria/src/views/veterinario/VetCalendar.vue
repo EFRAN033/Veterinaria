@@ -216,6 +216,9 @@ import listPlugin from '@fullcalendar/list';
 import esLocale from '@fullcalendar/core/locales/es';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
+import { getApiBaseUrl } from '@/config/publicUrl';
+
+const apiOrigin = getApiBaseUrl();
 import { 
   CalendarDaysIcon, UserIcon, ClockIcon, TagIcon, 
   MagnifyingGlassIcon, FunnelIcon, CheckBadgeIcon, 
@@ -311,7 +314,7 @@ const filteredList = computed(() => {
 const fetchAppointments = async () => {
   try {
     const [appointmentsRes, requestsData] = await Promise.all([
-      axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, { headers: { Authorization: `Bearer ${userStore.token}` } }),
+      axios.get(`${apiOrigin}/v1/appointments/all`, { headers: { Authorization: `Bearer ${userStore.token}` } }),
       getAllRequests() 
     ]);
 

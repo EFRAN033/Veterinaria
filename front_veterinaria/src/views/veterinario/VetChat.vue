@@ -349,6 +349,7 @@
 import { ref, nextTick, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { getApiBaseUrl, getBackendBaseUrl } from '@/config/publicUrl';
 import { 
   PaperAirplaneIcon, 
   CpuChipIcon, 
@@ -386,7 +387,8 @@ const requests = ref([]);
 const { getAllRequests, getRequestById } = useServiceRequests();
 const { getPetsByUserId } = usePets();
 const userStore = useUserStore();
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const apiOrigin = getApiBaseUrl();
+const backendUrl = getBackendBaseUrl();
 const route = useRoute();
 
 // New state for AI enhancements
@@ -691,7 +693,7 @@ const sendMessage = async () => {
       image_data: selectedImage.value
     };
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/v1/ai/chat`, payload);
+    const response = await axios.post(`${apiOrigin}/v1/ai/chat`, payload);
     
     loading.value = false;
 
@@ -735,7 +737,7 @@ const generateReport = async () => {
       messages: messages.value,
       pet_id: currentPetId.value
     };
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/v1/ai/report`, payload);
+    const response = await axios.post(`${apiOrigin}/v1/ai/report`, payload);
     reportContent.value = response.data.report;
     showReportModal.value = true;
   } catch (err) {
@@ -764,7 +766,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
   
   try {
     const dateStr = newDate.toISOString().split('T')[0];
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+    const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     
@@ -818,7 +820,7 @@ const confirmAppointment = async () => {
       notes: scheduleNotes.value
     };
 
-    await axios.post(`${import.meta.env.VITE_API_URL}/v1/appointments/`, payload, {
+    await axios.post(`${apiOrigin}/v1/appointments/`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
 

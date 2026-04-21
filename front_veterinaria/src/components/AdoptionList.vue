@@ -112,6 +112,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import apiClient from '@/axios';
+import { getBackendBaseUrl } from '@/config/publicUrl';
 
 const categories = ['Todos', 'Perros', 'Gatos', 'Aves', 'Hámsters', 'Peces', 'Otro'];
 const selectedCategory = ref('Todos');
@@ -119,7 +120,7 @@ const showModal = ref(false);
 const selectedPet = ref(null);
 const pets = ref([]);
 const loading = ref(true);
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = getBackendBaseUrl();
 
 const openAdoptionModal = (pet) => {
   selectedPet.value = pet;

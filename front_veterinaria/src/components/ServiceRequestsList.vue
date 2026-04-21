@@ -342,6 +342,9 @@ import { useToast } from '@/composables/useToast';
 import { useServiceRequests } from '@/composables/useServiceRequests';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import DateTimePicker from '@/components/DateTimePicker.vue';
+import axios from 'axios';
+import { useUserStore } from '@/stores/user';
+import { getApiBaseUrl, getBackendBaseUrl } from '@/config/publicUrl';
 import { 
   CheckCircleIcon, 
   XCircleIcon, 
@@ -356,15 +359,15 @@ import {
   XMarkIcon
 } from '@heroicons/vue/24/outline';
 
+const apiOrigin = getApiBaseUrl();
+const backendUrl = getBackendBaseUrl();
+
 const { getAllRequests, updateRequest, loading, error } = useServiceRequests();
 const router = useRouter();
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const requests = ref([]);
 const selectedRequest = ref(null);
 const analyzing = ref(false);
 const { addToast } = useToast();
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
 
 /** El API guarda `pet_id` dentro de `service_data`, no en la raíz del DTO. */
 function petIdFromRequest(request) {
@@ -400,7 +403,7 @@ watch(() => appointmentData.value.date, async (newDate) => {
   try {
     const dateStr = newDate.toISOString().split('T')[0];
     const userStore = useUserStore();
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/v1/appointments/all`, {
+    const response = await axios.get(`${apiOrigin}/v1/appointments/all`, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
     
@@ -448,7 +451,7 @@ const analyzeRequest = async (request) => {
     const userStore = useUserStore();
     try {
         const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/v1/service-requests/${request.id}/analyze`,
+            `${apiOrigin}/v1/service-requests/${request.id}/analyze`,
             {},
             { headers: { Authorization: `Bearer ${userStore.token}` } }
         );
@@ -499,7 +502,7 @@ const updateStatus = async (request, newStatus) => {
     
     // Call API to update status
     const userStore = useUserStore();
-    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/service-requests/${request.id}`, 
+    await axios.patch(`${apiOrigin}/v1/service-requests/${request.id}`, 
       { status: newStatus },
       { headers: { Authorization: `Bearer ${userStore.token}` } }
     );
@@ -547,14 +550,14 @@ const confirmAppointment = async () => {
       notes: scheduleNotes.value || undefined
     };
 
-    await axios.post(`${import.meta.env.VITE_API_URL}/v1/appointments/`, payload, {
+    await axios.post(`${apiOrigin}/v1/appointments/`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` }
     });
 
     // 2. Update Request Status to 'scheduled' (or 'completed'/'reviewed' depending on workflow)
     // We'll use 'reviewed' as per current flow, or maybe 'scheduled' if backend supports it.
     // Let's stick to 'reviewed' as the "Done" state for requests for now, or 'completed'.
-    await axios.patch(`${import.meta.env.VITE_API_URL}/v1/service-requests/${selectedRequest.value.id}`, 
+    await axios.patch(`${apiOrigin}/v1/service-requests/${selectedRequest.value.id}`, 
       { status: 'completed' }, // Mark as completed since it's now an appointment
       { headers: { Authorization: `Bearer ${userStore.token}` } }
     );
